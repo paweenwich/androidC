@@ -1,0 +1,178 @@
+$#include <unistd.h>
+$#include "../util/logger.h"
+$#include "MonoHooker.hpp"
+$#include "MonoEval.hpp"
+
+$void ServerLog(char *str);
+$extern Logger *logger;
+$extern MonoEval *monoEval;
+$extern bool flgLogMonoRuntimeInvoke;
+$extern bool flgLoadAssemblySuccess;
+
+class MonoAssembly {};
+class MonoDomain {};
+class MonoImage {};
+class MonoAssemblyName {};
+
+class MonoClass {};
+class MonoClassField {};
+class MonoVTable {};
+class MonoThreadsSync {};
+class MonoProperty {};
+class MonoMethod {};
+
+struct MonoObject {
+	MonoVTable *vtable;
+	MonoThreadsSync *synchronisation;
+};
+
+struct MonoString {
+	MonoObject object;
+	long length;
+	short chars[0];
+};
+
+
+char* mono_class_get_name(unsigned int monoClass);
+
+char* mono_class_get_namespace(unsigned int monoClass);
+
+char* mono_method_get_name(unsigned int monoMethod);
+
+unsigned int mono_method_get_class(unsigned int monoMethod);
+
+MonoDomain * mono_domain_get();
+
+MonoImage * mono_image_open_from_data(unsigned char *data,int size,int num,int *status);
+
+MonoAssembly * mono_domain_assembly_open(MonoDomain *domain, const char *assemblyName);
+
+MonoDomain * mono_get_root_domain();
+
+void mono_thread_attach(MonoDomain *domain);
+
+MonoAssembly* mono_assembly_load_from_full(MonoImage *image, const char *fname,int *status,int readonly);
+
+MonoImage* mono_assembly_get_image(MonoAssembly *assembly);
+
+MonoClass* mono_class_from_name(MonoImage *image, const char* name_space, const char *name);
+
+MonoMethod* mono_class_get_method_from_name(MonoClass *klass, const char *name, int param_count);
+
+void* mono_runtime_invoke(MonoMethod *method, MonoObject *obj, unsigned int params, unsigned int exc);
+
+void  mono_assembly_foreach(unsigned int func, void* user_data);
+
+MonoAssemblyName* mono_assembly_get_name(unsigned int assembly);
+
+char* mono_stringify_assembly_name(MonoAssemblyName *aname);
+
+int mono_image_get_table_rows(MonoImage *image, int table_id);
+
+MonoClass* mono_class_get(MonoImage *image, uint32_t type_token);
+
+MonoClassField* mono_class_get_fields (MonoClass* klass, unsigned int *iter);
+
+char * mono_field_get_name(MonoClassField *field);
+
+void mono_field_static_set_value(MonoVTable *vt, MonoClassField *field, void *value);
+
+void mono_field_static_get_value(MonoVTable *vt, MonoClassField *field, void *value);
+
+MonoVTable * mono_class_vtable(MonoDomain *domain, MonoClass *klass);
+
+MonoString* mono_string_new(MonoDomain* domain,char* str);
+
+void mono_runtime_class_init(MonoVTable *vtable);
+
+char * mono_string_to_utf8(MonoString *s);
+
+MonoClassField * mono_class_get_field_from_name(MonoClass *klass,char *name);
+
+MonoObject* mono_property_get_value(MonoProperty *prop, void *obj, void **params, MonoObject **exc);
+void mono_property_set_value(MonoProperty *prop, void *obj, void **params, MonoObject **exc);
+
+MonoProperty* mono_class_get_property_from_name(MonoClass *klass, const char *name);
+MonoClass* mono_class_get_parent(MonoClass *klass);
+
+void mono_field_get_value(MonoObject *obj, MonoClassField *field, void *value);
+void mono_field_set_value(MonoObject *obj, MonoClassField *field, void *value);
+
+unsigned int MonoLoad();
+unsigned char* BackupTargetAddress(unsigned int targetAddr);
+void InjectJumpCode(unsigned int targetAddr,int jumpToAddr);
+unsigned int MonoHook(char *monoFunctionName,unsigned int monoHookFuncAddr);
+MonoAssembly * MonoLoadAssembly(const char* fileName);
+void MonoDumpImage(MonoImage *image);
+void MonoLoadAndInvokeAssembly(const char* fileName,const char* name_space,char *className,const char* methodName);
+void *LoadManagedLibrary(void *);
+void ThreadLoadManageLibrary();
+
+extern unsigned int libmonoHandle;
+extern unsigned int monoTextSize;
+extern unsigned int monoBaseAddr;
+
+
+class MonoEval
+{
+public:
+    MonoEval();
+    void eval(char *str);
+    void GetAllAssembly();
+    MonoClass * GetClassFromName(char *klassNameSpace,char *klassName);
+    MonoClassField * GetFieldFromName(MonoClass *klass,char *name);
+    void SetFieldBool(MonoClass *klass,MonoObject *obj,char *fieldName,bool value);
+    //void GetField(MonoClass *klass,MonoObject *obj,char *fieldName,bool &bValue);
+    bool GetFieldAsBool(MonoClass *klass,MonoObject *obj,char *fieldName);
+    void SetFieldInt(MonoClass *klass,MonoObject *obj,char *fieldName,int value);
+    //void GetField(MonoClass *klass,MonoObject *obj,char *fieldName,int &iValue);
+    int  GetFieldAsInt(MonoClass *klass,MonoObject *obj,char *fieldName);
+    void SetFieldString(MonoClass *klass,MonoObject *obj,char *fieldName,char *str);
+    //void GetField(MonoClass *klass,MonoObject *obj,char *fieldName,char *str);
+    char *GetFieldAsString(MonoClass *klass,MonoObject *obj,char *fieldName);
+    int GetPropertyAsInt(MonoClass *klass,MonoObject *obj,char *fieldName);
+    char *GetPropertyAsString(MonoClass *klass,MonoObject *obj,char *fieldName);
+    bool GetPropertyAsBool(MonoClass *klass,MonoObject *obj,char *fieldName);
+    void SetProperty(MonoClass *klass,MonoObject *obj,char *fieldName,int value);
+    void SetPropertyString(MonoClass *klass,MonoObject *obj,char *fieldName,char *str);
+    MonoObject* IntToMonoObject(int x);
+    void InvokeStatic(char *klassNameSpace,char *klassName,const char* methodName,char *param,bool flgQueue);
+    void attatch();
+};
+
+class RunTimeInvokeData 
+{
+public:
+    MonoMethod *method;
+    MonoObject *obj;
+    unsigned int params;
+    unsigned int exec;
+    RunTimeInvokeData();
+};
+
+class RunTimeInvokeQueue
+{
+public:
+    Mutex mutex;
+    RunTimeInvokeQueue();
+    void add(RunTimeInvokeData data);
+    int size();
+    RunTimeInvokeData pop();
+};
+extern RunTimeInvokeQueue *runTimeInvokeQueue;
+
+class Logger  {
+public:
+    void logStr(char *p);
+    void logHex(unsigned int,int len);
+    char *toHex(unsigned int,int len);
+};
+
+
+extern Logger *logger;
+extern MonoEval *monoEval;
+extern bool flgLogMonoRuntimeInvoke;
+extern bool flgLoadAssemblySuccess;
+
+void ServerLog(char *str);
+void sleep(int);

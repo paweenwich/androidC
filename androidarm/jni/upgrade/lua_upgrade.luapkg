@@ -1,0 +1,390 @@
+$#include <stdio.h>
+$#include <sys/ptrace.h>
+$#include <sys/wait.h>
+$#include <sys/types.h>
+$#include <sys/mman.h>
+$#include <unistd.h>
+$#include <stdlib.h>
+$#include <stdio.h>
+$#include <errno.h>
+$#include <assert.h>
+$#include <string.h>
+$#include <dlfcn.h>
+$#include <stdarg.h>
+$#include <string>
+$#include <vector>
+$#include <algorithm>
+$#include <dirent.h>
+$#include "../util/logger.h"
+$#include "../util/util.hpp"
+$#include "../util/payload.hpp"
+$#include "../util/ProcessScanner.hpp"
+$#include "../luac/luascript.h"
+$#include "MonoObjectIndex.hpp"
+$#include "lua_upgrade.hpp"
+$#include "shell.hpp"
+$#include "upgrade.hpp"
+
+struct HeroData {
+    unsigned int creatureId;
+    char *title;
+    char *name; 
+    unsigned int combatType;
+    unsigned int baseHp;
+};
+
+struct _CreatureData {
+    unsigned int creatureId;
+    unsigned int combatType;
+    unsigned int baseHp;
+    unsigned int hpf;
+    unsigned int baseMp;
+    float mpf;
+    float baseMpRegen;
+    float mprf;
+    unsigned int baseAttackPoint;
+    float apf;
+    unsigned int movePoint;
+    float baseDr;
+    float drf;
+    float baseCr;
+    float crf;
+    float baseDgr;
+    float dgrf;
+    float baseHr;
+    float hrf;
+    float baseCar;
+    float carf;
+    float baseCadr;
+    float cadrf;
+    float mastery;
+    int skill0;
+    int skill1;
+    int skill2;
+    int skill3;
+    int skill4;
+//    int levelType;
+//    int creatureType;
+//    int moveType0;
+//    int moveType1;
+//    int moveType2;
+};
+
+struct MonsterData {
+    int monsterId;
+    int creatureid;
+    int cognitionRange;
+    int boss;
+    int level;
+    float hpRate;
+    float apRate;
+    int hp;
+    int mp;
+    int ap;
+    float dr;
+    float cr;
+    float dodge;
+    float hr;
+    float car;
+    float cadr;
+    int movePoint;
+    int skill0Lv;
+    int skill1Lv;
+    int skill2Lv;
+    int passiveLv;
+    int tribalism;
+    float moveSpeed;
+};
+
+
+struct CreatureData {
+    int creatureId;
+    int combatType;
+    int baseHp;
+    int hpf;
+    int baseMp;
+    float mpf;
+    float baseMpRegen;
+    float mprf;
+    int baseAttackPoint;
+    float apf;
+    int movePoint;
+    float baseDr;
+    float drf;
+    float baseCr;
+    float crf;
+    float baseDgr;
+    float dgrf;
+    float baseHr;
+    float hrf;
+    float baseCar;
+    float carf;
+    float baseCadr;
+    float cadrf;
+    float mastery;
+    int skill0;
+    int skill1;
+    int skill2;
+    int skill3;
+    int skill4;
+    int levelType;
+    int creatureType;
+    int moveType0;
+    int moveType1;
+    int moveType2;
+    char *name;
+    char *graphicPrefeb;
+    char *creatureIcon;
+    char *description;
+};
+
+class LuaShell
+{
+public:
+    ProcessScanner pscan;
+};
+
+
+struct MonoClass {
+    /* element class for arrays and enum basetype for enums */
+    MonoClass *element_class;
+    /* used for subtype checks */
+    MonoClass *cast_class;
+
+    /* for fast subtype checks */
+    //MonoClass **supertypes;
+    guint16     idepth;
+
+    /* array dimension */
+    guint8     rank;
+
+    int        instance_size; /* object instance size */
+
+    //int		bitfield;
+    guint8     exception_type;	/* MONO_EXCEPTION_* */
+
+    /* Additional information about the exception */
+    /* Stored as property MONO_CLASS_PROP_EXCEPTION_DATA */
+    //void       *exception_data;
+
+    MonoClass  *parent;
+    MonoClass  *nested_in;
+
+    MonoImage *image;
+    const char *name;
+    const char *name_space;
+
+    guint32    type_token;
+    int        vtable_size; /* number of slots */
+
+    guint16     interface_count;
+    guint16     interface_id;        /* unique inderface id (for interfaces) */
+    guint16     max_interface_id;
+
+    guint16     interface_offsets_count;
+    //MonoClass **interfaces_packed;
+    guint16    *interface_offsets_packed;
+    guint8     *interface_bitmap;
+
+    //MonoClass **interfaces;
+
+    //int	    sizes;
+
+    /*
+    * From the TypeDef table
+    */
+    guint32    flags;
+    //int	    field_first;
+    //int	    field_count;
+    //int	    method_first;
+    //int	    method_count;
+
+    /* loaded on demand */
+    MonoMarshalType *marshal_info;
+
+    /*
+    * Field information: Type and location from object base
+    */
+    MonoClassField *fields;
+
+    //MonoMethod **methods;
+
+    /* used as the type of the this argument and when passing the arg by value */
+    MonoType this_arg;
+    MonoType byval_arg;
+
+    MonoGenericClass *generic_class;
+    MonoGenericContainer *generic_container;
+
+    void *reflection_info;
+
+    void *gc_descr;
+
+    MonoClassRuntimeInfo *runtime_info;
+
+    /* next element in the class_cache hash list (in MonoImage) */
+    //MonoClass *next_class_cache;
+    unsigned int next_class_cache;
+
+    /* Generic vtable. Initialized by a call to mono_class_setup_vtable () */
+    //MonoMethod **vtable;
+
+    /* Rarely used fields of classes */
+    MonoClassExt *ext;
+};
+
+struct MonoVTable {
+    MonoClass  *klass;
+    /*
+    * According to comments in gc_gcj.h, this should be the second word in
+    * the vtable.
+    */
+    void *gc_descr;
+    MonoDomain *domain;  /* each object/vtable belongs to exactly one domain */
+    gpointer    data; /* to store static class data */
+    gpointer    type; /* System.Type type for klass */
+    guint8     *interface_bitmap;
+    guint16     max_interface_id;
+    guint8      rank;
+    //USE_UINT8_BIT_FIELD(guint, remote      : 1); /* class is remotely activated */
+    //USE_UINT8_BIT_FIELD(guint, initialized : 1); /* cctor has been run */
+    //USE_UINT8_BIT_FIELD(guint, init_failed : 1); /* cctor execution failed */
+    guint32     imt_collisions_bitmap;
+    MonoRuntimeGenericContext *runtime_generic_context;
+    /* do not add any fields after vtable, the structure is dynamically extended */
+    //gpointer    vtable[MONO_ZERO_LEN_ARRAY];
+};
+
+
+struct MonoObject {
+    MonoVTable *vtable;
+    MonoThreadsSync *synchronisation;
+};
+struct MonoString {
+    MonoObject object;
+    gint32 length;
+    gunichar2 chars[MONO_ZERO_LEN_ARRAY];
+};
+
+struct MonoArrayBounds {
+    mono_array_size_t length;
+    mono_array_lower_bound_t lower_bound;
+};
+
+struct MonoArray{
+    MonoObject obj;
+    /* bounds is NULL for szarrays */
+    MonoArrayBounds *bounds;
+    /* total number of elements of the array */
+    mono_array_size_t max_length;
+    unsigned int vector[MONO_ZERO_LEN_ARRAY];
+};
+
+struct MonoMethod {
+    guint16 flags;  /* method flags */
+    guint16 iflags; /* method implementation flags */
+    guint32 token;
+    MonoClass *klass;
+    MonoMethodSignature *signature;
+    /* name is useful mostly for debugging */
+    const char *name;
+    /* this is used by the inlining algorithm */
+
+    /*
+    * If is_generic is TRUE, the generic_container is stored in image->property_hash,
+    * using the key MONO_METHOD_PROP_GENERIC_CONTAINER.
+    */
+};
+
+class MonoArrayData: public MonoArray {
+public:
+    unsigned int get(int index);
+};
+
+class MonoClassData: public MonoClass {
+public:
+    unsigned int thisAddr;
+    void show(ProcessScanner &pscan);
+    bool isValid(ProcessScanner &pscan);
+};
+
+class MonoClassFieldData: public MonoClassField {
+public:    
+    unsigned int thisAddr;
+    void show(ProcessScanner &pscan);
+};
+
+class MonoTypeData: public MonoType
+{
+public:
+    unsigned int thisAddr;
+    void show(ProcessScanner &pscan);
+};
+
+class MonoVTableData: public MonoVTable
+{
+public:
+    unsigned int thisAddr;
+    void show(ProcessScanner &pscan);
+};
+
+class MonoMethodData: public MonoMethod
+{
+public:
+    unsigned int thisAddr;
+    void show(ProcessScanner &pscan);
+};
+
+
+class MonoObjectData: public MonoObject
+{
+public:
+    unsigned int thisAddr;
+    void show(ProcessScanner &pscan);
+    char *GetName(ProcessScanner& pscan);
+};
+
+class BattleManager: MonoObject{
+public:
+};
+
+class ProcessScanner {
+public:
+    char * readMonoString(unsigned int monoObjAddr);
+    unsigned int IntFromHex(char *hex);
+    char * readMonoClassName(unsigned int monoClassAddr);
+    
+    char * readCString(unsigned int monoClassAddr);
+    void MonoClassScan();
+    unsigned int MonoFindClass(char *className);
+    unsigned int MonoFindVtable(unsigned int classAddr);
+    unsigned int ReadInt(unsigned int targetAddr);
+    void MonoFindObject(unsigned int vTableAddr);
+    bool isDataAddress(unsigned int addr);
+    MonoClassData readMonoClass(unsigned int monoClassAddr);
+    MonoArrayData readMonoArray(unsigned int monoArrayAddr);
+    MonoClassFieldData readMonoClassField(unsigned int monoAddr);
+    MonoTypeData readMonoType(unsigned int monoAddr);
+    MonoVTableData readMonoVTable(unsigned int monoAddr);
+    MonoMethodData readMonoMethod(unsigned int monoAddr);
+    MonoObjectData readMonoObject(unsigned int monoAddr);
+    unsigned int GetStaticClassFieldInt(char *className,char *fieldName);
+    unsigned short GetStaticClassFieldShort(char *className,char *fieldName);
+    unsigned char GetStaticClassFieldByte(char *className,char *fieldName);
+    char *GetStaticClassFieldCString(char *className,char *fieldName);
+    unsigned int GetInstanceClassFieldInt(unsigned int objAddr,char *className,char *fieldName);
+    MonoVTableData GetClassVTable(char *className);
+};
+
+
+CreatureData *FindCreatureByID(int creatureID);
+struct HeroData * FindHeroByName(char *name);
+struct MonsterData monsters[10000000];
+struct HeroData heros[10000000];
+struct CreatureData creatures[10000000];
+_CreatureData paramCharacterData;
+bool flgShouldUpdate;
+unsigned int luaResultInt;
+LuaShell luaShell;
+char luaMonsterList[1024];
+BattleManager GetBattleManager(ProcessScanner &pscan);

@@ -1,0 +1,1 @@
+ls /proc/$1/task
