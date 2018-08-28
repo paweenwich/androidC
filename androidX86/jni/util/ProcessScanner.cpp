@@ -216,3 +216,69 @@ void ProcessScanner::dump(unsigned int targetAddr,int size)
     logger->logHex(buffer,size);
     free(buffer);
 }
+
+std::vector<ProcMapData> ProcessScanner::getHeap()
+{
+    std::vector<ProcMapData> ret;
+    for(int i=0;i<vProcMap.size();i++){
+	if(strcmp(vProcMap[i].desc,"[heap]")==0){
+	    ret.push_back(vProcMap[i]);
+	}
+    }
+    return ret;
+}
+
+bool ProcessScanner::buffToFile(unsigned int bufferAddr,int size,char *fileName)
+{
+    FILE *f = fopen(fileName,"wb");
+    if(f!=NULL){
+	int numWrite = fwrite((void *)bufferAddr,size,1,f);
+	fclose(f);
+	return numWrite > 0;
+    }
+    return false;
+}
+
+
+std::vector<SnapShotResult> SnapShotData::findInt32(unsigned int data)
+{
+    std::vector<SnapShotResult> ret;
+    unsigned int *iptr = (unsigned int *)buf;
+    for(int i=0;i<size/4;i++){
+	if(iptr[i] == data){
+	    SnapShotResult r;
+	    r.addr = startAddr + (i*4);
+	    memcpy(r.data,&iptr[i],sizeof(int));
+	    ret.push_back(r);
+	}
+    }
+    return ret;
+}
+
+std::vector<SnapShotResult> SnapShot::findInt32(unsigned int data)
+{
+    std::vector<SnapShotResult> ret;
+    for(int i=0;i<vData.size();i++){
+	std::vector<SnapShotResult> tmp = vData[i].findInt32(data);
+	ret.insert(ret.end(),tmp.begin(),tmp.end());
+    }
+    return ret;
+}
+
+std::vector<SnapShotResult> SnapShot::readFromFile(char *fileName)
+{
+    std::vector<SnapShotResult> ret;
+    FILE *f = fopen(fileName,"rb");
+    if(f!=NULL){
+	SnapShotResult data;
+	while(fread(&data,sizeof(SnapShotResult),1,f)>0){
+	    ret.push_back(data);
+	}
+	fclose(f);
+    }
+    return ret;
+}
+
+bool ascendingAddr(const SnapShotResult& guy1, const SnapShotResult& guy2) {
+  return guy1.addr < guy2.addr;
+}

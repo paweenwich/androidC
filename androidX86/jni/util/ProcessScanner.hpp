@@ -33,6 +33,30 @@ public:
     }
 };
 
+class SnapShotResult{
+public:
+    unsigned int addr;
+    unsigned char data[4];
+};
+
+bool ascendingAddr(const SnapShotResult& guy1, const SnapShotResult& guy2);
+
+class SnapShotData {
+public:
+    unsigned int startAddr;
+    unsigned int size;
+    void *buf;
+    //std::vector<unsigned int> findInt32(unsigned int);
+    std::vector<SnapShotResult> findInt32(unsigned int);
+};
+
+class SnapShot {
+public:
+    std::vector<SnapShotData> vData;
+    std::vector<SnapShotResult> findInt32(unsigned int);
+    static std::vector<SnapShotResult> readFromFile(char *fileName);
+};
+
 class ScanResult {
 public:
     unsigned int addr;
@@ -79,6 +103,8 @@ public:
     bool write(unsigned int targetAddr,int size,unsigned int bufferAddr);
     bool writeAll(std::vector<WriteData> &vData);
     void dump(unsigned int targetAddr,int size);
+    std::vector<ProcMapData> getHeap();
+    bool buffToFile(unsigned int bufferAddr,int size,char *fileName);
     static void memScan(unsigned int dataAddr,int dataSize,unsigned int memAddr,int memSize,std::vector<ScanResult> &result,int step);
 private:
 

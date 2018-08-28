@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <cctype>
 #include <android/log.h>
 #include "util.hpp"
 
@@ -383,6 +384,7 @@ int FindProcessByName(char *processName,char *filter)
     FILE *in;
     char cmd[1024];
     char buff[1024];
+    char username[64];
     sprintf(cmd,"ps | grep %s",processName);
     if(!(in = popen(cmd, "r"))){
 		exit(1);
@@ -396,8 +398,14 @@ int FindProcessByName(char *processName,char *filter)
         }
 	printf("FindProcessByName %s", buff);
         if(ret==0){
-            sscanf(buff,"%d",&ret);
-            //printf("Found pid=%d\n",ret);
+	    // if first one is digit then simple ps
+	    if(isdigit(buff[0])){
+		sscanf(buff,"%d",&ret);
+	    }else{
+		sscanf(buff,"%s %d",username,&ret);
+	    }
+            printf("FindProcessByName: Found pid=%d\n",ret);
+	    break;
         }
     }
     pclose(in);
