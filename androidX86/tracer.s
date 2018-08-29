@@ -12,7 +12,7 @@
 	.globl	_Z12Shell_dlopenv
 	.type	_Z12Shell_dlopenv, @function
 _Z12Shell_dlopenv:
-.LFB1611:
+.LFB1619:
 	.file 1 "jni/tracer/tracer.cpp"
 	.loc 1 325 0
 	.cfi_startproc
@@ -27,7 +27,7 @@ int $3
 #NO_APP
 	ret
 	.cfi_endproc
-.LFE1611:
+.LFE1619:
 	.size	_Z12Shell_dlopenv, .-_Z12Shell_dlopenv
 	.section	.text.unlikely._Z12Shell_dlopenv
 .LCOLDE1:
@@ -165,7 +165,7 @@ _ZNSsD2Ev:
 	.globl	_Z6Attachi
 	.type	_Z6Attachi, @function
 _Z6Attachi:
-.LFB1595:
+.LFB1603:
 	.loc 1 65 0
 	.cfi_startproc
 .LVL10:
@@ -234,7 +234,7 @@ _Z6Attachi:
 .LBE779:
 .LBE778:
 	.cfi_endproc
-.LFE1595:
+.LFE1603:
 	.size	_Z6Attachi, .-_Z6Attachi
 	.section	.text.unlikely._Z6Attachi
 .LCOLDE6:
@@ -251,7 +251,7 @@ _Z6Attachi:
 	.globl	_Z6Detachi
 	.type	_Z6Detachi, @function
 _Z6Detachi:
-.LFB1596:
+.LFB1604:
 	.loc 1 77 0 is_stmt 1
 	.cfi_startproc
 .LVL19:
@@ -313,7 +313,7 @@ _Z6Detachi:
 .LBE786:
 .LBE785:
 	.cfi_endproc
-.LFE1596:
+.LFE1604:
 	.size	_Z6Detachi, .-_Z6Detachi
 	.section	.text.unlikely._Z6Detachi
 .LCOLDE8:
@@ -330,7 +330,7 @@ _Z6Detachi:
 	.globl	_Z13TraceContinuei
 	.type	_Z13TraceContinuei, @function
 _Z13TraceContinuei:
-.LFB1597:
+.LFB1605:
 	.loc 1 88 0 is_stmt 1
 	.cfi_startproc
 .LVL27:
@@ -401,7 +401,7 @@ _Z13TraceContinuei:
 .LBE793:
 .LBE792:
 	.cfi_endproc
-.LFE1597:
+.LFE1605:
 	.size	_Z13TraceContinuei, .-_Z13TraceContinuei
 	.section	.text.unlikely._Z13TraceContinuei
 .LCOLDE10:
@@ -418,7 +418,7 @@ _Z13TraceContinuei:
 	.globl	_Z7GetRegsiP7pt_regs
 	.type	_Z7GetRegsiP7pt_regs, @function
 _Z7GetRegsiP7pt_regs:
-.LFB1598:
+.LFB1606:
 	.loc 1 99 0 is_stmt 1
 	.cfi_startproc
 .LVL37:
@@ -490,7 +490,7 @@ _Z7GetRegsiP7pt_regs:
 .LBE800:
 .LBE799:
 	.cfi_endproc
-.LFE1598:
+.LFE1606:
 	.size	_Z7GetRegsiP7pt_regs, .-_Z7GetRegsiP7pt_regs
 	.section	.text.unlikely._Z7GetRegsiP7pt_regs
 .LCOLDE12:
@@ -507,7 +507,7 @@ _Z7GetRegsiP7pt_regs:
 	.globl	_Z7SetRegsiP7pt_regs
 	.type	_Z7SetRegsiP7pt_regs, @function
 _Z7SetRegsiP7pt_regs:
-.LFB1599:
+.LFB1607:
 	.loc 1 110 0 is_stmt 1
 	.cfi_startproc
 .LVL47:
@@ -579,7 +579,7 @@ _Z7SetRegsiP7pt_regs:
 .LBE807:
 .LBE806:
 	.cfi_endproc
-.LFE1599:
+.LFE1607:
 	.size	_Z7SetRegsiP7pt_regs, .-_Z7SetRegsiP7pt_regs
 	.section	.text.unlikely._Z7SetRegsiP7pt_regs
 .LCOLDE14:
@@ -596,7 +596,7 @@ _Z7SetRegsiP7pt_regs:
 	.globl	_Z8PeekTextij
 	.type	_Z8PeekTextij, @function
 _Z8PeekTextij:
-.LFB1600:
+.LFB1608:
 	.loc 1 121 0 is_stmt 1
 	.cfi_startproc
 .LVL57:
@@ -681,7 +681,7 @@ _Z8PeekTextij:
 .LBE815:
 .LBE814:
 	.cfi_endproc
-.LFE1600:
+.LFE1608:
 	.size	_Z8PeekTextij, .-_Z8PeekTextij
 	.section	.text.unlikely._Z8PeekTextij
 .LCOLDE16:
@@ -698,7 +698,7 @@ _Z8PeekTextij:
 	.globl	_Z8PokeTextijj
 	.type	_Z8PokeTextijj, @function
 _Z8PokeTextijj:
-.LFB1601:
+.LFB1609:
 	.loc 1 135 0 is_stmt 1
 	.cfi_startproc
 .LVL68:
@@ -771,7 +771,7 @@ _Z8PokeTextijj:
 .LBE822:
 .LBE821:
 	.cfi_endproc
-.LFE1601:
+.LFE1609:
 	.size	_Z8PokeTextijj, .-_Z8PokeTextijj
 	.section	.text.unlikely._Z8PokeTextijj
 .LCOLDE18:
@@ -818,7 +818,7 @@ _Z8PokeTextijj:
 	.globl	_Z8ShowRegsP7pt_regs
 	.type	_Z8ShowRegsP7pt_regs, @function
 _Z8ShowRegsP7pt_regs:
-.LFB1602:
+.LFB1610:
 	.loc 1 146 0 is_stmt 1
 	.cfi_startproc
 .LVL78:
@@ -957,7 +957,7 @@ _Z8ShowRegsP7pt_regs:
 	.cfi_def_cfa_offset 4
 	ret
 	.cfi_endproc
-.LFE1602:
+.LFE1610:
 	.size	_Z8ShowRegsP7pt_regs, .-_Z8ShowRegsP7pt_regs
 	.section	.text.unlikely._Z8ShowRegsP7pt_regs
 .LCOLDE35:
@@ -975,7 +975,7 @@ _Z8ShowRegsP7pt_regs:
 	.globl	_Z17ReadProcessMemoryijPhj
 	.type	_Z17ReadProcessMemoryijPhj, @function
 _Z17ReadProcessMemoryijPhj:
-.LFB1603:
+.LFB1611:
 	.loc 1 169 0
 	.cfi_startproc
 .LVL95:
@@ -1093,7 +1093,7 @@ _Z17ReadProcessMemoryijPhj:
 	.cfi_def_cfa_offset 4
 	ret
 	.cfi_endproc
-.LFE1603:
+.LFE1611:
 	.size	_Z17ReadProcessMemoryijPhj, .-_Z17ReadProcessMemoryijPhj
 	.section	.text.unlikely._Z17ReadProcessMemoryijPhj
 .LCOLDE37:
@@ -1107,7 +1107,7 @@ _Z17ReadProcessMemoryijPhj:
 	.globl	_Z13wordAlignSizei
 	.type	_Z13wordAlignSizei, @function
 _Z13wordAlignSizei:
-.LFB1604:
+.LFB1612:
 	.loc 1 185 0
 	.cfi_startproc
 .LVL103:
@@ -1120,7 +1120,7 @@ _Z13wordAlignSizei:
 	.loc 1 187 0
 	ret
 	.cfi_endproc
-.LFE1604:
+.LFE1612:
 	.size	_Z13wordAlignSizei, .-_Z13wordAlignSizei
 	.section	.text.unlikely._Z13wordAlignSizei
 .LCOLDE38:
@@ -1134,7 +1134,7 @@ _Z13wordAlignSizei:
 	.globl	_Z18WriteProcessMemoryijPhj
 	.type	_Z18WriteProcessMemoryijPhj, @function
 _Z18WriteProcessMemoryijPhj:
-.LFB1605:
+.LFB1613:
 	.loc 1 189 0
 	.cfi_startproc
 .LVL104:
@@ -1293,7 +1293,7 @@ _Z18WriteProcessMemoryijPhj:
 .LVL120:
 	ret
 	.cfi_endproc
-.LFE1605:
+.LFE1613:
 	.size	_Z18WriteProcessMemoryijPhj, .-_Z18WriteProcessMemoryijPhj
 	.section	.text.unlikely._Z18WriteProcessMemoryijPhj
 .LCOLDE39:
@@ -1314,7 +1314,7 @@ _Z18WriteProcessMemoryijPhj:
 	.globl	_Z24AllocProcessMemoryStringiPKc
 	.type	_Z24AllocProcessMemoryStringiPKc, @function
 _Z24AllocProcessMemoryStringiPKc:
-.LFB1606:
+.LFB1614:
 	.loc 1 209 0
 	.cfi_startproc
 .LVL121:
@@ -1408,7 +1408,7 @@ _Z24AllocProcessMemoryStringiPKc:
 	.cfi_def_cfa_offset 4
 	ret
 	.cfi_endproc
-.LFE1606:
+.LFE1614:
 	.size	_Z24AllocProcessMemoryStringiPKc, .-_Z24AllocProcessMemoryStringiPKc
 	.section	.text.unlikely._Z24AllocProcessMemoryStringiPKc
 .LCOLDE42:
@@ -1435,7 +1435,7 @@ _Z24AllocProcessMemoryStringiPKc:
 	.globl	_Z15PrintAllAddressv
 	.type	_Z15PrintAllAddressv, @function
 _Z15PrintAllAddressv:
-.LFB1608:
+.LFB1616:
 	.loc 1 244 0
 	.cfi_startproc
 	pushl	%ebx
@@ -1501,7 +1501,7 @@ _Z15PrintAllAddressv:
 	.cfi_def_cfa_offset 4
 	ret
 	.cfi_endproc
-.LFE1608:
+.LFE1616:
 	.size	_Z15PrintAllAddressv, .-_Z15PrintAllAddressv
 	.section	.text.unlikely._Z15PrintAllAddressv
 .LCOLDE49:
@@ -1533,7 +1533,7 @@ _Z15PrintAllAddressv:
 	.globl	_Z16GetRemoteAddressi
 	.type	_Z16GetRemoteAddressi, @function
 _Z16GetRemoteAddressi:
-.LFB1607:
+.LFB1615:
 	.loc 1 218 0
 	.cfi_startproc
 .LVL138:
@@ -1677,7 +1677,7 @@ _Z16GetRemoteAddressi:
 	jmp	.L85
 .LBE836:
 	.cfi_endproc
-.LFE1607:
+.LFE1615:
 	.size	_Z16GetRemoteAddressi, .-_Z16GetRemoteAddressi
 	.section	.text.unlikely._Z16GetRemoteAddressi
 .LCOLDE56:
@@ -1694,7 +1694,7 @@ _Z16GetRemoteAddressi:
 	.globl	_Z4testiiii
 	.type	_Z4testiiii, @function
 _Z4testiiii:
-.LFB1609:
+.LFB1617:
 	.loc 1 255 0
 	.cfi_startproc
 .LVL155:
@@ -1764,7 +1764,7 @@ _Z4testiiii:
 	.cfi_def_cfa_offset 4
 	ret
 	.cfi_endproc
-.LFE1609:
+.LFE1617:
 	.size	_Z4testiiii, .-_Z4testiiii
 	.section	.text.unlikely._Z4testiiii
 .LCOLDE58:
@@ -1796,7 +1796,7 @@ _Z4testiiii:
 	.globl	_Z11waitForStopi
 	.type	_Z11waitForStopi, @function
 _Z11waitForStopi:
-.LFB1610:
+.LFB1618:
 	.loc 1 285 0
 	.cfi_startproc
 .LVL159:
@@ -1954,7 +1954,7 @@ _Z11waitForStopi:
 	call	__stack_chk_fail_local
 .LVL168:
 	.cfi_endproc
-.LFE1610:
+.LFE1618:
 	.size	_Z11waitForStopi, .-_Z11waitForStopi
 	.section	.text.unlikely._Z11waitForStopi
 .LCOLDE66:
@@ -2008,7 +2008,7 @@ _Z11waitForStopi:
 	.globl	_Z6injectiPc
 	.type	_Z6injectiPc, @function
 _Z6injectiPc:
-.LFB1612:
+.LFB1620:
 	.loc 1 342 0
 	.cfi_startproc
 .LVL169:
@@ -2442,7 +2442,7 @@ _Z6injectiPc:
 	call	__stack_chk_fail_local
 .LVL231:
 	.cfi_endproc
-.LFE1612:
+.LFE1620:
 	.size	_Z6injectiPc, .-_Z6injectiPc
 	.section	.text.unlikely._Z6injectiPc
 .LCOLDE85:
@@ -2706,7 +2706,7 @@ _Z6injectiPc:
 	.globl	_Z17PtraceLoadLibrarybiPcjjjj
 	.type	_Z17PtraceLoadLibrarybiPcjjjj, @function
 _Z17PtraceLoadLibrarybiPcjjjj:
-.LFB1613:
+.LFB1621:
 	.loc 1 436 0
 	.cfi_startproc
 .LVL232:
@@ -3259,7 +3259,7 @@ _Z17PtraceLoadLibrarybiPcjjjj:
 	call	__stack_chk_fail_local
 .LVL303:
 	.cfi_endproc
-.LFE1613:
+.LFE1621:
 	.size	_Z17PtraceLoadLibrarybiPcjjjj, .-_Z17PtraceLoadLibrarybiPcjjjj
 	.section	.text.unlikely._Z17PtraceLoadLibrarybiPcjjjj
 .LCOLDE102:
@@ -3302,7 +3302,7 @@ _Z17PtraceLoadLibrarybiPcjjjj:
 	.globl	_Z10inject_armbiPcj
 	.type	_Z10inject_armbiPcj, @function
 _Z10inject_armbiPcj:
-.LFB1614:
+.LFB1622:
 	.loc 1 694 0
 	.cfi_startproc
 .LVL304:
@@ -3548,7 +3548,7 @@ _Z10inject_armbiPcj:
 	jmp	.L173
 .LBE852:
 	.cfi_endproc
-.LFE1614:
+.LFE1622:
 	.size	_Z10inject_armbiPcj, .-_Z10inject_armbiPcj
 	.section	.text.unlikely._Z10inject_armbiPcj
 .LCOLDE113:
@@ -3567,7 +3567,7 @@ _Z10inject_armbiPcj:
 	.weak	_ZNSsC2ERKSs
 	.type	_ZNSsC2ERKSs, @function
 _ZNSsC2ERKSs:
-.LFB1633:
+.LFB1641:
 	.file 6 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_string.c"
 	.loc 6 647 0
 	.cfi_startproc
@@ -3884,7 +3884,7 @@ _ZNSsC2ERKSs:
 	call	__stack_chk_fail_local
 .LVL376:
 	.cfi_endproc
-.LFE1633:
+.LFE1641:
 	.size	_ZNSsC2ERKSs, .-_ZNSsC2ERKSs
 	.section	.text.unlikely._ZNSsC2ERKSs,"axG",@progbits,_ZNSsC5ERKSs,comdat
 .LCOLDE115:
@@ -3905,7 +3905,7 @@ _ZNSsC2ERKSs:
 	.weak	_ZNSt6vectorISsSaISsEE22_M_insert_overflow_auxEPSsRKSsRKSt12__false_typejb
 	.type	_ZNSt6vectorISsSaISsEE22_M_insert_overflow_auxEPSsRKSsRKSt12__false_typejb, @function
 _ZNSt6vectorISsSaISsEE22_M_insert_overflow_auxEPSsRKSsRKSt12__false_typejb:
-.LFB1845:
+.LFB1866:
 	.file 9 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_vector.c"
 	.loc 9 81 0
 	.cfi_startproc
@@ -4601,7 +4601,7 @@ _ZNSt6vectorISsSaISsEE22_M_insert_overflow_auxEPSsRKSsRKSt12__false_typejb:
 .LBE1160:
 .LBE1165:
 	.cfi_endproc
-.LFE1845:
+.LFE1866:
 	.size	_ZNSt6vectorISsSaISsEE22_M_insert_overflow_auxEPSsRKSsRKSt12__false_typejb, .-_ZNSt6vectorISsSaISsEE22_M_insert_overflow_auxEPSsRKSsRKSt12__false_typejb
 	.section	.text.unlikely._ZNSt6vectorISsSaISsEE22_M_insert_overflow_auxEPSsRKSsRKSt12__false_typejb,"axG",@progbits,_ZNSt6vectorISsSaISsEE22_M_insert_overflow_auxEPSsRKSsRKSt12__false_typejb,comdat
 .LCOLDE117:
@@ -4618,7 +4618,7 @@ _ZNSt6vectorISsSaISsEE22_M_insert_overflow_auxEPSsRKSsRKSt12__false_typejb:
 	.globl	_Z12ReadAllLinesPcRSt6vectorISsSaISsEE
 	.type	_Z12ReadAllLinesPcRSt6vectorISsSaISsEE, @function
 _Z12ReadAllLinesPcRSt6vectorISsSaISsEE:
-.LFB1615:
+.LFB1623:
 	.loc 1 737 0
 	.cfi_startproc
 .LVL449:
@@ -5465,7 +5465,7 @@ _Z12ReadAllLinesPcRSt6vectorISsSaISsEE:
 	call	__stack_chk_fail_local
 .LVL518:
 	.cfi_endproc
-.LFE1615:
+.LFE1623:
 	.size	_Z12ReadAllLinesPcRSt6vectorISsSaISsEE, .-_Z12ReadAllLinesPcRSt6vectorISsSaISsEE
 	.section	.text.unlikely._Z12ReadAllLinesPcRSt6vectorISsSaISsEE
 .LCOLDE119:
@@ -5492,7 +5492,7 @@ _Z12ReadAllLinesPcRSt6vectorISsSaISsEE:
 	.globl	_Z17GetFunctionOffsetPcS_
 	.type	_Z17GetFunctionOffsetPcS_, @function
 _Z17GetFunctionOffsetPcS_:
-.LFB1616:
+.LFB1624:
 	.loc 1 758 0
 	.cfi_startproc
 .LVL519:
@@ -5908,7 +5908,7 @@ _Z17GetFunctionOffsetPcS_:
 	call	__stack_chk_fail_local
 .LVL562:
 	.cfi_endproc
-.LFE1616:
+.LFE1624:
 	.size	_Z17GetFunctionOffsetPcS_, .-_Z17GetFunctionOffsetPcS_
 	.section	.text.unlikely._Z17GetFunctionOffsetPcS_
 .LCOLDE125:
@@ -5964,7 +5964,7 @@ _Z17GetFunctionOffsetPcS_:
 	.globl	main
 	.type	main, @function
 main:
-.LFB1617:
+.LFB1625:
 	.loc 1 783 0
 	.cfi_startproc
 .LVL563:
@@ -6362,7 +6362,7 @@ main:
 	call	__stack_chk_fail_local
 .LVL615:
 	.cfi_endproc
-.LFE1617:
+.LFE1625:
 	.size	main, .-main
 	.section	.text.unlikely.main
 .LCOLDE145:
@@ -6375,7 +6375,7 @@ main:
 	.p2align 4,,15
 	.type	_GLOBAL__sub_I_tracer.cpp, @function
 _GLOBAL__sub_I_tracer.cpp:
-.LFB1927:
+.LFB1953:
 	.loc 1 934 0
 	.cfi_startproc
 .LVL616:
@@ -6474,7 +6474,7 @@ _GLOBAL__sub_I_tracer.cpp:
 	.cfi_def_cfa_offset 4
 	ret
 	.cfi_endproc
-.LFE1927:
+.LFE1953:
 	.size	_GLOBAL__sub_I_tracer.cpp, .-_GLOBAL__sub_I_tracer.cpp
 	.section	.text.unlikely._GLOBAL__sub_I_tracer.cpp
 .LCOLDE146:
@@ -6549,12 +6549,12 @@ _dlopen:
 	.hidden	__x86.get_pc_thunk.bx
 	.type	__x86.get_pc_thunk.bx, @function
 __x86.get_pc_thunk.bx:
-.LFB1983:
+.LFB2009:
 	.cfi_startproc
 	movl	(%esp), %ebx
 	ret
 	.cfi_endproc
-.LFE1983:
+.LFE2009:
 	.text
 .Letext0:
 	.section	.text.unlikely._Z12Shell_dlopenv
@@ -19097,8 +19097,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0x1
 	.value	0x144
 	.long	.LASF1120
-	.long	.LFB1611
-	.long	.LFE1611-.LFB1611
+	.long	.LFB1619
+	.long	.LFE1619-.LFB1619
 	.uleb128 0x1
 	.byte	0x9c
 	.uleb128 0x77
@@ -19197,8 +19197,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x7f
 	.long	0x5e1b
 	.long	.LASF947
-	.long	.LFB1595
-	.long	.LFE1595-.LFB1595
+	.long	.LFB1603
+	.long	.LFE1603-.LFB1603
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x74bb
@@ -19302,8 +19302,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x7f
 	.long	0x5e48
 	.long	.LASF949
-	.long	.LFB1596
-	.long	.LFE1596-.LFB1596
+	.long	.LFB1604
+	.long	.LFE1604-.LFB1604
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x757a
@@ -19395,8 +19395,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x7f
 	.long	0x5e75
 	.long	.LASF951
-	.long	.LFB1597
-	.long	.LFE1597-.LFB1597
+	.long	.LFB1605
+	.long	.LFE1605-.LFB1605
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x7639
@@ -19488,8 +19488,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x7f
 	.long	0x5ea2
 	.long	.LASF953
-	.long	.LFB1598
-	.long	.LFE1598-.LFB1598
+	.long	.LFB1606
+	.long	.LFE1606-.LFB1606
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x770a
@@ -19593,8 +19593,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x7f
 	.long	0x5ee0
 	.long	.LASF955
-	.long	.LFB1599
-	.long	.LFE1599-.LFB1599
+	.long	.LFB1607
+	.long	.LFE1607-.LFB1607
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x77db
@@ -19698,8 +19698,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x7f
 	.long	0x5f18
 	.long	.LASF957
-	.long	.LFB1600
-	.long	.LFE1600-.LFB1600
+	.long	.LFB1608
+	.long	.LFE1608-.LFB1608
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x78be
@@ -19809,8 +19809,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x7f
 	.long	0x5f50
 	.long	.LASF960
-	.long	.LFB1601
-	.long	.LFE1601-.LFB1601
+	.long	.LFB1609
+	.long	.LFE1609-.LFB1609
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x79a1
@@ -19928,8 +19928,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0x1
 	.byte	0x91
 	.long	.LASF982
-	.long	.LFB1602
-	.long	.LFE1602-.LFB1602
+	.long	.LFB1610
+	.long	.LFE1610-.LFB1610
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x7b67
@@ -20139,8 +20139,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0xa9
 	.long	.LASF986
 	.long	0x57fa
-	.long	.LFB1603
-	.long	.LFE1603-.LFB1603
+	.long	.LFB1611
+	.long	.LFE1611-.LFB1611
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x7c2f
@@ -20245,8 +20245,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0xb8
 	.long	.LASF987
 	.long	0x4691
-	.long	.LFB1604
-	.long	.LFE1604-.LFB1604
+	.long	.LFB1612
+	.long	.LFE1612-.LFB1612
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x7c5d
@@ -20265,8 +20265,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0xbd
 	.long	.LASF989
 	.long	0x57fa
-	.long	.LFB1605
-	.long	.LFE1605-.LFB1605
+	.long	.LFB1613
+	.long	.LFE1613-.LFB1613
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x7d81
@@ -20414,8 +20414,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0xd0
 	.long	.LASF991
 	.long	0x46e0
-	.long	.LFB1606
-	.long	.LFE1606-.LFB1606
+	.long	.LFB1614
+	.long	.LFE1614-.LFB1614
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x7ea9
@@ -20581,8 +20581,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0x1
 	.byte	0xf3
 	.long	.LASF993
-	.long	.LFB1608
-	.long	.LFE1608-.LFB1608
+	.long	.LFB1616
+	.long	.LFE1616-.LFB1616
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x7f5c
@@ -20664,8 +20664,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0xd9
 	.long	.LASF995
 	.long	0x4691
-	.long	.LFB1607
-	.long	.LFE1607-.LFB1607
+	.long	.LFB1615
+	.long	.LFE1615-.LFB1615
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x8089
@@ -20820,8 +20820,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0x1
 	.byte	0xfe
 	.long	.LASF999
-	.long	.LFB1609
-	.long	.LFE1609-.LFB1609
+	.long	.LFB1617
+	.long	.LFE1617-.LFB1617
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x8142
@@ -20937,8 +20937,8 @@ __x86.get_pc_thunk.bx:
 	.value	0x11c
 	.long	.LASF1003
 	.long	0x4691
-	.long	.LFB1610
-	.long	.LFE1610-.LFB1610
+	.long	.LFB1618
+	.long	.LFE1618-.LFB1618
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x828c
@@ -21103,8 +21103,8 @@ __x86.get_pc_thunk.bx:
 	.value	0x155
 	.long	.LASF1004
 	.long	0x4691
-	.long	.LFB1612
-	.long	.LFE1612-.LFB1612
+	.long	.LFB1620
+	.long	.LFE1620-.LFB1620
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x87e9
@@ -21827,8 +21827,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0x1
 	.value	0x1b3
 	.long	.LASF1011
-	.long	.LFB1613
-	.long	.LFE1613-.LFB1613
+	.long	.LFB1621
+	.long	.LFE1621-.LFB1621
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x8ec4
@@ -22790,8 +22790,8 @@ __x86.get_pc_thunk.bx:
 	.value	0x2b5
 	.long	.LASF1023
 	.long	0x4691
-	.long	.LFB1614
-	.long	.LFE1614-.LFB1614
+	.long	.LFB1622
+	.long	.LFE1622-.LFB1622
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x9227
@@ -23271,8 +23271,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x77
 	.long	0x924d
 	.long	.LASF1029
-	.long	.LFB1633
-	.long	.LFE1633-.LFB1633
+	.long	.LFB1641
+	.long	.LFE1641-.LFB1641
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x9293
@@ -23641,8 +23641,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.uleb128 0xa1
 	.long	0x34e2
-	.long	.LFB1845
-	.long	.LFE1845-.LFB1845
+	.long	.LFB1866
+	.long	.LFE1866-.LFB1866
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x9635
@@ -24424,8 +24424,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0x1
 	.value	0x2e0
 	.long	.LASF1038
-	.long	.LFB1615
-	.long	.LFE1615-.LFB1615
+	.long	.LFB1623
+	.long	.LFE1623-.LFB1623
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0xa806
@@ -25522,8 +25522,8 @@ __x86.get_pc_thunk.bx:
 	.value	0x2f5
 	.long	.LASF1043
 	.long	0x46a3
-	.long	.LFB1616
-	.long	.LFE1616-.LFB1616
+	.long	.LFB1624
+	.long	.LFE1624-.LFB1624
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0xad44
@@ -26096,8 +26096,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0x1
 	.value	0x30f
 	.long	0x4691
-	.long	.LFB1617
-	.long	.LFE1617-.LFB1617
+	.long	.LFB1625
+	.long	.LFE1625-.LFB1625
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0xb01e
@@ -26459,8 +26459,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.uleb128 0xad
 	.long	.LASF1122
-	.long	.LFB1927
-	.long	.LFE1927-.LFB1927
+	.long	.LFB1953
+	.long	.LFE1953-.LFB1953
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0xb1f6
@@ -26987,7 +26987,7 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x50
 	.long	.LASF1090
 	.byte	0x34
-	.byte	0x2a
+	.byte	0x30
 	.long	0x46a3
 	.long	0xb4d1
 	.uleb128 0x13
@@ -27123,7 +27123,7 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x50
 	.long	.LASF1105
 	.byte	0x34
-	.byte	0x30
+	.byte	0x36
 	.long	0x4691
 	.long	0xb61e
 	.uleb128 0x13
@@ -30097,7 +30097,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x50
 	.long	.LVL33
-	.long	.LFE1597
+	.long	.LFE1605
 	.value	0x1
 	.byte	0x56
 	.long	0
@@ -30116,7 +30116,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x50
 	.long	.LVL43
-	.long	.LFE1598
+	.long	.LFE1606
 	.value	0x1
 	.byte	0x56
 	.long	0
@@ -30135,7 +30135,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x50
 	.long	.LVL53
-	.long	.LFE1599
+	.long	.LFE1607
 	.value	0x1
 	.byte	0x56
 	.long	0
@@ -30154,7 +30154,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x50
 	.long	.LVL63-1
-	.long	.LFE1600
+	.long	.LFE1608
 	.value	0x1
 	.byte	0x56
 	.long	0
@@ -30173,7 +30173,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x50
 	.long	.LVL74
-	.long	.LFE1601
+	.long	.LFE1609
 	.value	0x1
 	.byte	0x56
 	.long	0
@@ -30267,7 +30267,7 @@ __x86.get_pc_thunk.bx:
 	.byte	0x91
 	.sleb128 -68
 	.long	.LVL126-1
-	.long	.LFE1606
+	.long	.LFE1614
 	.value	0x2
 	.byte	0x91
 	.sleb128 -36
@@ -30283,7 +30283,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x56
 	.long	.LVL131
-	.long	.LFE1606
+	.long	.LFE1614
 	.value	0x1
 	.byte	0x50
 	.long	0
@@ -30302,7 +30302,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x50
 	.long	.LVL151
-	.long	.LFE1607
+	.long	.LFE1615
 	.value	0x1
 	.byte	0x56
 	.long	0
@@ -30317,7 +30317,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x57
 	.long	.LVL153
-	.long	.LFE1607
+	.long	.LFE1615
 	.value	0x1
 	.byte	0x57
 	.long	0
@@ -30711,7 +30711,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x50
 	.long	.LVL338
-	.long	.LFE1614
+	.long	.LFE1622
 	.value	0x1
 	.byte	0x57
 	.long	0
@@ -30732,7 +30732,7 @@ __x86.get_pc_thunk.bx:
 	.byte	0x91
 	.sleb128 -40
 	.long	.LVL338
-	.long	.LFE1614
+	.long	.LFE1622
 	.value	0x2
 	.byte	0x91
 	.sleb128 -40
@@ -30749,7 +30749,7 @@ __x86.get_pc_thunk.bx:
 	.byte	0x91
 	.sleb128 -44
 	.long	.LVL338
-	.long	.LFE1614
+	.long	.LFE1622
 	.value	0x2
 	.byte	0x91
 	.sleb128 -44
@@ -30761,7 +30761,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x55
 	.long	.LVL338
-	.long	.LFE1614
+	.long	.LFE1622
 	.value	0x1
 	.byte	0x55
 	.long	0
@@ -30772,7 +30772,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x55
 	.long	.LVL358
-	.long	.LFE1633
+	.long	.LFE1641
 	.value	0x1
 	.byte	0x55
 	.long	0
@@ -30783,7 +30783,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x55
 	.long	.LVL358
-	.long	.LFE1633
+	.long	.LFE1641
 	.value	0x1
 	.byte	0x55
 	.long	0
@@ -30796,7 +30796,7 @@ __x86.get_pc_thunk.bx:
 	.sleb128 20
 	.byte	0x9f
 	.long	.LVL358
-	.long	.LFE1633
+	.long	.LFE1641
 	.value	0x3
 	.byte	0x75
 	.sleb128 20
@@ -30845,7 +30845,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x55
 	.long	.LVL358
-	.long	.LFE1633
+	.long	.LFE1641
 	.value	0x1
 	.byte	0x55
 	.long	0
@@ -30982,7 +30982,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x55
 	.long	.LVL358
-	.long	.LFE1633
+	.long	.LFE1641
 	.value	0x1
 	.byte	0x55
 	.long	0
@@ -31150,7 +31150,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x55
 	.long	.LVL375
-	.long	.LFE1633
+	.long	.LFE1641
 	.value	0x1
 	.byte	0x55
 	.long	0
@@ -31230,7 +31230,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x55
 	.long	.LVL443
-	.long	.LFE1845
+	.long	.LFE1866
 	.value	0x2
 	.byte	0x91
 	.sleb128 16
@@ -31265,7 +31265,7 @@ __x86.get_pc_thunk.bx:
 	.byte	0x91
 	.sleb128 0
 	.long	.LVL447
-	.long	.LFE1845
+	.long	.LFE1866
 	.value	0x1
 	.byte	0x57
 	.long	0
@@ -33050,7 +33050,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x50
 	.long	.LVL524-1
-	.long	.LFE1616
+	.long	.LFE1624
 	.value	0x4
 	.byte	0x91
 	.sleb128 -432
@@ -33065,7 +33065,7 @@ __x86.get_pc_thunk.bx:
 	.sleb128 8
 	.byte	0x9f
 	.long	.LVL524-1
-	.long	.LFE1616
+	.long	.LFE1624
 	.value	0x4
 	.byte	0x91
 	.sleb128 -424
@@ -33096,7 +33096,7 @@ __x86.get_pc_thunk.bx:
 	.sleb128 -432
 	.byte	0x9f
 	.long	.LVL561
-	.long	.LFE1616
+	.long	.LFE1624
 	.value	0x4
 	.byte	0x91
 	.sleb128 -432
@@ -33110,7 +33110,7 @@ __x86.get_pc_thunk.bx:
 	.byte	0x30
 	.byte	0x9f
 	.long	.LVL561
-	.long	.LFE1616
+	.long	.LFE1624
 	.value	0x2
 	.byte	0x30
 	.byte	0x9f
@@ -33232,7 +33232,7 @@ __x86.get_pc_thunk.bx:
 	.sleb128 -432
 	.byte	0x9f
 	.long	.LVL561
-	.long	.LFE1616
+	.long	.LFE1624
 	.value	0x4
 	.byte	0x91
 	.sleb128 -432
@@ -33470,26 +33470,10 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.value	0
 	.value	0
-	.long	.LFB1611
-	.long	.LFE1611-.LFB1611
+	.long	.LFB1619
+	.long	.LFE1619-.LFB1619
 	.long	.LFB875
 	.long	.LFE875-.LFB875
-	.long	.LFB1595
-	.long	.LFE1595-.LFB1595
-	.long	.LFB1596
-	.long	.LFE1596-.LFB1596
-	.long	.LFB1597
-	.long	.LFE1597-.LFB1597
-	.long	.LFB1598
-	.long	.LFE1598-.LFB1598
-	.long	.LFB1599
-	.long	.LFE1599-.LFB1599
-	.long	.LFB1600
-	.long	.LFE1600-.LFB1600
-	.long	.LFB1601
-	.long	.LFE1601-.LFB1601
-	.long	.LFB1602
-	.long	.LFE1602-.LFB1602
 	.long	.LFB1603
 	.long	.LFE1603-.LFB1603
 	.long	.LFB1604
@@ -33498,32 +33482,48 @@ __x86.get_pc_thunk.bx:
 	.long	.LFE1605-.LFB1605
 	.long	.LFB1606
 	.long	.LFE1606-.LFB1606
-	.long	.LFB1608
-	.long	.LFE1608-.LFB1608
 	.long	.LFB1607
 	.long	.LFE1607-.LFB1607
+	.long	.LFB1608
+	.long	.LFE1608-.LFB1608
 	.long	.LFB1609
 	.long	.LFE1609-.LFB1609
 	.long	.LFB1610
 	.long	.LFE1610-.LFB1610
+	.long	.LFB1611
+	.long	.LFE1611-.LFB1611
 	.long	.LFB1612
 	.long	.LFE1612-.LFB1612
 	.long	.LFB1613
 	.long	.LFE1613-.LFB1613
 	.long	.LFB1614
 	.long	.LFE1614-.LFB1614
-	.long	.LFB1633
-	.long	.LFE1633-.LFB1633
-	.long	.LFB1845
-	.long	.LFE1845-.LFB1845
-	.long	.LFB1615
-	.long	.LFE1615-.LFB1615
 	.long	.LFB1616
 	.long	.LFE1616-.LFB1616
+	.long	.LFB1615
+	.long	.LFE1615-.LFB1615
 	.long	.LFB1617
 	.long	.LFE1617-.LFB1617
-	.long	.LFB1927
-	.long	.LFE1927-.LFB1927
+	.long	.LFB1618
+	.long	.LFE1618-.LFB1618
+	.long	.LFB1620
+	.long	.LFE1620-.LFB1620
+	.long	.LFB1621
+	.long	.LFE1621-.LFB1621
+	.long	.LFB1622
+	.long	.LFE1622-.LFB1622
+	.long	.LFB1641
+	.long	.LFE1641-.LFB1641
+	.long	.LFB1866
+	.long	.LFE1866-.LFB1866
+	.long	.LFB1623
+	.long	.LFE1623-.LFB1623
+	.long	.LFB1624
+	.long	.LFE1624-.LFB1624
+	.long	.LFB1625
+	.long	.LFE1625-.LFB1625
+	.long	.LFB1953
+	.long	.LFE1953-.LFB1953
 	.long	0
 	.long	0
 	.section	.debug_ranges,"",@progbits
@@ -34068,26 +34068,10 @@ __x86.get_pc_thunk.bx:
 	.long	.LBE1694
 	.long	0
 	.long	0
-	.long	.LFB1611
-	.long	.LFE1611
+	.long	.LFB1619
+	.long	.LFE1619
 	.long	.LFB875
 	.long	.LFE875
-	.long	.LFB1595
-	.long	.LFE1595
-	.long	.LFB1596
-	.long	.LFE1596
-	.long	.LFB1597
-	.long	.LFE1597
-	.long	.LFB1598
-	.long	.LFE1598
-	.long	.LFB1599
-	.long	.LFE1599
-	.long	.LFB1600
-	.long	.LFE1600
-	.long	.LFB1601
-	.long	.LFE1601
-	.long	.LFB1602
-	.long	.LFE1602
 	.long	.LFB1603
 	.long	.LFE1603
 	.long	.LFB1604
@@ -34096,32 +34080,48 @@ __x86.get_pc_thunk.bx:
 	.long	.LFE1605
 	.long	.LFB1606
 	.long	.LFE1606
-	.long	.LFB1608
-	.long	.LFE1608
 	.long	.LFB1607
 	.long	.LFE1607
+	.long	.LFB1608
+	.long	.LFE1608
 	.long	.LFB1609
 	.long	.LFE1609
 	.long	.LFB1610
 	.long	.LFE1610
+	.long	.LFB1611
+	.long	.LFE1611
 	.long	.LFB1612
 	.long	.LFE1612
 	.long	.LFB1613
 	.long	.LFE1613
 	.long	.LFB1614
 	.long	.LFE1614
-	.long	.LFB1633
-	.long	.LFE1633
-	.long	.LFB1845
-	.long	.LFE1845
-	.long	.LFB1615
-	.long	.LFE1615
 	.long	.LFB1616
 	.long	.LFE1616
+	.long	.LFB1615
+	.long	.LFE1615
 	.long	.LFB1617
 	.long	.LFE1617
-	.long	.LFB1927
-	.long	.LFE1927
+	.long	.LFB1618
+	.long	.LFE1618
+	.long	.LFB1620
+	.long	.LFE1620
+	.long	.LFB1621
+	.long	.LFE1621
+	.long	.LFB1622
+	.long	.LFE1622
+	.long	.LFB1641
+	.long	.LFE1641
+	.long	.LFB1866
+	.long	.LFE1866
+	.long	.LFB1623
+	.long	.LFE1623
+	.long	.LFB1624
+	.long	.LFE1624
+	.long	.LFB1625
+	.long	.LFE1625
+	.long	.LFB1953
+	.long	.LFE1953
 	.long	0
 	.long	0
 	.section	.debug_line,"",@progbits

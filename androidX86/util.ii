@@ -1,8 +1,8 @@
-# 1 "jni/scrcap/../util/util.cpp"
+# 1 "jni/tracer/../util/util.cpp"
 # 1 "C:\\cygwin64\\home\\kwang\\C\\androidX86//"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "jni/scrcap/../util/util.cpp"
+# 1 "jni/tracer/../util/util.cpp"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -632,7 +632,7 @@ int vfdprintf(int, const char*, __va_list);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 2
-# 2 "jni/scrcap/../util/util.cpp" 2
+# 2 "jni/tracer/../util/util.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\ptrace.h" 1 3 4
 # 34 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\ptrace.h" 3 4
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\ptrace.h" 1 3 4
@@ -681,7 +681,7 @@ extern "C" {
 extern long ptrace(int request, ...);
 
 }
-# 3 "jni/scrcap/../util/util.cpp" 2
+# 3 "jni/tracer/../util/util.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\wait.h" 1 3 4
 # 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\wait.h" 3 4
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\resource.h" 1 3 4
@@ -1425,7 +1425,7 @@ typedef int idtype_t;
 extern int waitid(idtype_t which, id_t id, siginfo_t *info, int options);
 
 }
-# 4 "jni/scrcap/../util/util.cpp" 2
+# 4 "jni/tracer/../util/util.cpp" 2
 
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\mman.h" 1 3 4
 # 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\mman.h" 3 4
@@ -1460,7 +1460,98 @@ extern int munlock(const void *addr, size_t len);
 extern int mincore(void* start, size_t length, unsigned char* vec);
 
 }
-# 6 "jni/scrcap/../util/util.cpp" 2
+# 6 "jni/tracer/../util/util.cpp" 2
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 1 3 4
+# 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\time.h" 1 3 4
+# 35 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\time.h" 3 4
+extern "C" {
+
+extern int gettimeofday(struct timeval *, struct timezone *);
+extern int settimeofday(const struct timeval *, const struct timezone *);
+
+extern int getitimer(int, struct itimerval *);
+extern int setitimer(int, const struct itimerval *, struct itimerval *);
+
+extern int utimes(const char *, const struct timeval *);
+# 76 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\time.h" 3 4
+}
+# 34 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 2 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\stat.h" 1 3 4
+# 35 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 2 3 4
+
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\endian.h" 1 3 4
+# 31 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\endian.h" 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\endian.h" 1 3 4
+# 51 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\endian.h" 3 4
+extern "C" {
+uint32_t htonl(uint32_t) __attribute__((__const__));
+uint16_t htons(uint16_t) __attribute__((__const__));
+uint32_t ntohl(uint32_t) __attribute__((__const__));
+uint16_t ntohs(uint16_t) __attribute__((__const__));
+}
+# 32 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\endian.h" 2 3 4
+# 37 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 2 3 4
+
+extern "C" {
+# 77 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 3 4
+struct stat {
+    unsigned long long st_dev;
+    unsigned char __pad0[4];
+
+    unsigned long __st_ino;
+    unsigned int st_mode;
+    unsigned int st_nlink;
+
+    unsigned long st_uid;
+    unsigned long st_gid;
+
+    unsigned long long st_rdev;
+    unsigned char __pad3[4];
+
+    long long st_size;
+    unsigned long st_blksize;
+    unsigned long long st_blocks;
+
+    unsigned long st_atime;
+    unsigned long st_atime_nsec;
+
+    unsigned long st_mtime;
+    unsigned long st_mtime_nsec;
+
+    unsigned long st_ctime;
+    unsigned long st_ctime_nsec;
+
+    unsigned long long st_ino;
+};
+# 115 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 3 4
+extern int chmod(const char *, mode_t);
+extern int fchmod(int, mode_t);
+extern int mkdir(const char *, mode_t);
+
+extern int stat(const char *, struct stat *);
+extern int fstat(int, struct stat *);
+extern int lstat(const char *, struct stat *);
+extern int mknod(const char *, mode_t, dev_t);
+extern mode_t umask(mode_t);
+
+
+
+
+
+static __inline__ int mkfifo(const char *__p, mode_t __m)
+{
+  return mknod(__p, (__m & ~00170000) | 0010000, (dev_t)0);
+}
+
+extern int fstatat(int dirfd, const char *path, struct stat *buf, int flags);
+extern int mkdirat(int dirfd, const char *pathname, mode_t mode);
+extern int fchownat(int dirfd, const char *path, uid_t owner, gid_t group, int flags);
+extern int fchmodat(int dirfd, const char *path, mode_t mode, int flags);
+extern int renameat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath);
+
+}
+# 7 "jni/tracer/../util/util.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\unistd.h" 1 3 4
 # 31 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\unistd.h" 3 4
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stddef.h" 1 3 4
@@ -1483,22 +1574,7 @@ extern int mincore(void* start, size_t length, unsigned char* vec);
 
 
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\select.h" 1 3 4
-# 32 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\select.h" 3 4
-# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\time.h" 1 3 4
-# 35 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\time.h" 3 4
-extern "C" {
-
-extern int gettimeofday(struct timeval *, struct timezone *);
-extern int settimeofday(const struct timeval *, const struct timezone *);
-
-extern int getitimer(int, struct itimerval *);
-extern int setitimer(int, const struct itimerval *, struct itimerval *);
-
-extern int utimes(const char *, const struct timeval *);
-# 76 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\time.h" 3 4
-}
-# 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\select.h" 2 3 4
-
+# 34 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\select.h" 3 4
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/signal.h" 1 3 4
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/signal.h" 3 4
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1 3 4
@@ -1681,7 +1757,7 @@ extern pid_t tcgetpgrp(int fd);
 extern int tcsetpgrp(int fd, pid_t _pid);
 # 205 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\unistd.h" 3 4
 }
-# 7 "jni/scrcap/../util/util.cpp" 2
+# 8 "jni/tracer/../util/util.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1861,7 +1937,7 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 61 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h" 2
-# 8 "jni/scrcap/../util/util.cpp" 2
+# 9 "jni/tracer/../util/util.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1872,7 +1948,7 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 2
-# 9 "jni/scrcap/../util/util.cpp" 2
+# 10 "jni/tracer/../util/util.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h" 1
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1883,7 +1959,7 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 62 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h" 2
-# 10 "jni/scrcap/../util/util.cpp" 2
+# 11 "jni/tracer/../util/util.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h" 1
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1902,7 +1978,7 @@ extern "C" {
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h" 2
-# 11 "jni/scrcap/../util/util.cpp" 2
+# 12 "jni/tracer/../util/util.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h" 1
 # 26 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1913,7 +1989,7 @@ extern "C" {
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 60 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h" 2
-# 12 "jni/scrcap/../util/util.cpp" 2
+# 13 "jni/tracer/../util/util.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dlfcn.h" 1 3 4
 # 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dlfcn.h" 3 4
 extern "C" {
@@ -1947,7 +2023,7 @@ enum {
 
 
 }
-# 13 "jni/scrcap/../util/util.cpp" 2
+# 14 "jni/tracer/../util/util.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1966,7 +2042,7 @@ typedef __gnuc_va_list va_list;
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 2
-# 14 "jni/scrcap/../util/util.cpp" 2
+# 15 "jni/tracer/../util/util.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string" 1
 # 23 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
@@ -16401,7 +16477,7 @@ getline(basic_istream<_CharT, _Traits>& __is,
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string" 2
-# 15 "jni/scrcap/../util/util.cpp" 2
+# 16 "jni/tracer/../util/util.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/vector" 1
 # 27 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/vector"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
@@ -17973,7 +18049,7 @@ struct _DefaultZeroValue<vector<_Tp, _Alloc> >
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/vector" 2
-# 16 "jni/scrcap/../util/util.cpp" 2
+# 17 "jni/tracer/../util/util.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/fstream" 1
 # 28 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/fstream"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
@@ -19594,7 +19670,817 @@ namespace std {
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 54 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/fstream" 2
-# 17 "jni/scrcap/../util/util.cpp" 2
+# 18 "jni/tracer/../util/util.cpp" 2
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/sstream" 1
+# 27 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/sstream"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
+
+
+
+
+
+
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
+# 8 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 2
+# 28 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/sstream" 2
+
+
+
+
+
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_ioserr.h" 1
+# 34 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/sstream" 2
+
+
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_sstream.h" 1
+# 40 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_sstream.h"
+namespace std {
+# 54 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_sstream.h"
+template <class _CharT, class _Traits, class _Alloc>
+class basic_stringbuf : public basic_streambuf<_CharT, _Traits> {
+public:
+  typedef _CharT char_type;
+  typedef typename _Traits::int_type int_type;
+  typedef typename _Traits::pos_type pos_type;
+  typedef typename _Traits::off_type off_type;
+  typedef _Traits traits_type;
+
+  typedef basic_streambuf<_CharT, _Traits> _Base;
+  typedef basic_stringbuf<_CharT, _Traits, _Alloc> _Self;
+  typedef basic_string<_CharT, _Traits, _Alloc> _String;
+
+public:
+  explicit basic_stringbuf(ios_base::openmode __mode
+                                      = ios_base::in | ios_base::out);
+  explicit basic_stringbuf(const _String& __s, ios_base::openmode __mode
+                                      = ios_base::in | ios_base::out);
+  virtual ~basic_stringbuf();
+
+public:
+  _String str() const { return _M_str; }
+  void str(const _String& __s);
+
+protected:
+  virtual int_type underflow();
+  virtual int_type uflow();
+  virtual int_type pbackfail(int_type __c);
+  virtual int_type overflow(int_type __c);
+  int_type pbackfail() {return pbackfail(_Traits::eof());}
+  int_type overflow() {return overflow(_Traits::eof());}
+
+  virtual streamsize xsputn(const char_type* __s, streamsize __n);
+  virtual streamsize _M_xsputnc(char_type __c, streamsize __n);
+
+  virtual _Base* setbuf(_CharT* __buf, streamsize __n);
+  virtual pos_type seekoff(off_type __off, ios_base::seekdir __dir,
+                           ios_base::openmode __mode
+                                      = ios_base::in | ios_base::out);
+  virtual pos_type seekpos(pos_type __pos, ios_base::openmode __mode
+                                      = ios_base::in | ios_base::out);
+
+private:
+  void _M_set_ptrs();
+  static _CharT* _S_start(const _String& __str) { return const_cast<_CharT*>(__str.data()); }
+  static _CharT* _S_finish(const _String& __str) { return const_cast<_CharT*>(__str.data()) + __str.size(); }
+
+private:
+  ios_base::openmode _M_mode;
+  _String _M_str;
+};
+# 116 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_sstream.h"
+template <class _CharT, class _Traits, class _Alloc>
+class basic_istringstream : public basic_istream<_CharT, _Traits> {
+public:
+  typedef typename _Traits::char_type char_type;
+  typedef typename _Traits::int_type int_type;
+  typedef typename _Traits::pos_type pos_type;
+  typedef typename _Traits::off_type off_type;
+  typedef _Traits traits_type;
+
+  typedef basic_ios<_CharT, _Traits> _Basic_ios;
+  typedef basic_istream<_CharT, _Traits> _Base;
+  typedef basic_string<_CharT, _Traits, _Alloc> _String;
+  typedef basic_stringbuf<_CharT, _Traits, _Alloc> _Buf;
+
+public:
+  basic_istringstream(ios_base::openmode __mode = ios_base::in);
+  basic_istringstream(const _String& __str,
+                      ios_base::openmode __mode = ios_base::in);
+  ~basic_istringstream();
+
+public:
+
+  basic_stringbuf<_CharT, _Traits, _Alloc>* rdbuf() const
+    { return const_cast<_Buf*>(&_M_buf); }
+
+  _String str() const { return _M_buf.str(); }
+  void str(const _String& __s) { _M_buf.str(__s); }
+
+private:
+  basic_stringbuf<_CharT, _Traits, _Alloc> _M_buf;
+
+
+
+
+
+
+
+};
+
+
+
+
+
+template <class _CharT, class _Traits, class _Alloc>
+class basic_ostringstream : public basic_ostream<_CharT, _Traits> {
+public:
+  typedef typename _Traits::char_type char_type;
+  typedef typename _Traits::int_type int_type;
+  typedef typename _Traits::pos_type pos_type;
+  typedef typename _Traits::off_type off_type;
+  typedef _Traits traits_type;
+
+  typedef basic_ios<_CharT, _Traits> _Basic_ios;
+  typedef basic_ostream<_CharT, _Traits> _Base;
+  typedef basic_string<_CharT, _Traits, _Alloc> _String;
+  typedef basic_stringbuf<_CharT, _Traits, _Alloc> _Buf;
+
+public:
+  basic_ostringstream(ios_base::openmode __mode = ios_base::out);
+  basic_ostringstream(const _String& __str,
+                      ios_base::openmode __mode = ios_base::out);
+  ~basic_ostringstream();
+
+public:
+
+  basic_stringbuf<_CharT, _Traits, _Alloc>* rdbuf() const
+    { return const_cast<_Buf*>(&_M_buf); }
+
+  _String str() const { return _M_buf.str(); }
+    void str(const _String& __s) { _M_buf.str(__s); }
+
+
+private:
+  basic_stringbuf<_CharT, _Traits, _Alloc> _M_buf;
+
+
+
+
+
+
+
+};
+
+
+
+
+
+template <class _CharT, class _Traits, class _Alloc>
+class basic_stringstream : public basic_iostream<_CharT, _Traits> {
+public:
+  typedef typename _Traits::char_type char_type;
+  typedef typename _Traits::int_type int_type;
+  typedef typename _Traits::pos_type pos_type;
+  typedef typename _Traits::off_type off_type;
+  typedef _Traits traits_type;
+
+  typedef basic_ios<_CharT, _Traits> _Basic_ios;
+  typedef basic_iostream<_CharT, _Traits> _Base;
+  typedef basic_string<_CharT, _Traits, _Alloc> _String;
+  typedef basic_stringbuf<_CharT, _Traits, _Alloc> _Buf;
+
+  typedef ios_base::openmode openmode;
+
+public:
+  basic_stringstream(openmode __mod = ios_base::in | ios_base::out);
+  basic_stringstream(const _String& __str,
+                     openmode __mod = ios_base::in | ios_base::out);
+  ~basic_stringstream();
+
+public:
+
+  basic_stringbuf<_CharT, _Traits, _Alloc>* rdbuf() const
+    { return const_cast<_Buf*>(&_M_buf); }
+
+  _String str() const { return _M_buf.str(); }
+    void str(const _String& __s) { _M_buf.str(__s); }
+
+private:
+  basic_stringbuf<_CharT, _Traits, _Alloc> _M_buf;
+
+
+
+
+
+
+
+};
+# 256 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_sstream.h"
+}
+
+
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_sstream.c" 1
+# 35 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_sstream.c"
+namespace std {
+
+
+
+
+
+
+
+template <class _CharT, class _Traits, class _Alloc>
+basic_stringbuf<_CharT, _Traits, _Alloc>
+  ::basic_stringbuf(ios_base::openmode __mode)
+    : basic_streambuf<_CharT, _Traits>(), _M_mode(__mode), _M_str()
+{}
+
+template <class _CharT, class _Traits, class _Alloc>
+basic_stringbuf<_CharT, _Traits, _Alloc>
+  ::basic_stringbuf(const basic_string<_CharT, _Traits, _Alloc>& __s, ios_base::openmode __mode)
+    : basic_streambuf<_CharT, _Traits>(), _M_mode(__mode), _M_str(__s)
+{
+  _M_set_ptrs();
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+basic_stringbuf<_CharT, _Traits, _Alloc>::~basic_stringbuf()
+{}
+
+
+template <class _CharT, class _Traits, class _Alloc>
+void
+basic_stringbuf<_CharT, _Traits, _Alloc>::str(const basic_string<_CharT, _Traits, _Alloc>& __s)
+{
+  _M_str = __s;
+  _M_set_ptrs();
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+void
+basic_stringbuf<_CharT, _Traits, _Alloc>::_M_set_ptrs()
+{
+  _CharT* __data_ptr = _S_start(_M_str);
+  _CharT* __data_end = _S_finish(_M_str);
+
+  if (_M_mode & ios_base::in) {
+    this->setg(__data_ptr, (_M_mode & ios_base::ate) ? __data_end : __data_ptr, __data_end);
+  }
+
+
+  if (_M_mode & ios_base::out) {
+    if ( _M_mode & (ios_base::app | ios_base::ate) ) {
+      this->setp( __data_end, __data_end );
+    } else {
+      this->setp( __data_ptr, __data_end );
+      this->pbump((int)_M_str.size());
+    }
+
+  }
+}
+
+
+template <class _CharT, class _Traits, class _Alloc>
+typename basic_stringbuf<_CharT, _Traits, _Alloc>::int_type
+basic_stringbuf<_CharT, _Traits, _Alloc>::underflow() {
+  return this->gptr() != this->egptr()
+    ? _Traits::to_int_type(*this->gptr())
+    : _Traits::eof();
+}
+
+
+template <class _CharT, class _Traits, class _Alloc>
+typename basic_stringbuf<_CharT, _Traits, _Alloc>::int_type
+basic_stringbuf<_CharT, _Traits, _Alloc>::uflow() {
+  if (this->gptr() != this->egptr()) {
+    int_type __c = _Traits::to_int_type(*this->gptr());
+    this->gbump(1);
+    return __c;
+  }
+  else
+    return _Traits::eof();
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+typename basic_stringbuf<_CharT, _Traits, _Alloc>::int_type
+basic_stringbuf<_CharT, _Traits, _Alloc>::pbackfail(int_type __c) {
+  if (this->gptr() != this->eback()) {
+    if (!_Traits::eq_int_type(__c, _Traits::eof())) {
+      if (_Traits::eq(_Traits::to_char_type(__c), this->gptr()[-1])) {
+        this->gbump(-1);
+        return __c;
+      }
+      else if (_M_mode & ios_base::out) {
+        this->gbump(-1);
+        *this->gptr() = _Traits::to_char_type(__c);
+        return __c;
+      }
+      else
+        return _Traits::eof();
+    }
+    else {
+      this->gbump(-1);
+      return _Traits::not_eof(__c);
+    }
+  }
+  else
+    return _Traits::eof();
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+typename basic_stringbuf<_CharT, _Traits, _Alloc>::int_type basic_stringbuf<_CharT, _Traits, _Alloc>::overflow(int_type __c)
+{
+  if (!_Traits::eq_int_type(__c, _Traits::eof())) {
+    if (_M_mode & ios_base::out) {
+      if ( this->pptr() < this->epptr() ) {
+        _M_str.push_back( _Traits::to_char_type(__c) );
+        this->pbump(1);
+      } else if ( _M_mode & ios_base::in ) {
+        ptrdiff_t __offset = this->gptr() - this->eback();
+        _M_str.push_back(_Traits::to_char_type(__c));
+        _CharT* __data_ptr = _S_start(_M_str);
+        this->setg(__data_ptr, __data_ptr + __offset, _S_finish(_M_str));
+        this->setp(__data_ptr, _S_finish(_M_str));
+        this->pbump((int)_M_str.size());
+      } else {
+        _M_str.push_back( _Traits::to_char_type(__c) );
+        this->setp(_S_start(_M_str), _S_finish(_M_str));
+        this->pbump((int)_M_str.size());
+      }
+      return __c;
+    }
+    return _Traits::eof();
+  }
+  return _Traits::not_eof(__c);
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+streamsize
+basic_stringbuf<_CharT, _Traits, _Alloc>::xsputn(const char_type* __s,
+                                                 streamsize __n) {
+  streamsize __nwritten = 0;
+
+  if ((_M_mode & ios_base::out) && __n > 0) {
+
+
+    if ( !_M_str.empty() && this->pbase() == _S_start(_M_str)) {
+      ptrdiff_t __avail = _S_finish(_M_str) - this->pptr();
+      if (__avail > __n) {
+        _Traits::copy(this->pptr(), __s, static_cast<size_t>(__n));
+        this->pbump((int)__n);
+        return __n;
+      } else {
+        _Traits::copy(this->pptr(), __s, __avail);
+        __nwritten += __avail;
+        __n -= __avail;
+        __s += __avail;
+      }
+    }
+
+
+    _CharT* __data_ptr;
+    if (_M_mode & ios_base::in) {
+      ptrdiff_t __get_offset = this->gptr() - this->eback();
+      _M_str.append(__s, __s + static_cast<ptrdiff_t>(__n));
+      __data_ptr = _S_start(_M_str);
+      this->setg(__data_ptr, __data_ptr + __get_offset, _S_finish(_M_str));
+    } else {
+      _M_str.append(__s, __s + static_cast<ptrdiff_t>(__n));
+      __data_ptr = _S_start(_M_str);
+    }
+
+    this->setp(__data_ptr, _S_finish(_M_str));
+    this->pbump((int)_M_str.size());
+    __nwritten += __n;
+  }
+
+  return __nwritten;
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+streamsize
+basic_stringbuf<_CharT, _Traits, _Alloc>::_M_xsputnc(char_type __c,
+                                                     streamsize __n) {
+  streamsize __nwritten = 0;
+
+  if ((_M_mode & ios_base::out) && __n > 0) {
+
+
+    if (this->pbase() == _S_start(_M_str)) {
+      ptrdiff_t __avail = _S_finish(_M_str) - this->pptr();
+      if (__avail > __n) {
+        _Traits::assign(this->pptr(), static_cast<size_t>(__n), __c);
+        this->pbump(static_cast<int>(__n));
+        return __n;
+      }
+      else {
+        _Traits::assign(this->pptr(), __avail, __c);
+        __nwritten += __avail;
+        __n -= __avail;
+      }
+    }
+
+
+    size_t __app_size = sizeof(streamsize) > sizeof(size_t) ? static_cast<size_t>((min)(__n, static_cast<streamsize>(_M_str.max_size())))
+                                                            : static_cast<size_t>(__n);
+    _CharT* __data_ptr;
+    if (this->_M_mode & ios_base::in) {
+      ptrdiff_t __get_offset = this->gptr() - this->eback();
+      _M_str.append(__app_size, __c);
+      __data_ptr = _S_start(_M_str);
+      this->setg(__data_ptr, __data_ptr + __get_offset, _S_finish(_M_str));
+    } else {
+      _M_str.append(__app_size, __c);
+      __data_ptr = _S_start(_M_str);
+    }
+
+    this->setp(__data_ptr, _S_finish(_M_str));
+    this->pbump((int)_M_str.size());
+    __nwritten += __app_size;
+  }
+
+  return __nwritten;
+}
+
+
+
+
+
+template <class _CharT, class _Traits, class _Alloc>
+basic_streambuf<_CharT, _Traits>*
+basic_stringbuf<_CharT, _Traits, _Alloc>::setbuf(_CharT*, streamsize __n) {
+  if (__n > 0) {
+    bool __do_get_area = false;
+    bool __do_put_area = false;
+    ptrdiff_t __offg = 0;
+    ptrdiff_t __offp = 0;
+
+    if (this->pbase() == _S_start(_M_str)) {
+      __do_put_area = true;
+      __offp = this->pptr() - this->pbase();
+    }
+
+    if (this->eback() == _S_start(_M_str)) {
+      __do_get_area = true;
+      __offg = this->gptr() - this->eback();
+    }
+
+    _M_str.reserve(sizeof(streamsize) > sizeof(size_t) ? static_cast<size_t>((min)(__n, static_cast<streamsize>(_M_str.max_size())))
+                                                       : static_cast<size_t>(__n));
+
+    _CharT* __data_ptr = _S_start(_M_str);
+
+    if (__do_get_area) {
+      this->setg(__data_ptr, __data_ptr + __offg, _S_finish(_M_str));
+    }
+
+    if (__do_put_area) {
+      this->setp(__data_ptr, _S_finish(_M_str));
+      this->pbump((int)__offp);
+    }
+  }
+
+  return this;
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+typename basic_stringbuf<_CharT, _Traits, _Alloc>::pos_type
+basic_stringbuf<_CharT, _Traits, _Alloc>
+  ::seekoff(off_type __off,
+            ios_base::seekdir __dir,
+            ios_base::openmode __mode) {
+  __mode &= _M_mode;
+
+  bool __imode = (__mode & ios_base::in) != 0;
+  bool __omode = (__mode & ios_base::out) != 0;
+
+  if ( !(__imode || __omode) )
+    return pos_type(off_type(-1));
+
+  if ( (__imode && (this->gptr() == 0)) || (__omode && (this->pptr() == 0)) )
+    return pos_type(off_type(-1));
+
+  streamoff __newoff;
+  switch(__dir) {
+    case ios_base::beg:
+      __newoff = 0;
+      break;
+    case ios_base::end:
+      __newoff = _M_str.size();
+      break;
+    case ios_base::cur:
+      __newoff = __imode ? this->gptr() - this->eback() : this->pptr() - this->pbase();
+      if ( __off == 0 ) {
+        return pos_type(__newoff);
+      }
+      break;
+    default:
+      return pos_type(off_type(-1));
+  }
+
+  __off += __newoff;
+
+  if (__imode) {
+    ptrdiff_t __n = this->egptr() - this->eback();
+
+    if (__off < 0 || __off > __n)
+      return pos_type(off_type(-1));
+    this->setg(this->eback(), this->eback() + static_cast<ptrdiff_t>(__off),
+                              this->eback() + static_cast<ptrdiff_t>(__n));
+  }
+
+  if (__omode) {
+    ptrdiff_t __n = this->epptr() - this->pbase();
+
+    if (__off < 0 || __off > __n)
+      return pos_type(off_type(-1));
+    this->setp(this->pbase(), this->pbase() + __n);
+    this->pbump((int)__off);
+  }
+
+  return pos_type(__off);
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+typename basic_stringbuf<_CharT, _Traits, _Alloc>::pos_type
+basic_stringbuf<_CharT, _Traits, _Alloc>
+  ::seekpos(pos_type __pos, ios_base::openmode __mode) {
+  __mode &= _M_mode;
+
+  bool __imode = (__mode & ios_base::in) != 0;
+  bool __omode = (__mode & ios_base::out) != 0;
+
+  if ( !(__imode || __omode) )
+    return pos_type(off_type(-1));
+
+  if ( (__imode && (this->gptr() == 0)) || (__omode && (this->pptr() == 0)) )
+    return pos_type(off_type(-1));
+
+  const off_type __n = __pos - pos_type(off_type(0));
+
+  if (__imode) {
+    if (__n < 0 || __n > this->egptr() - this->eback())
+      return pos_type(off_type(-1));
+    this->setg(this->eback(), this->eback() + static_cast<ptrdiff_t>(__n), this->egptr());
+  }
+
+  if (__omode) {
+    if (__n < 0 || size_t(__n) > _M_str.size())
+      return pos_type(off_type(-1));
+
+    this->setp(_S_start(_M_str), _S_finish(_M_str));
+    this->pbump((int)__n);
+  }
+
+  return __pos;
+}
+
+
+
+
+template <class _CharT, class _Traits, class _Alloc>
+basic_istringstream<_CharT, _Traits, _Alloc>
+  ::basic_istringstream(ios_base::openmode __mode)
+    : basic_istream<_CharT, _Traits>(0),
+      _M_buf(__mode | ios_base::in) {
+  this->init(&_M_buf);
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+basic_istringstream<_CharT, _Traits, _Alloc>
+  ::basic_istringstream(const _String& __str,ios_base::openmode __mode)
+    : basic_istream<_CharT, _Traits>(0),
+      _M_buf(__str, __mode | ios_base::in) {
+  this->init(&_M_buf);
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+basic_istringstream<_CharT, _Traits, _Alloc>::~basic_istringstream()
+{}
+
+
+
+
+template <class _CharT, class _Traits, class _Alloc>
+basic_ostringstream<_CharT, _Traits, _Alloc>
+  ::basic_ostringstream(ios_base::openmode __mode)
+    : basic_ostream<_CharT, _Traits>(0),
+      _M_buf(__mode | ios_base::out) {
+  this->init(&_M_buf);
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+basic_ostringstream<_CharT, _Traits, _Alloc>
+  ::basic_ostringstream(const _String& __str, ios_base::openmode __mode)
+    : basic_ostream<_CharT, _Traits>(0),
+      _M_buf(__str, __mode | ios_base::out) {
+  this->init(&_M_buf);
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+basic_ostringstream<_CharT, _Traits, _Alloc>::~basic_ostringstream()
+{}
+
+
+
+
+template <class _CharT, class _Traits, class _Alloc>
+basic_stringstream<_CharT, _Traits, _Alloc>
+  ::basic_stringstream(ios_base::openmode __mode)
+    : basic_iostream<_CharT, _Traits>(0), _M_buf(__mode) {
+   this->init(&_M_buf);
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+basic_stringstream<_CharT, _Traits, _Alloc>
+  ::basic_stringstream(const _String& __str, ios_base::openmode __mode)
+    : basic_iostream<_CharT, _Traits>(0), _M_buf(__str, __mode) {
+  this->init(&_M_buf);
+}
+
+template <class _CharT, class _Traits, class _Alloc>
+basic_stringstream<_CharT, _Traits, _Alloc>::~basic_stringstream()
+{}
+
+}
+# 260 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_sstream.h" 2
+# 37 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/sstream" 2
+# 49 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/sstream"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 1
+# 19 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
+# 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
+# 50 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/sstream" 2
+# 19 "jni/tracer/../util/util.cpp" 2
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/iomanip" 1
+# 23 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/iomanip"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
+
+
+
+
+
+
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
+# 8 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 2
+# 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/iomanip" 2
+
+
+
+
+
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_ioserr.h" 1
+# 30 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/iomanip" 2
+
+
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_iomanip.h" 1
+# 26 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_iomanip.h"
+namespace std {
+
+namespace priv {
+
+
+
+
+
+template <class _Arg>
+struct _Ios_Manip_1 {
+   typedef _Arg (ios_base::*__f_ptr_type)(_Arg);
+
+  _Ios_Manip_1(__f_ptr_type __f, const _Arg& __arg)
+    : _M_f(__f), _M_arg(__arg) {}
+
+  void operator()(ios_base& __ios) const
+  { (__ios.*_M_f)(_M_arg); }
+
+  __f_ptr_type _M_f;
+  _Arg _M_arg;
+};
+
+
+struct _Ios_Setf_Manip {
+  ios_base::fmtflags _M_flag;
+  ios_base::fmtflags _M_mask;
+  bool _M_two_args;
+
+  _Ios_Setf_Manip(ios_base::fmtflags __f)
+    : _M_flag(__f), _M_mask(0), _M_two_args(false) {}
+
+  _Ios_Setf_Manip(ios_base::fmtflags __f, ios_base::fmtflags __m)
+    : _M_flag(__f), _M_mask(__m), _M_two_args(true) {}
+
+  void operator()(ios_base& __ios) const {
+    if (_M_two_args)
+      __ios.setf(_M_flag, _M_mask);
+    else
+      __ios.setf(_M_flag);
+  }
+};
+
+}
+
+template <class _CharT, class _Traits, class _Arg>
+inline basic_istream<_CharT, _Traits>&
+operator>>(basic_istream<_CharT, _Traits>& __istr,
+           const ::std::priv:: _Ios_Manip_1<_Arg>& __f) {
+  __f(__istr);
+  return __istr;
+}
+
+template <class _CharT, class _Traits, class _Arg>
+inline basic_ostream<_CharT, _Traits>&
+operator<<(basic_ostream<_CharT, _Traits>& __os,
+           const ::std::priv:: _Ios_Manip_1<_Arg>& __f) {
+  __f(__os);
+  return __os;
+}
+
+template <class _CharT, class _Traits>
+inline basic_istream<_CharT, _Traits>&
+operator>>(basic_istream<_CharT, _Traits>& __istr,
+           const ::std::priv:: _Ios_Setf_Manip& __f) {
+  __f(__istr);
+  return __istr;
+}
+
+template <class _CharT, class _Traits>
+inline basic_ostream<_CharT, _Traits>&
+operator<<(basic_ostream<_CharT, _Traits>& __os,
+           const ::std::priv:: _Ios_Setf_Manip& __f) {
+  __f(__os);
+  return __os;
+}
+
+
+
+inline ::std::priv:: _Ios_Setf_Manip resetiosflags(ios_base::fmtflags __mask)
+{ return ::std::priv:: _Ios_Setf_Manip(0, __mask); }
+
+inline ::std::priv:: _Ios_Setf_Manip setiosflags(ios_base::fmtflags __flag)
+{ return ::std::priv:: _Ios_Setf_Manip(__flag); }
+
+inline ::std::priv:: _Ios_Setf_Manip setbase(int __n) {
+  ios_base::fmtflags __base = __n == 8 ? ios_base::oct :
+                              __n == 10 ? ios_base::dec :
+                              __n == 16 ? ios_base::hex :
+                              ios_base::fmtflags(0);
+  return ::std::priv:: _Ios_Setf_Manip(__base, ios_base::basefield);
+}
+
+inline ::std::priv:: _Ios_Manip_1<streamsize>
+setprecision(int __n) {
+  ::std::priv:: _Ios_Manip_1<streamsize>::__f_ptr_type __f = &ios_base::precision;
+  return ::std::priv:: _Ios_Manip_1<streamsize>(__f, __n);
+}
+
+inline ::std::priv:: _Ios_Manip_1<streamsize>
+setw(int __n) {
+  ::std::priv:: _Ios_Manip_1<streamsize>::__f_ptr_type __f = &ios_base::width;
+  return ::std::priv:: _Ios_Manip_1<streamsize>(__f, __n);
+}
+
+
+
+
+namespace priv {
+
+template <class _CharT>
+struct _Setfill_Manip {
+  _Setfill_Manip(_CharT __c) : _M_c(__c) {}
+  _CharT _M_c;
+};
+
+}
+
+template <class _CharT, class _CharT2, class _Traits>
+inline basic_ostream<_CharT, _Traits>&
+operator<<(basic_ostream<_CharT, _Traits>& __os,
+           const ::std::priv:: _Setfill_Manip<_CharT2>& __m) {
+  __os.fill(__m._M_c);
+  return __os;
+}
+
+template <class _CharT, class _CharT2, class _Traits>
+inline basic_istream<_CharT, _Traits>&
+operator>>(basic_istream<_CharT, _Traits>& __is,
+           const ::std::priv:: _Setfill_Manip<_CharT2>& __m) {
+  __is.fill(__m._M_c);
+  return __is;
+}
+
+template <class _CharT>
+inline ::std::priv:: _Setfill_Manip<_CharT> setfill(_CharT __c)
+{ return ::std::priv:: _Setfill_Manip<_CharT>(__c); }
+
+}
+# 33 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/iomanip" 2
+# 45 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/iomanip"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 1
+# 19 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
+# 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
+# 46 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/iomanip" 2
+# 20 "jni/tracer/../util/util.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/cctype" 1
 # 21 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/cctype"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
@@ -19783,7 +20669,7 @@ using ::toupper;
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 40 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/cctype" 2
-# 18 "jni/scrcap/../util/util.cpp" 2
+# 21 "jni/tracer/../util/util.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\android\\log.h" 1 3 4
 # 70 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\android\\log.h" 3 4
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 1 3 4
@@ -19852,9 +20738,9 @@ void __android_log_assert(const char *cond, const char *tag,
 
 
 }
-# 19 "jni/scrcap/../util/util.cpp" 2
-# 1 "jni/scrcap/../util/util.hpp" 1
-# 13 "jni/scrcap/../util/util.hpp"
+# 22 "jni/tracer/../util/util.cpp" 2
+# 1 "jni/tracer/../util/util.hpp" 1
+# 13 "jni/tracer/../util/util.hpp"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -19865,7 +20751,7 @@ void __android_log_assert(const char *cond, const char *tag,
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 2
-# 14 "jni/scrcap/../util/util.hpp" 2
+# 14 "jni/tracer/../util/util.hpp" 2
 
 
 
@@ -19881,7 +20767,7 @@ void __android_log_assert(const char *cond, const char *tag,
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 61 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h" 2
-# 20 "jni/scrcap/../util/util.hpp" 2
+# 20 "jni/tracer/../util/util.hpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -19892,7 +20778,7 @@ void __android_log_assert(const char *cond, const char *tag,
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 2
-# 21 "jni/scrcap/../util/util.hpp" 2
+# 21 "jni/tracer/../util/util.hpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h" 1
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -19903,7 +20789,7 @@ void __android_log_assert(const char *cond, const char *tag,
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 62 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h" 2
-# 22 "jni/scrcap/../util/util.hpp" 2
+# 22 "jni/tracer/../util/util.hpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h" 1
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -19914,7 +20800,7 @@ void __android_log_assert(const char *cond, const char *tag,
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h" 2
-# 23 "jni/scrcap/../util/util.hpp" 2
+# 23 "jni/tracer/../util/util.hpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h" 1
 # 26 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -19925,7 +20811,7 @@ void __android_log_assert(const char *cond, const char *tag,
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 60 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h" 2
-# 24 "jni/scrcap/../util/util.hpp" 2
+# 24 "jni/tracer/../util/util.hpp" 2
 
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h"
@@ -19937,10 +20823,55 @@ void __android_log_assert(const char *cond, const char *tag,
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 2
-# 26 "jni/scrcap/../util/util.hpp" 2
-# 34 "jni/scrcap/../util/util.hpp"
+# 26 "jni/tracer/../util/util.hpp" 2
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\fcntl.h" 1 3 4
+# 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\fcntl.h" 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\fcntl.h" 1 3 4
+# 15 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\fcntl.h" 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm\\fcntl.h" 1 3 4
+# 19 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm\\fcntl.h" 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm-generic\\fcntl.h" 1 3 4
+# 117 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm-generic\\fcntl.h" 3 4
+struct flock {
+ short l_type;
+ short l_whence;
+ off_t l_start;
+ off_t l_len;
+ pid_t l_pid;
+
+};
+# 138 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm-generic\\fcntl.h" 3 4
+struct flock64 {
+ short l_type;
+ short l_whence;
+ loff_t l_start;
+ loff_t l_len;
+ pid_t l_pid;
+
+};
+# 19 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm\\fcntl.h" 2 3 4
+# 16 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\fcntl.h" 2 3 4
+# 34 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\fcntl.h" 2 3 4
+
+
+extern "C" {
+# 46 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\fcntl.h" 3 4
+extern int open(const char* path, int mode, ...);
+extern int openat(int fd, const char* path, int mode, ...);
+extern int unlinkat(int dirfd, const char *pathname, int flags);
+extern int fcntl(int fd, int command, ...);
+extern int creat(const char* path, mode_t mode);
+
+}
+# 27 "jni/tracer/../util/util.hpp" 2
+# 35 "jni/tracer/../util/util.hpp"
 std::vector<unsigned char> ReadFile(const char *fileName);
 void ReadMaps(int pid,std::vector<std::string> &out);
+std::string bin2hex(std::string const &s);
+std::vector<unsigned char> hex2bin(std::string const& s);
+std::vector<std::string> DirectoryListFile(std::string& dirName,std::string filter = "");
+std::string StringReplaceChar(std::string src,char c1,char c2);
+std::vector<std::string> SplitByChar(std::string src, char c = ' ');
 
 
 
@@ -19957,8 +20888,50 @@ extern "C" {
     unsigned int FinddlopenAddress(int pid);
     unsigned int FindwriteAddress(int pid);
     unsigned int GetBaseLibraryTextSize(const char* libname,int pid);
+    bool isDirectoryExist(const char* dir);
+    size_t GetFilesize(const char* filename);
 };
-# 20 "jni/scrcap/../util/util.cpp" 2
+
+class FileMap
+{
+public:
+    std::string fileName;
+    size_t filesize;
+    int fd;
+    void *buf;
+    FileMap(){
+ buf = __null;
+    }
+    ~FileMap(){
+ unMap();
+    }
+    void* map(std::string fileName){
+ this->fileName = fileName;
+ filesize = GetFilesize(fileName.c_str());
+ if(filesize > 0){
+     fd = open(fileName.c_str(), 00000000, 0);
+     if(fd > 0 ){
+
+  buf = mmap(__null, filesize, 0x1, 0x02 | 0x8000, fd, 0);
+  if(buf != ((void *)-1)){
+
+      return buf;
+  }
+     }
+     close(fd);
+ }
+ return(__null);
+    }
+    void unMap(){
+ if(buf!=__null){
+     int rc = munmap(buf, filesize);
+
+     close(fd);
+ }
+    }
+
+};
+# 23 "jni/tracer/../util/util.cpp" 2
 
 
 
@@ -19974,7 +20947,7 @@ typedef void* MonoMethod;
 typedef void* MonoString;
 typedef int gboolean;
 typedef void* gpointer;
-# 52 "jni/scrcap/../util/util.cpp"
+# 55 "jni/tracer/../util/util.cpp"
 typedef void * (*mono_domain_get_t)();
 mono_domain_get_t mono_domain_get;
 
@@ -20345,4 +21318,113 @@ void Test()
     __android_log_print(ANDROID_LOG_DEBUG, "utils", "dlsym=%08X",(unsigned int)dlsym);
     __android_log_print(ANDROID_LOG_DEBUG, "utils", "pid=%d",getpid());
     __android_log_print(ANDROID_LOG_DEBUG, "utils", "gettid=%d",gettid());
+}
+
+std::vector<unsigned char> hex2bin(std::string const& s)
+{
+    std::vector<unsigned char> ret;
+    char *ptr = (char *)s.c_str();
+    for(int i=0;i<strlen(ptr);i+=2){
+ char buf[3];
+ strncpy(buf,&ptr[i],2);
+ buf[2] = 0;
+ int c;
+ sscanf(buf,"%x",&c);
+ ret.push_back(c);
+
+    }
+    return ret;
+}
+
+bool isDirectoryExist(const char* dir){
+    struct stat sb;
+    if (stat(dir, &sb) == 0 && (((sb.st_mode) & 00170000) == 0040000))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+size_t GetFilesize(const char* filename) {
+    struct stat st;
+    stat(filename, &st);
+    return st.st_size;
+}
+
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dirent.h" 1 3 4
+# 34 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dirent.h" 3 4
+extern "C" {
+# 53 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dirent.h" 3 4
+struct dirent {
+  uint64_t d_ino;
+  int64_t d_off;
+  unsigned short d_reclen;
+  unsigned char d_type;
+  char d_name[256];
+};
+
+typedef struct DIR DIR;
+
+extern DIR* opendir(const char* dirpath);
+extern DIR* fdopendir(int fd);
+extern struct dirent* readdir(DIR* dirp);
+extern int readdir_r(DIR* dirp, struct dirent* entry, struct dirent** result);
+extern int closedir(DIR* dirp);
+extern void rewinddir(DIR* dirp);
+extern int dirfd(DIR* dirp);
+extern int alphasort(const struct dirent** a, const struct dirent** b);
+extern int scandir(const char* dir, struct dirent*** namelist,
+                                 int(*filter)(const struct dirent*),
+                                 int(*compar)(const struct dirent**,
+                                              const struct dirent**));
+
+extern int getdents(unsigned int, struct dirent*, unsigned int);
+
+}
+# 462 "jni/tracer/../util/util.cpp" 2
+std::vector<std::string> DirectoryListFile(std::string& dirName,std::string filter){
+    std::vector<std::string> ret;
+
+    DIR *dirp = opendir(dirName.c_str());
+    struct dirent *dp;
+    while ((dp = readdir(dirp)) != __null){
+ if(filter!=""){
+     if(strstr(dp->d_name,filter.c_str())!=__null){
+  ret.push_back(dp->d_name);
+     }
+ }else{
+     ret.push_back(dp->d_name);
+ }
+
+
+
+
+    }
+    closedir(dirp);
+    return ret;
+}
+
+std::string StringReplaceChar(std::string src,char c1,char c2)
+{
+    std::string s = src;
+    std::replace(s.begin(), s.end(), c1, c2 );
+    return s;
+}
+
+std::vector<std::string> SplitByChar(std::string src, char c)
+{
+    std::vector<std::string> result;
+    char *str = (char *)src.c_str();
+    do
+    {
+        const char *begin = str;
+        while(*str != c && *str)
+            str++;
+
+        result.push_back(std::string((char *)begin, str));
+    } while (0 != *str++);
+    return result;
 }

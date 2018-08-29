@@ -14,6 +14,7 @@
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/mman.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -34,7 +35,7 @@
 
 #define stricmp strcasecmp
 
-
+Logger logger;
 using namespace std;
 
 class SearchCommand {
@@ -43,8 +44,11 @@ public:
     char type;
     int iValue;
     float fValue;
+    //char sValue[1024];
+    std::vector<unsigned char>hValue;
+    string sValue;
     // {op}{type}{value}
-    // op -> = > < x c
+    // op -> = > < x c :
     // type -> i f 
     static SearchCommand parse(char *data){
 	//printf("SearchCommand:parse [%s]\n",data);
@@ -53,14 +57,29 @@ public:
 	strcpy(buf,data);
 	ret.op = buf[0];
 	ret.type = buf[1];
-	if(ret.type == 'i'){
-	    sscanf(&data[2],"%d",&ret.iValue);
-	}
-	if(ret.type == 'f'){
-	    sscanf(&data[2],"%f",&ret.fValue);
+	if(ret.op == ':'){ //  :path
+	    ret.sValue.append(&data[1]);
+	}else{
+	    if(ret.type == 'i'){
+		sscanf(&data[2],"%d",&ret.iValue);
+	    }
+	    if(ret.type == 'f'){
+		sscanf(&data[2],"%f",&ret.fValue);
+	    }
+	    if(ret.type == 's'){
+		//sscanf(&data[2],"%s",ret.sValue);
+		ret.hValue.insert(ret.hValue.end(), &data[2], &data[strlen(data)]);
+
+	    }
+	    if(ret.type == 'h'){
+		//printf("[%s]\n",ret.sValue);
+		ret.hValue = hex2bin(&data[2]);
+		//logger.logHex(ret.hValue.begin(),ret.hValue.size());
+	    }
 	}
 	return ret;
     }
+    
     SearchCommand(){
 	op = ' ';
     }
@@ -68,13 +87,93 @@ public:
 	return op != ' ';
     }
     void show(){
-	if(type == 'i'){
-	    printf("%c %c %d\n",op,type,iValue);
+	if(op == ':'){
+	    printf("DUMP %c [%s]\n",op,sValue.c_str());
 	}else{
-	    printf("%c %c %f\n",op,type,fValue);
+	    if(type == 'i'){
+		printf("%c %c %d\n",op,type,iValue);
+	    }
+	    if(type == 'f'){
+		printf("%c %c %f\n",op,type,fValue);
+	    }
+	    if(type == 's'){
+		printf("%c %c\n",op,type);
+		logger.logHex(hValue.begin(),hValue.size());
+
+	    }
+	    if(type == 'h'){
+		printf("%c %c\n",op,type);
+		logger.logHex(hValue.begin(),hValue.size());
+	    }
 	}
+	
     }
 };
+
+void dumpToDir(std::vector<ProcMapData>& vMaps, ProcessScanner& pscan, char *path)
+{
+    for(int i=0;i<vMaps.size();i++){
+//if(vMaps[i].startAddr < 0x94455000){
+//    printf("SKIP %08X\n",vMaps[i].startAddr);
+//    continue;
+//}
+	    //heapMap[i].show();
+	char *buf = (char *)malloc(vMaps[i].size());
+	if(buf == NULL){
+	    printf("malloc fail for %d",vMaps[i].size());
+	    continue;
+	}
+	if(pscan.read(vMaps[i].startAddr,vMaps[i].size(),(unsigned int)&buf[0])){
+	    SnapShotData sn;
+	    sn.buf = (void *)&buf[0];
+	    sn.size = vMaps[i].size();
+	    sn.startAddr = vMaps[i].startAddr;
+	    char dumpFileName[1024];
+	    sprintf(dumpFileName,"%s/%08X-%08X.bin",path,vMaps[i].startAddr,vMaps[i].endAddr);
+	    pscan.buffToFile((unsigned int)&buf[0],vMaps[i].size(),dumpFileName);
+	    printf("dump %s\n",dumpFileName);
+	}else{
+	    printf("Read fail\n");
+	}
+	free(buf);
+    }
+}
+
+void searchDir(std::string dirName,SearchCommand &cmd)
+{
+    printf("%s\n",dirName.c_str());
+    std::vector<std::string> vFiles = DirectoryListFile(dirName,".bin");    
+    //std::vector<SnapShotResult> allAddrs;
+    for(int i=0;i<vFiles.size();i++){
+	std::string fileName = dirName + "/" + vFiles[i];
+	if(cmd.hasCommand()){
+	    SnapShotFileData snapShot(fileName);
+	    std::vector<SnapShotResult> currentAddrs;
+	    if(cmd.op == '='){
+		if(cmd.type=='i'){
+		    currentAddrs = snapShot.findInt32(cmd.iValue);
+		}
+		if((cmd.type=='s')||(cmd.type=='h')){
+		    currentAddrs = snapShot.findBinary(cmd.hValue);
+		}
+	    }
+	    //allAddrs.insert(allAddrs.end(),currentAddrs.begin(),currentAddrs.end());
+	    if(currentAddrs.size()>0){
+		printf("%s\n",fileName.c_str());
+		for(int j=0;j<currentAddrs.size();j++){
+		    unsigned int addr = (unsigned int)snapShot.GetVirtualAddress(currentAddrs[j].addr);
+		    printf("%08X %08X\n",currentAddrs[j].addr,addr);
+		    logger.logHex((unsigned char *)addr,64);
+		}
+	    }
+	}else{
+	    //printf("%s\n",fileName.c_str());
+	}
+    }
+    if(cmd.hasCommand()){
+	//printf("%d\n",allAddrs.size());
+    }
+}
 
 /*
  * 
@@ -100,9 +199,12 @@ int main(int argc, char** argv) {
     char outputFileName[128];
     char inputFileName[128];
     SearchCommand cmd;
+    std::string mainCommand;
+    std::string argv1;
     outputFileName[0] = 0;
     inputFileName[0] = 0;
     bool flgDump = false;
+    bool flgParseOnly = false;
     //printf("%d\n",argc);
     if(argc>1){
 	for(int i=2;i<argc;i++){
@@ -122,12 +224,34 @@ int main(int argc, char** argv) {
 	    if(strcmp(argv[i],"-d")==0){
 		flgDump = true;
 	    }
+	    if(strcmp(argv[i],"-p")==0){
+		flgParseOnly = true;
+	    }
+	    if(strcmp(argv[i],"search")==0){
+		mainCommand = std::string(argv[i]);
+		i++;
+		argv1 = std::string(argv[i]);
+	    }
+	    
 	}
     }
+    if(flgParseOnly){
+	printf("Done (parse only)\n");
+	return 0;
+    }
+    if(mainCommand!=""){
+	if(mainCommand == "search"){
+	    searchDir(argv1,cmd);
+	}
+	return 0;
+    }
+	
     if(!cmd.hasCommand()){
 	printf("-c not found\n");
 	return 0;
     }
+//printf("DEBUG BREAK\n");    
+//return 0;    
     printf("i=%s o=%s\n",inputFileName,outputFileName);
     std::vector<SnapShotResult> prevAddrs;
     if(inputFileName[0]!=0){
@@ -138,12 +262,33 @@ int main(int argc, char** argv) {
     if(pscan.open(pid)){
 	//printf("Open success %d\n",pid);
 	pscan.readMap();
-	std::vector<ProcMapData> heapMap = pscan.getHeap();
+	//std::vector<ProcMapData> heapMap = pscan.getHeap();
+	std::vector<ProcMapData> heapMap = pscan.getWriteable();
+	
+	if(cmd.op == ':'){
+	    if(cmd.sValue.size()==0){
+		printf("Directory [%s] not define\n",(char *)cmd.sValue.c_str());
+	    }else{
+		if(!isDirectoryExist(cmd.sValue.c_str())){
+		    printf("Directory [%s] not found\n",(char *)cmd.sValue.c_str());
+		    mkdir((char *)cmd.sValue.c_str(),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+		    printf("Create Directory [%s]\n",(char *)cmd.sValue.c_str());
+		}
+		dumpToDir(heapMap,pscan,(char *)cmd.sValue.c_str());
+	    }
+	    pscan.close();
+	    return 0;
+        }
+
 	SnapShot snapShot;
 	//printf("%d\n",heapMap.size());
 	for(int i=0;i<heapMap.size();i++){
 	    //heapMap[i].show();
 	    char *buf = (char *)malloc(heapMap[i].size());
+	    if(buf == NULL){
+		printf("malloc fail for %d",heapMap[i].size());
+		continue;
+	    }
 	    if(pscan.read(heapMap[i].startAddr,heapMap[i].size(),(unsigned int)&buf[0])){
 		SnapShotData sn;
 		sn.buf = (void *)&buf[0];
@@ -164,6 +309,9 @@ int main(int argc, char** argv) {
 	if(cmd.op == '='){
 	    if(cmd.type=='i'){
 		currentAddrs = snapShot.findInt32(cmd.iValue);
+	    }
+	    if((cmd.type=='s')||(cmd.type=='h')){
+		currentAddrs = snapShot.findBinary(cmd.hValue);
 	    }
 	}
 	printf("currentAddrs=%d\n",currentAddrs.size());

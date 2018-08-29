@@ -1428,6 +1428,97 @@ extern int waitid(idtype_t which, id_t id, siginfo_t *info, int options);
 }
 # 16 "jni/scrcap/main.cpp" 2
 
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 1 3 4
+# 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\time.h" 1 3 4
+# 35 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\time.h" 3 4
+extern "C" {
+
+extern int gettimeofday(struct timeval *, struct timezone *);
+extern int settimeofday(const struct timeval *, const struct timezone *);
+
+extern int getitimer(int, struct itimerval *);
+extern int setitimer(int, const struct itimerval *, struct itimerval *);
+
+extern int utimes(const char *, const struct timeval *);
+# 76 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\time.h" 3 4
+}
+# 34 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 2 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\stat.h" 1 3 4
+# 35 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 2 3 4
+
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\endian.h" 1 3 4
+# 31 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\endian.h" 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\endian.h" 1 3 4
+# 51 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\endian.h" 3 4
+extern "C" {
+uint32_t htonl(uint32_t) __attribute__((__const__));
+uint16_t htons(uint16_t) __attribute__((__const__));
+uint32_t ntohl(uint32_t) __attribute__((__const__));
+uint16_t ntohs(uint16_t) __attribute__((__const__));
+}
+# 32 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\endian.h" 2 3 4
+# 37 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 2 3 4
+
+extern "C" {
+# 77 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 3 4
+struct stat {
+    unsigned long long st_dev;
+    unsigned char __pad0[4];
+
+    unsigned long __st_ino;
+    unsigned int st_mode;
+    unsigned int st_nlink;
+
+    unsigned long st_uid;
+    unsigned long st_gid;
+
+    unsigned long long st_rdev;
+    unsigned char __pad3[4];
+
+    long long st_size;
+    unsigned long st_blksize;
+    unsigned long long st_blocks;
+
+    unsigned long st_atime;
+    unsigned long st_atime_nsec;
+
+    unsigned long st_mtime;
+    unsigned long st_mtime_nsec;
+
+    unsigned long st_ctime;
+    unsigned long st_ctime_nsec;
+
+    unsigned long long st_ino;
+};
+# 115 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h" 3 4
+extern int chmod(const char *, mode_t);
+extern int fchmod(int, mode_t);
+extern int mkdir(const char *, mode_t);
+
+extern int stat(const char *, struct stat *);
+extern int fstat(int, struct stat *);
+extern int lstat(const char *, struct stat *);
+extern int mknod(const char *, mode_t, dev_t);
+extern mode_t umask(mode_t);
+
+
+
+
+
+static __inline__ int mkfifo(const char *__p, mode_t __m)
+{
+  return mknod(__p, (__m & ~00170000) | 0010000, (dev_t)0);
+}
+
+extern int fstatat(int dirfd, const char *path, struct stat *buf, int flags);
+extern int mkdirat(int dirfd, const char *pathname, mode_t mode);
+extern int fchownat(int dirfd, const char *path, uid_t owner, gid_t group, int flags);
+extern int fchmodat(int dirfd, const char *path, mode_t mode, int flags);
+extern int renameat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath);
+
+}
+# 18 "jni/scrcap/main.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\mman.h" 1 3 4
 # 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\mman.h" 3 4
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm\\mman.h" 1 3 4
@@ -1461,7 +1552,7 @@ extern int munlock(const void *addr, size_t len);
 extern int mincore(void* start, size_t length, unsigned char* vec);
 
 }
-# 18 "jni/scrcap/main.cpp" 2
+# 19 "jni/scrcap/main.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\unistd.h" 1 3 4
 # 31 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\unistd.h" 3 4
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stddef.h" 1 3 4
@@ -1484,22 +1575,7 @@ extern int mincore(void* start, size_t length, unsigned char* vec);
 
 
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\select.h" 1 3 4
-# 32 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\select.h" 3 4
-# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\time.h" 1 3 4
-# 35 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\time.h" 3 4
-extern "C" {
-
-extern int gettimeofday(struct timeval *, struct timezone *);
-extern int settimeofday(const struct timeval *, const struct timezone *);
-
-extern int getitimer(int, struct itimerval *);
-extern int setitimer(int, const struct itimerval *, struct itimerval *);
-
-extern int utimes(const char *, const struct timeval *);
-# 76 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\time.h" 3 4
-}
-# 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\select.h" 2 3 4
-
+# 34 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\select.h" 3 4
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/signal.h" 1 3 4
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/signal.h" 3 4
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1 3 4
@@ -1682,7 +1758,7 @@ extern pid_t tcgetpgrp(int fd);
 extern int tcsetpgrp(int fd, pid_t _pid);
 # 205 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\unistd.h" 3 4
 }
-# 19 "jni/scrcap/main.cpp" 2
+# 20 "jni/scrcap/main.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1862,7 +1938,7 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 61 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h" 2
-# 20 "jni/scrcap/main.cpp" 2
+# 21 "jni/scrcap/main.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1873,7 +1949,7 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 2
-# 21 "jni/scrcap/main.cpp" 2
+# 22 "jni/scrcap/main.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h" 1
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1884,7 +1960,7 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 62 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h" 2
-# 22 "jni/scrcap/main.cpp" 2
+# 23 "jni/scrcap/main.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h" 1
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1903,7 +1979,7 @@ extern "C" {
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h" 2
-# 23 "jni/scrcap/main.cpp" 2
+# 24 "jni/scrcap/main.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h" 1
 # 26 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1914,7 +1990,7 @@ extern "C" {
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 60 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h" 2
-# 24 "jni/scrcap/main.cpp" 2
+# 25 "jni/scrcap/main.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dlfcn.h" 1 3 4
 # 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dlfcn.h" 3 4
 extern "C" {
@@ -1948,7 +2024,7 @@ enum {
 
 
 }
-# 25 "jni/scrcap/main.cpp" 2
+# 26 "jni/scrcap/main.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1967,7 +2043,7 @@ typedef __gnuc_va_list va_list;
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 2
-# 26 "jni/scrcap/main.cpp" 2
+# 27 "jni/scrcap/main.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string" 1
 # 23 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
@@ -16402,7 +16478,7 @@ getline(basic_istream<_CharT, _Traits>& __is,
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string" 2
-# 27 "jni/scrcap/main.cpp" 2
+# 28 "jni/scrcap/main.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/vector" 1
 # 27 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/vector"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
@@ -17974,7 +18050,7 @@ struct _DefaultZeroValue<vector<_Tp, _Alloc> >
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/vector" 2
-# 28 "jni/scrcap/main.cpp" 2
+# 29 "jni/scrcap/main.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/algorithm" 1
 # 30 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/algorithm"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
@@ -21068,7 +21144,7 @@ bool __is_sorted(_ForwardIter __first, _ForwardIter __last,
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 55 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/algorithm" 2
-# 29 "jni/scrcap/main.cpp" 2
+# 30 "jni/scrcap/main.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dirent.h" 1 3 4
 # 34 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dirent.h" 3 4
 extern "C" {
@@ -21099,7 +21175,7 @@ extern int scandir(const char* dir, struct dirent*** namelist,
 extern int getdents(unsigned int, struct dirent*, unsigned int);
 
 }
-# 30 "jni/scrcap/main.cpp" 2
+# 31 "jni/scrcap/main.cpp" 2
 # 1 "jni/scrcap/../util/logger.h" 1
 
 
@@ -21162,7 +21238,7 @@ public:
  char *toHex(unsigned char *p,int len);
         void printf(char *format, ...);
 };
-# 31 "jni/scrcap/main.cpp" 2
+# 32 "jni/scrcap/main.cpp" 2
 # 1 "jni/scrcap/../util/util.hpp" 1
 # 13 "jni/scrcap/../util/util.hpp"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 1
@@ -21248,6 +21324,46 @@ public:
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 2
 # 26 "jni/scrcap/../util/util.hpp" 2
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\fcntl.h" 1 3 4
+# 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\fcntl.h" 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\fcntl.h" 1 3 4
+# 15 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\fcntl.h" 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm\\fcntl.h" 1 3 4
+# 19 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm\\fcntl.h" 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm-generic\\fcntl.h" 1 3 4
+# 117 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm-generic\\fcntl.h" 3 4
+struct flock {
+ short l_type;
+ short l_whence;
+ off_t l_start;
+ off_t l_len;
+ pid_t l_pid;
+
+};
+# 138 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm-generic\\fcntl.h" 3 4
+struct flock64 {
+ short l_type;
+ short l_whence;
+ loff_t l_start;
+ loff_t l_len;
+ pid_t l_pid;
+
+};
+# 19 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm\\fcntl.h" 2 3 4
+# 16 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\fcntl.h" 2 3 4
+# 34 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\fcntl.h" 2 3 4
+
+
+extern "C" {
+# 46 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\fcntl.h" 3 4
+extern int open(const char* path, int mode, ...);
+extern int openat(int fd, const char* path, int mode, ...);
+extern int unlinkat(int dirfd, const char *pathname, int flags);
+extern int fcntl(int fd, int command, ...);
+extern int creat(const char* path, mode_t mode);
+
+}
+# 27 "jni/scrcap/../util/util.hpp" 2
 
 
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/fstream" 1
@@ -22870,7 +22986,7 @@ namespace std {
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 54 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/fstream" 2
-# 29 "jni/scrcap/../util/util.hpp" 2
+# 30 "jni/scrcap/../util/util.hpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\android\\log.h" 1 3 4
 # 70 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\android\\log.h" 3 4
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 1 3 4
@@ -22939,13 +23055,18 @@ void __android_log_assert(const char *cond, const char *tag,
 
 
 }
-# 30 "jni/scrcap/../util/util.hpp" 2
+# 31 "jni/scrcap/../util/util.hpp" 2
 
 
 
 
 std::vector<unsigned char> ReadFile(const char *fileName);
 void ReadMaps(int pid,std::vector<std::string> &out);
+std::string bin2hex(std::string const &s);
+std::vector<unsigned char> hex2bin(std::string const& s);
+std::vector<std::string> DirectoryListFile(std::string& dirName,std::string filter = "");
+std::string StringReplaceChar(std::string src,char c1,char c2);
+std::vector<std::string> SplitByChar(std::string src, char c = ' ');
 
 
 
@@ -22962,8 +23083,50 @@ extern "C" {
     unsigned int FinddlopenAddress(int pid);
     unsigned int FindwriteAddress(int pid);
     unsigned int GetBaseLibraryTextSize(const char* libname,int pid);
+    bool isDirectoryExist(const char* dir);
+    size_t GetFilesize(const char* filename);
 };
-# 32 "jni/scrcap/main.cpp" 2
+
+class FileMap
+{
+public:
+    std::string fileName;
+    size_t filesize;
+    int fd;
+    void *buf;
+    FileMap(){
+ buf = __null;
+    }
+    ~FileMap(){
+ unMap();
+    }
+    void* map(std::string fileName){
+ this->fileName = fileName;
+ filesize = GetFilesize(fileName.c_str());
+ if(filesize > 0){
+     fd = open(fileName.c_str(), 00000000, 0);
+     if(fd > 0 ){
+
+  buf = mmap(__null, filesize, 0x1, 0x02 | 0x8000, fd, 0);
+  if(buf != ((void *)-1)){
+
+      return buf;
+  }
+     }
+     close(fd);
+ }
+ return(__null);
+    }
+    void unMap(){
+ if(buf!=__null){
+     int rc = munmap(buf, filesize);
+
+     close(fd);
+ }
+    }
+
+};
+# 33 "jni/scrcap/main.cpp" 2
 # 1 "jni/scrcap/../util/payload.hpp" 1
 # 17 "jni/scrcap/../util/payload.hpp"
 struct _PayloadData {
@@ -22997,7 +23160,7 @@ unsigned char *ReadAllBytes(char *fileName,int *size);
 std::vector<unsigned char> _ReadFile(const char *fileName);
 unsigned char * CreateBranchToAddressCommand(unsigned int jumpToAddr);
 int GetBranchToAddressCommandSize();
-# 33 "jni/scrcap/main.cpp" 2
+# 34 "jni/scrcap/main.cpp" 2
 # 1 "jni/scrcap/../util/ProcessScanner.hpp" 1
 # 14 "jni/scrcap/../util/ProcessScanner.hpp"
 # 1 "jni/scrcap/../util/PtraceUtil.hpp" 1
@@ -23302,6 +23465,93 @@ private:
 
 };
 # 15 "jni/scrcap/../util/ProcessScanner.hpp" 2
+# 1 "jni/scrcap/../util/util.hpp" 1
+# 13 "jni/scrcap/../util/util.hpp"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 1
+# 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
+# 25 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 2
+# 50 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 1
+# 19 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
+# 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
+# 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 2
+# 14 "jni/scrcap/../util/util.hpp" 2
+
+
+
+
+
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h" 1
+# 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
+# 25 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h" 2
+# 60 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 1
+# 19 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
+# 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
+# 61 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h" 2
+# 20 "jni/scrcap/../util/util.hpp" 2
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 1
+# 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
+# 25 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 2
+# 50 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 1
+# 19 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
+# 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
+# 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 2
+# 21 "jni/scrcap/../util/util.hpp" 2
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h" 1
+# 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
+# 19 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h" 2
+# 61 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 1
+# 19 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
+# 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
+# 62 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h" 2
+# 22 "jni/scrcap/../util/util.hpp" 2
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h" 1
+# 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
+# 19 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h" 2
+# 41 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 1
+# 19 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
+# 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
+# 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h" 2
+# 23 "jni/scrcap/../util/util.hpp" 2
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h" 1
+# 26 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
+# 27 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h" 2
+# 59 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 1
+# 19 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
+# 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
+# 60 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h" 2
+# 24 "jni/scrcap/../util/util.hpp" 2
+
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 1
+# 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
+# 25 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 2
+# 41 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 1
+# 19 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h"
+# 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
+# 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
+# 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 2
+# 26 "jni/scrcap/../util/util.hpp" 2
+# 16 "jni/scrcap/../util/ProcessScanner.hpp" 2
+
 
 
 
@@ -23331,19 +23581,46 @@ public:
 
 bool ascendingAddr(const SnapShotResult& guy1, const SnapShotResult& guy2);
 
-class SnapShotData {
+class ISnapShotData {
 public:
     unsigned int startAddr;
     unsigned int size;
-    void *buf;
-
-    std::vector<SnapShotResult> findInt32(unsigned int);
+    virtual std::vector<SnapShotResult> findInt32(unsigned int) =0;
+    virtual std::vector<SnapShotResult> findBinary(std::vector<unsigned char>)=0;
 };
+
+class SnapShotData: public ISnapShotData {
+public:
+    void *buf;
+    void *GetVirtualAddress(unsigned int addr){
+ unsigned char *ptr = (unsigned char *)buf;
+ return &ptr[addr - startAddr];
+    }
+    std::vector<SnapShotResult> findInt32(unsigned int);
+    std::vector<SnapShotResult> findBinary(std::vector<unsigned char>);
+};
+
+class SnapShotFileData: public SnapShotData {
+public:
+    FileMap fileMap;
+    SnapShotFileData(std::string fileName){
+ fileMap = FileMap();
+
+ std::string sAddr = SplitByChar(SplitByChar(fileName,'/').back(),'-')[0];
+
+
+ sscanf(sAddr.c_str(),"%X",&startAddr);
+ buf = fileMap.map(fileName);
+ size = fileMap.filesize;
+    }
+};
+
 
 class SnapShot {
 public:
     std::vector<SnapShotData> vData;
     std::vector<SnapShotResult> findInt32(unsigned int);
+    std::vector<SnapShotResult> findBinary(std::vector<unsigned char>);
     static std::vector<SnapShotResult> readFromFile(char *fileName);
 };
 
@@ -23394,16 +23671,17 @@ public:
     bool writeAll(std::vector<WriteData> &vData);
     void dump(unsigned int targetAddr,int size);
     std::vector<ProcMapData> getHeap();
+    std::vector<ProcMapData> getWriteable();
     bool buffToFile(unsigned int bufferAddr,int size,char *fileName);
     static void memScan(unsigned int dataAddr,int dataSize,unsigned int memAddr,int memSize,std::vector<ScanResult> &result,int step);
 private:
 
 };
-# 34 "jni/scrcap/main.cpp" 2
+# 35 "jni/scrcap/main.cpp" 2
 
 
 
-
+Logger logger;
 using namespace std;
 
 class SearchCommand {
@@ -23412,6 +23690,9 @@ public:
     char type;
     int iValue;
     float fValue;
+
+    std::vector<unsigned char>hValue;
+    string sValue;
 
 
 
@@ -23422,14 +23703,29 @@ public:
  strcpy(buf,data);
  ret.op = buf[0];
  ret.type = buf[1];
- if(ret.type == 'i'){
-     sscanf(&data[2],"%d",&ret.iValue);
- }
- if(ret.type == 'f'){
-     sscanf(&data[2],"%f",&ret.fValue);
+ if(ret.op == ':'){
+     ret.sValue.append(&data[1]);
+ }else{
+     if(ret.type == 'i'){
+  sscanf(&data[2],"%d",&ret.iValue);
+     }
+     if(ret.type == 'f'){
+  sscanf(&data[2],"%f",&ret.fValue);
+     }
+     if(ret.type == 's'){
+
+  ret.hValue.insert(ret.hValue.end(), &data[2], &data[strlen(data)]);
+
+     }
+     if(ret.type == 'h'){
+
+  ret.hValue = hex2bin(&data[2]);
+
+     }
  }
  return ret;
     }
+
     SearchCommand(){
  op = ' ';
     }
@@ -23437,13 +23733,93 @@ public:
  return op != ' ';
     }
     void show(){
- if(type == 'i'){
-     printf("%c %c %d\n",op,type,iValue);
+ if(op == ':'){
+     printf("DUMP %c [%s]\n",op,sValue.c_str());
  }else{
-     printf("%c %c %f\n",op,type,fValue);
+     if(type == 'i'){
+  printf("%c %c %d\n",op,type,iValue);
+     }
+     if(type == 'f'){
+  printf("%c %c %f\n",op,type,fValue);
+     }
+     if(type == 's'){
+  printf("%c %c\n",op,type);
+  logger.logHex(hValue.begin(),hValue.size());
+
+     }
+     if(type == 'h'){
+  printf("%c %c\n",op,type);
+  logger.logHex(hValue.begin(),hValue.size());
+     }
  }
+
     }
 };
+
+void dumpToDir(std::vector<ProcMapData>& vMaps, ProcessScanner& pscan, char *path)
+{
+    for(int i=0;i<vMaps.size();i++){
+
+
+
+
+
+ char *buf = (char *)malloc(vMaps[i].size());
+ if(buf == __null){
+     printf("malloc fail for %d",vMaps[i].size());
+     continue;
+ }
+ if(pscan.read(vMaps[i].startAddr,vMaps[i].size(),(unsigned int)&buf[0])){
+     SnapShotData sn;
+     sn.buf = (void *)&buf[0];
+     sn.size = vMaps[i].size();
+     sn.startAddr = vMaps[i].startAddr;
+     char dumpFileName[1024];
+     sprintf(dumpFileName,"%s/%08X-%08X.bin",path,vMaps[i].startAddr,vMaps[i].endAddr);
+     pscan.buffToFile((unsigned int)&buf[0],vMaps[i].size(),dumpFileName);
+     printf("dump %s\n",dumpFileName);
+ }else{
+     printf("Read fail\n");
+ }
+ free(buf);
+    }
+}
+
+void searchDir(std::string dirName,SearchCommand &cmd)
+{
+    printf("%s\n",dirName.c_str());
+    std::vector<std::string> vFiles = DirectoryListFile(dirName,".bin");
+
+    for(int i=0;i<vFiles.size();i++){
+ std::string fileName = dirName + "/" + vFiles[i];
+ if(cmd.hasCommand()){
+     SnapShotFileData snapShot(fileName);
+     std::vector<SnapShotResult> currentAddrs;
+     if(cmd.op == '='){
+  if(cmd.type=='i'){
+      currentAddrs = snapShot.findInt32(cmd.iValue);
+  }
+  if((cmd.type=='s')||(cmd.type=='h')){
+      currentAddrs = snapShot.findBinary(cmd.hValue);
+  }
+     }
+
+     if(currentAddrs.size()>0){
+  printf("%s\n",fileName.c_str());
+  for(int j=0;j<currentAddrs.size();j++){
+      unsigned int offset = (unsigned int)snapShot.GetVirtualAddress(currentAddrs[j].addr);
+      printf("%08X %08X\n",currentAddrs[j].addr,offset);
+      logger.logHex((unsigned char *)offset,64);
+  }
+     }
+ }else{
+
+ }
+    }
+    if(cmd.hasCommand()){
+
+    }
+}
 
 
 
@@ -23469,9 +23845,12 @@ int main(int argc, char** argv) {
     char outputFileName[128];
     char inputFileName[128];
     SearchCommand cmd;
+    std::string mainCommand;
+    std::string argv1;
     outputFileName[0] = 0;
     inputFileName[0] = 0;
     bool flgDump = false;
+    bool flgParseOnly = false;
 
     if(argc>1){
  for(int i=2;i<argc;i++){
@@ -23491,12 +23870,34 @@ int main(int argc, char** argv) {
      if(strcmp(argv[i],"-d")==0){
   flgDump = true;
      }
+     if(strcmp(argv[i],"-p")==0){
+  flgParseOnly = true;
+     }
+     if(strcmp(argv[i],"search")==0){
+  mainCommand = std::string(argv[i]);
+  i++;
+  argv1 = std::string(argv[i]);
+     }
+
  }
     }
+    if(flgParseOnly){
+ printf("Done (parse only)\n");
+ return 0;
+    }
+    if(mainCommand!=""){
+ if(mainCommand == "search"){
+     searchDir(argv1,cmd);
+ }
+ return 0;
+    }
+
     if(!cmd.hasCommand()){
  printf("-c not found\n");
  return 0;
     }
+
+
     printf("i=%s o=%s\n",inputFileName,outputFileName);
     std::vector<SnapShotResult> prevAddrs;
     if(inputFileName[0]!=0){
@@ -23507,12 +23908,33 @@ int main(int argc, char** argv) {
     if(pscan.open(pid)){
 
  pscan.readMap();
- std::vector<ProcMapData> heapMap = pscan.getHeap();
+
+ std::vector<ProcMapData> heapMap = pscan.getWriteable();
+
+ if(cmd.op == ':'){
+     if(cmd.sValue.size()==0){
+  printf("Directory [%s] not define\n",(char *)cmd.sValue.c_str());
+     }else{
+  if(!isDirectoryExist(cmd.sValue.c_str())){
+      printf("Directory [%s] not found\n",(char *)cmd.sValue.c_str());
+      mkdir((char *)cmd.sValue.c_str(),00700 | 00070 | 00004 | 00001);
+      printf("Create Directory [%s]\n",(char *)cmd.sValue.c_str());
+  }
+  dumpToDir(heapMap,pscan,(char *)cmd.sValue.c_str());
+     }
+     pscan.close();
+     return 0;
+        }
+
  SnapShot snapShot;
 
  for(int i=0;i<heapMap.size();i++){
 
      char *buf = (char *)malloc(heapMap[i].size());
+     if(buf == __null){
+  printf("malloc fail for %d",heapMap[i].size());
+  continue;
+     }
      if(pscan.read(heapMap[i].startAddr,heapMap[i].size(),(unsigned int)&buf[0])){
   SnapShotData sn;
   sn.buf = (void *)&buf[0];
@@ -23533,6 +23955,9 @@ int main(int argc, char** argv) {
  if(cmd.op == '='){
      if(cmd.type=='i'){
   currentAddrs = snapShot.findInt32(cmd.iValue);
+     }
+     if((cmd.type=='s')||(cmd.type=='h')){
+  currentAddrs = snapShot.findBinary(cmd.hValue);
      }
  }
  printf("currentAddrs=%d\n",currentAddrs.size());

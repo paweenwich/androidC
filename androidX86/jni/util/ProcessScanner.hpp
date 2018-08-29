@@ -10,8 +10,10 @@
  *
  * Created on August 25, 2016, 8:25 AM
  */
-
+//#include <string>
 #include "PtraceUtil.hpp"
+#include "util.hpp"
+
 
 #ifndef PROCESSSCANNER_HPP
 #define PROCESSSCANNER_HPP
@@ -41,19 +43,46 @@ public:
 
 bool ascendingAddr(const SnapShotResult& guy1, const SnapShotResult& guy2);
 
-class SnapShotData {
+class ISnapShotData {
 public:
     unsigned int startAddr;
     unsigned int size;
-    void *buf;
-    //std::vector<unsigned int> findInt32(unsigned int);
-    std::vector<SnapShotResult> findInt32(unsigned int);
+    virtual std::vector<SnapShotResult> findInt32(unsigned int) =0;
+    virtual std::vector<SnapShotResult> findBinary(std::vector<unsigned char>)=0;
 };
+
+class SnapShotData: public ISnapShotData {
+public:
+    void *buf;
+    void *GetVirtualAddress(unsigned int addr){
+	unsigned char *ptr = (unsigned char *)buf;
+	return &ptr[addr - startAddr];
+    }
+    std::vector<SnapShotResult> findInt32(unsigned int);
+    std::vector<SnapShotResult> findBinary(std::vector<unsigned char>);
+};
+
+class SnapShotFileData: public SnapShotData {
+public:
+    FileMap fileMap;
+    SnapShotFileData(std::string fileName){
+	fileMap = FileMap();
+	//printf("%d %d\n",size,fileMap.filesize);
+	std::string sAddr = SplitByChar(SplitByChar(fileName,'/').back(),'-')[0];
+	//std::string s = StringReplaceChar(onlyFileName,'-',' ');
+	//std::string sAddr = SplitByChar(s,' ')[0];
+	sscanf(sAddr.c_str(),"%X",&startAddr);
+	buf = fileMap.map(fileName);
+	size = fileMap.filesize;	
+    }
+};
+
 
 class SnapShot {
 public:
     std::vector<SnapShotData> vData;
     std::vector<SnapShotResult> findInt32(unsigned int);
+    std::vector<SnapShotResult> findBinary(std::vector<unsigned char>);
     static std::vector<SnapShotResult> readFromFile(char *fileName);
 };
 
@@ -104,6 +133,7 @@ public:
     bool writeAll(std::vector<WriteData> &vData);
     void dump(unsigned int targetAddr,int size);
     std::vector<ProcMapData> getHeap();
+    std::vector<ProcMapData> getWriteable();
     bool buffToFile(unsigned int bufferAddr,int size,char *fileName);
     static void memScan(unsigned int dataAddr,int dataSize,unsigned int memAddr,int memSize,std::vector<ScanResult> &result,int step);
 private:

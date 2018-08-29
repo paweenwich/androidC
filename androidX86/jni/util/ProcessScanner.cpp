@@ -228,6 +228,17 @@ std::vector<ProcMapData> ProcessScanner::getHeap()
     return ret;
 }
 
+std::vector<ProcMapData> ProcessScanner::getWriteable()
+{
+    std::vector<ProcMapData> ret;
+    for(int i=0;i<vProcMap.size();i++){
+	if(strcmp(vProcMap[i].protection,"rw-p")==0){
+	    ret.push_back(vProcMap[i]);
+	}
+    }
+    return ret;
+}
+
 bool ProcessScanner::buffToFile(unsigned int bufferAddr,int size,char *fileName)
 {
     FILE *f = fopen(fileName,"wb");
@@ -265,6 +276,34 @@ std::vector<SnapShotResult> SnapShot::findInt32(unsigned int data)
     return ret;
 }
 
+std::vector<SnapShotResult> SnapShotData::findBinary(std::vector<unsigned char> data)
+{
+    //printf("SnapShotData::findBinary %d %d %08X\n",data.size(),size,(unsigned int)buf);
+    std::vector<SnapShotResult> ret;
+    unsigned char *ptr = (unsigned char *)buf;
+    for(int i=0;i<size - data.size();i++){
+	//printf("%d\n",i);
+	if(ptr[i] == data[0]){
+	    if(memcmp(&ptr[i],data.begin(),data.size())==0){
+		SnapShotResult r;
+    		r.addr = startAddr + i;
+		ret.push_back(r);
+	    }
+	}
+    }
+    return ret;
+}
+
+std::vector<SnapShotResult> SnapShot::findBinary(std::vector<unsigned char> data)
+{
+    std::vector<SnapShotResult> ret;
+    for(int i=0;i<vData.size();i++){
+	std::vector<SnapShotResult> tmp = vData[i].findBinary(data);
+	ret.insert(ret.end(),tmp.begin(),tmp.end());
+    }
+    return ret;
+}
+
 std::vector<SnapShotResult> SnapShot::readFromFile(char *fileName)
 {
     std::vector<SnapShotResult> ret;
@@ -282,3 +321,4 @@ std::vector<SnapShotResult> SnapShot::readFromFile(char *fileName)
 bool ascendingAddr(const SnapShotResult& guy1, const SnapShotResult& guy2) {
   return guy1.addr < guy2.addr;
 }
+

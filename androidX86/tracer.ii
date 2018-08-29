@@ -18280,6 +18280,46 @@ extern int getdents(unsigned int, struct dirent*, unsigned int);
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 2
 # 26 "jni/tracer/../util/util.hpp" 2
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\fcntl.h" 1 3 4
+# 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\fcntl.h" 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\fcntl.h" 1 3 4
+# 15 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\fcntl.h" 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm\\fcntl.h" 1 3 4
+# 19 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm\\fcntl.h" 3 4
+# 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm-generic\\fcntl.h" 1 3 4
+# 117 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm-generic\\fcntl.h" 3 4
+struct flock {
+ short l_type;
+ short l_whence;
+ off_t l_start;
+ off_t l_len;
+ pid_t l_pid;
+
+};
+# 138 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm-generic\\fcntl.h" 3 4
+struct flock64 {
+ short l_type;
+ short l_whence;
+ loff_t l_start;
+ loff_t l_len;
+ pid_t l_pid;
+
+};
+# 19 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\asm\\fcntl.h" 2 3 4
+# 16 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\fcntl.h" 2 3 4
+# 34 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\fcntl.h" 2 3 4
+
+
+extern "C" {
+# 46 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\fcntl.h" 3 4
+extern int open(const char* path, int mode, ...);
+extern int openat(int fd, const char* path, int mode, ...);
+extern int unlinkat(int dirfd, const char *pathname, int flags);
+extern int fcntl(int fd, int command, ...);
+extern int creat(const char* path, mode_t mode);
+
+}
+# 27 "jni/tracer/../util/util.hpp" 2
 
 
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/fstream" 1
@@ -19902,7 +19942,7 @@ namespace std {
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 54 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/fstream" 2
-# 29 "jni/tracer/../util/util.hpp" 2
+# 30 "jni/tracer/../util/util.hpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\android\\log.h" 1 3 4
 # 70 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\android\\log.h" 3 4
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 1 3 4
@@ -19971,13 +20011,18 @@ void __android_log_assert(const char *cond, const char *tag,
 
 
 }
-# 30 "jni/tracer/../util/util.hpp" 2
+# 31 "jni/tracer/../util/util.hpp" 2
 
 
 
 
 std::vector<unsigned char> ReadFile(const char *fileName);
 void ReadMaps(int pid,std::vector<std::string> &out);
+std::string bin2hex(std::string const &s);
+std::vector<unsigned char> hex2bin(std::string const& s);
+std::vector<std::string> DirectoryListFile(std::string& dirName,std::string filter = "");
+std::string StringReplaceChar(std::string src,char c1,char c2);
+std::vector<std::string> SplitByChar(std::string src, char c = ' ');
 
 
 
@@ -19994,6 +20039,48 @@ extern "C" {
     unsigned int FinddlopenAddress(int pid);
     unsigned int FindwriteAddress(int pid);
     unsigned int GetBaseLibraryTextSize(const char* libname,int pid);
+    bool isDirectoryExist(const char* dir);
+    size_t GetFilesize(const char* filename);
+};
+
+class FileMap
+{
+public:
+    std::string fileName;
+    size_t filesize;
+    int fd;
+    void *buf;
+    FileMap(){
+ buf = __null;
+    }
+    ~FileMap(){
+ unMap();
+    }
+    void* map(std::string fileName){
+ this->fileName = fileName;
+ filesize = GetFilesize(fileName.c_str());
+ if(filesize > 0){
+     fd = open(fileName.c_str(), 00000000, 0);
+     if(fd > 0 ){
+
+  buf = mmap(__null, filesize, 0x1, 0x02 | 0x8000, fd, 0);
+  if(buf != ((void *)-1)){
+
+      return buf;
+  }
+     }
+     close(fd);
+ }
+ return(__null);
+    }
+    void unMap(){
+ if(buf!=__null){
+     int rc = munmap(buf, filesize);
+
+     close(fd);
+ }
+    }
+
 };
 # 32 "jni/tracer/tracer.cpp" 2
 # 1 "jni/tracer/../util/PtraceUtil.hpp" 1

@@ -14,8 +14,8 @@
 	.globl	_ZN10PtraceUtilD2Ev
 	.type	_ZN10PtraceUtilD2Ev, @function
 _ZN10PtraceUtilD2Ev:
-.LFB1599:
-	.file 1 "jni/scrcap/../util/PtraceUtil.cpp"
+.LFB1607:
+	.file 1 "jni/tracer/../util/PtraceUtil.cpp"
 	.loc 1 42 0
 	.cfi_startproc
 .LVL0:
@@ -123,7 +123,7 @@ _ZN10PtraceUtilD2Ev:
 .LBE384:
 .LBE385:
 	.cfi_endproc
-.LFE1599:
+.LFE1607:
 	.size	_ZN10PtraceUtilD2Ev, .-_ZN10PtraceUtilD2Ev
 	.section	.text.unlikely._ZN10PtraceUtilD2Ev
 .LCOLDE0:
@@ -141,7 +141,7 @@ _ZN10PtraceUtilD2Ev:
 	.globl	_ZN10PtraceUtilD0Ev
 	.type	_ZN10PtraceUtilD0Ev, @function
 _ZN10PtraceUtilD0Ev:
-.LFB1601:
+.LFB1609:
 	.loc 1 42 0
 	.cfi_startproc
 .LVL11:
@@ -176,7 +176,7 @@ _ZN10PtraceUtilD0Ev:
 	.cfi_def_cfa_offset 4
 	ret
 	.cfi_endproc
-.LFE1601:
+.LFE1609:
 	.size	_ZN10PtraceUtilD0Ev, .-_ZN10PtraceUtilD0Ev
 	.section	.text.unlikely._ZN10PtraceUtilD0Ev
 .LCOLDE1:
@@ -192,7 +192,7 @@ _ZN10PtraceUtilD0Ev:
 	.globl	_ZN10PtraceUtilC2Ev
 	.type	_ZN10PtraceUtilC2Ev, @function
 _ZN10PtraceUtilC2Ev:
-.LFB1596:
+.LFB1604:
 	.loc 1 38 0 is_stmt 1
 	.cfi_startproc
 .LVL14:
@@ -248,7 +248,7 @@ _ZN10PtraceUtilC2Ev:
 .LVL18:
 	ret
 	.cfi_endproc
-.LFE1596:
+.LFE1604:
 	.size	_ZN10PtraceUtilC2Ev, .-_ZN10PtraceUtilC2Ev
 	.section	.text.unlikely._ZN10PtraceUtilC2Ev
 .LCOLDE2:
@@ -273,7 +273,7 @@ _ZN10PtraceUtilC2Ev:
 	.globl	_ZN10PtraceUtil6AttachEi
 	.type	_ZN10PtraceUtil6AttachEi, @function
 _ZN10PtraceUtil6AttachEi:
-.LFB1602:
+.LFB1610:
 	.loc 1 46 0
 	.cfi_startproc
 .LVL19:
@@ -360,7 +360,7 @@ _ZN10PtraceUtil6AttachEi:
 	jmp	.L16
 .LBE394:
 	.cfi_endproc
-.LFE1602:
+.LFE1610:
 	.size	_ZN10PtraceUtil6AttachEi, .-_ZN10PtraceUtil6AttachEi
 	.section	.text.unlikely._ZN10PtraceUtil6AttachEi
 .LCOLDE6:
@@ -381,7 +381,7 @@ _ZN10PtraceUtil6AttachEi:
 	.globl	_ZN10PtraceUtil6DetachEv
 	.type	_ZN10PtraceUtil6DetachEv, @function
 _ZN10PtraceUtil6DetachEv:
-.LFB1603:
+.LFB1611:
 	.loc 1 59 0
 	.cfi_startproc
 .LVL28:
@@ -458,7 +458,7 @@ _ZN10PtraceUtil6DetachEv:
 	jmp	.L21
 .LBE396:
 	.cfi_endproc
-.LFE1603:
+.LFE1611:
 	.size	_ZN10PtraceUtil6DetachEv, .-_ZN10PtraceUtil6DetachEv
 	.section	.text.unlikely._ZN10PtraceUtil6DetachEv
 .LCOLDE9:
@@ -479,7 +479,7 @@ _ZN10PtraceUtil6DetachEv:
 	.globl	_ZN10PtraceUtil8ContinueEv
 	.type	_ZN10PtraceUtil8ContinueEv, @function
 _ZN10PtraceUtil8ContinueEv:
-.LFB1604:
+.LFB1612:
 	.loc 1 71 0
 	.cfi_startproc
 .LVL37:
@@ -563,7 +563,7 @@ _ZN10PtraceUtil8ContinueEv:
 	jmp	.L26
 .LBE398:
 	.cfi_endproc
-.LFE1604:
+.LFE1612:
 	.size	_ZN10PtraceUtil8ContinueEv, .-_ZN10PtraceUtil8ContinueEv
 	.section	.text.unlikely._ZN10PtraceUtil8ContinueEv
 .LCOLDE12:
@@ -582,7 +582,7 @@ _ZN10PtraceUtil8ContinueEv:
 	.globl	_ZN10PtraceUtil16FindBackupMemoryEj
 	.type	_ZN10PtraceUtil16FindBackupMemoryEj, @function
 _ZN10PtraceUtil16FindBackupMemoryEj:
-.LFB1605:
+.LFB1613:
 	.loc 1 82 0
 	.cfi_startproc
 .LVL47:
@@ -724,7 +724,7 @@ _ZN10PtraceUtil16FindBackupMemoryEj:
 	.cfi_def_cfa_offset 4
 	ret
 	.cfi_endproc
-.LFE1605:
+.LFE1613:
 	.size	_ZN10PtraceUtil16FindBackupMemoryEj, .-_ZN10PtraceUtil16FindBackupMemoryEj
 	.section	.text.unlikely._ZN10PtraceUtil16FindBackupMemoryEj
 .LCOLDE14:
@@ -740,7 +740,7 @@ _ZN10PtraceUtil16FindBackupMemoryEj:
 	.globl	_ZN10PtraceUtil13wordAlignSizeEi
 	.type	_ZN10PtraceUtil13wordAlignSizeEi, @function
 _ZN10PtraceUtil13wordAlignSizeEi:
-.LFB1609:
+.LFB1617:
 	.loc 1 152 0
 	.cfi_startproc
 .LVL58:
@@ -753,7 +753,7 @@ _ZN10PtraceUtil13wordAlignSizeEi:
 	.loc 1 154 0
 	ret
 	.cfi_endproc
-.LFE1609:
+.LFE1617:
 	.size	_ZN10PtraceUtil13wordAlignSizeEi, .-_ZN10PtraceUtil13wordAlignSizeEi
 	.section	.text.unlikely._ZN10PtraceUtil13wordAlignSizeEi
 .LCOLDE15:
@@ -772,7 +772,7 @@ _ZN10PtraceUtil13wordAlignSizeEi:
 	.globl	_ZN10PtraceUtil8PeekTextEjPj
 	.type	_ZN10PtraceUtil8PeekTextEjPj, @function
 _ZN10PtraceUtil8PeekTextEjPj:
-.LFB1611:
+.LFB1619:
 	.loc 1 175 0
 	.cfi_startproc
 .LVL59:
@@ -867,7 +867,7 @@ _ZN10PtraceUtil8PeekTextEjPj:
 .LBE417:
 .LBE416:
 	.cfi_endproc
-.LFE1611:
+.LFE1619:
 	.size	_ZN10PtraceUtil8PeekTextEjPj, .-_ZN10PtraceUtil8PeekTextEjPj
 	.section	.text.unlikely._ZN10PtraceUtil8PeekTextEjPj
 .LCOLDE17:
@@ -887,7 +887,7 @@ _ZN10PtraceUtil8PeekTextEjPj:
 	.globl	_ZN10PtraceUtil17ReadProcessMemoryEjPhi
 	.type	_ZN10PtraceUtil17ReadProcessMemoryEjPhi, @function
 _ZN10PtraceUtil17ReadProcessMemoryEjPhi:
-.LFB1608:
+.LFB1616:
 	.loc 1 138 0 is_stmt 1
 	.cfi_startproc
 .LVL71:
@@ -1019,7 +1019,7 @@ _ZN10PtraceUtil17ReadProcessMemoryEjPhi:
 	call	__stack_chk_fail_local
 .LVL82:
 	.cfi_endproc
-.LFE1608:
+.LFE1616:
 	.size	_ZN10PtraceUtil17ReadProcessMemoryEjPhi, .-_ZN10PtraceUtil17ReadProcessMemoryEjPhi
 	.section	.text.unlikely._ZN10PtraceUtil17ReadProcessMemoryEjPhi
 .LCOLDE19:
@@ -1038,7 +1038,7 @@ _ZN10PtraceUtil17ReadProcessMemoryEjPhi:
 	.globl	_ZN10PtraceUtil8PokeTextEjj
 	.type	_ZN10PtraceUtil8PokeTextEjj, @function
 _ZN10PtraceUtil8PokeTextEjj:
-.LFB1612:
+.LFB1620:
 	.loc 1 189 0
 	.cfi_startproc
 .LVL83:
@@ -1117,7 +1117,7 @@ _ZN10PtraceUtil8PokeTextEjj:
 .LBE442:
 .LBE441:
 	.cfi_endproc
-.LFE1612:
+.LFE1620:
 	.size	_ZN10PtraceUtil8PokeTextEjj, .-_ZN10PtraceUtil8PokeTextEjj
 	.section	.text.unlikely._ZN10PtraceUtil8PokeTextEjj
 .LCOLDE21:
@@ -1133,7 +1133,7 @@ _ZN10PtraceUtil8PokeTextEjj:
 	.globl	_ZN10PtraceUtil18WriteProcessMemoryEjPhi
 	.type	_ZN10PtraceUtil18WriteProcessMemoryEjPhi, @function
 _ZN10PtraceUtil18WriteProcessMemoryEjPhi:
-.LFB1610:
+.LFB1618:
 	.loc 1 156 0 is_stmt 1
 	.cfi_startproc
 .LVL93:
@@ -1296,7 +1296,7 @@ _ZN10PtraceUtil18WriteProcessMemoryEjPhi:
 .LVL109:
 	ret
 	.cfi_endproc
-.LFE1610:
+.LFE1618:
 	.size	_ZN10PtraceUtil18WriteProcessMemoryEjPhi, .-_ZN10PtraceUtil18WriteProcessMemoryEjPhi
 	.section	.text.unlikely._ZN10PtraceUtil18WriteProcessMemoryEjPhi
 .LCOLDE22:
@@ -1321,7 +1321,7 @@ _ZN10PtraceUtil18WriteProcessMemoryEjPhi:
 	.globl	_ZN10PtraceUtil13RestoreMemoryEj
 	.type	_ZN10PtraceUtil13RestoreMemoryEj, @function
 _ZN10PtraceUtil13RestoreMemoryEj:
-.LFB1607:
+.LFB1615:
 	.loc 1 122 0
 	.cfi_startproc
 .LVL110:
@@ -1447,7 +1447,7 @@ _ZN10PtraceUtil13RestoreMemoryEj:
 	.cfi_def_cfa_offset 4
 	ret
 	.cfi_endproc
-.LFE1607:
+.LFE1615:
 	.size	_ZN10PtraceUtil13RestoreMemoryEj, .-_ZN10PtraceUtil13RestoreMemoryEj
 	.section	.text.unlikely._ZN10PtraceUtil13RestoreMemoryEj
 .LCOLDE26:
@@ -1463,7 +1463,7 @@ _ZN10PtraceUtil13RestoreMemoryEj:
 	.globl	_ZN10PtraceUtil7DumpHexEji
 	.type	_ZN10PtraceUtil7DumpHexEji, @function
 _ZN10PtraceUtil7DumpHexEji:
-.LFB1613:
+.LFB1621:
 	.loc 1 200 0
 	.cfi_startproc
 .LVL119:
@@ -1537,7 +1537,7 @@ _ZN10PtraceUtil7DumpHexEji:
 	.cfi_def_cfa_offset 4
 	ret
 	.cfi_endproc
-.LFE1613:
+.LFE1621:
 	.size	_ZN10PtraceUtil7DumpHexEji, .-_ZN10PtraceUtil7DumpHexEji
 	.section	.text.unlikely._ZN10PtraceUtil7DumpHexEji
 .LCOLDE27:
@@ -1571,7 +1571,7 @@ _ZN10PtraceUtil7DumpHexEji:
 	.globl	_ZN10PtraceUtil11waitForStopEv
 	.type	_ZN10PtraceUtil11waitForStopEv, @function
 _ZN10PtraceUtil11waitForStopEv:
-.LFB1614:
+.LFB1622:
 	.loc 1 209 0
 	.cfi_startproc
 .LVL127:
@@ -1753,7 +1753,7 @@ _ZN10PtraceUtil11waitForStopEv:
 	call	__stack_chk_fail_local
 .LVL137:
 	.cfi_endproc
-.LFE1614:
+.LFE1622:
 	.size	_ZN10PtraceUtil11waitForStopEv, .-_ZN10PtraceUtil11waitForStopEv
 	.section	.text.unlikely._ZN10PtraceUtil11waitForStopEv
 .LCOLDE35:
@@ -1772,7 +1772,7 @@ _ZN10PtraceUtil11waitForStopEv:
 	.weak	_ZNSt6vectorI12MemoryBackupSaIS0_EE22_M_insert_overflow_auxEPS0_RKS0_RKSt12__false_typejb
 	.type	_ZNSt6vectorI12MemoryBackupSaIS0_EE22_M_insert_overflow_auxEPS0_RKS0_RKSt12__false_typejb, @function
 _ZNSt6vectorI12MemoryBackupSaIS0_EE22_M_insert_overflow_auxEPS0_RKS0_RKSt12__false_typejb:
-.LFB1803:
+.LFB1827:
 	.file 5 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_vector.c"
 	.loc 5 81 0
 	.cfi_startproc
@@ -2280,7 +2280,7 @@ _ZNSt6vectorI12MemoryBackupSaIS0_EE22_M_insert_overflow_auxEPS0_RKS0_RKSt12__fal
 .LBE615:
 .LBE617:
 	.cfi_endproc
-.LFE1803:
+.LFE1827:
 	.size	_ZNSt6vectorI12MemoryBackupSaIS0_EE22_M_insert_overflow_auxEPS0_RKS0_RKSt12__false_typejb, .-_ZNSt6vectorI12MemoryBackupSaIS0_EE22_M_insert_overflow_auxEPS0_RKS0_RKSt12__false_typejb
 	.section	.text.unlikely._ZNSt6vectorI12MemoryBackupSaIS0_EE22_M_insert_overflow_auxEPS0_RKS0_RKSt12__false_typejb,"axG",@progbits,_ZNSt6vectorI12MemoryBackupSaIS0_EE22_M_insert_overflow_auxEPS0_RKS0_RKSt12__false_typejb,comdat
 .LCOLDE37:
@@ -2310,7 +2310,7 @@ _ZNSt6vectorI12MemoryBackupSaIS0_EE22_M_insert_overflow_auxEPS0_RKS0_RKSt12__fal
 	.globl	_ZN10PtraceUtil12BackupMemoryEji
 	.type	_ZN10PtraceUtil12BackupMemoryEji, @function
 _ZN10PtraceUtil12BackupMemoryEji:
-.LFB1606:
+.LFB1614:
 	.loc 1 94 0
 	.cfi_startproc
 .LVL195:
@@ -2567,7 +2567,7 @@ _ZN10PtraceUtil12BackupMemoryEji:
 	call	__stack_chk_fail_local
 .LVL217:
 	.cfi_endproc
-.LFE1606:
+.LFE1614:
 	.size	_ZN10PtraceUtil12BackupMemoryEji, .-_ZN10PtraceUtil12BackupMemoryEji
 	.section	.text.unlikely._ZN10PtraceUtil12BackupMemoryEji
 .LCOLDE43:
@@ -2602,12 +2602,12 @@ _ZTV10PtraceUtil:
 	.hidden	__x86.get_pc_thunk.bx
 	.type	__x86.get_pc_thunk.bx, @function
 __x86.get_pc_thunk.bx:
-.LFB1900:
+.LFB1932:
 	.cfi_startproc
 	movl	(%esp), %ebx
 	ret
 	.cfi_endproc
-.LFE1900:
+.LFE1932:
 	.text
 .Letext0:
 	.section	.text.unlikely._ZN10PtraceUtilD2Ev
@@ -2642,9 +2642,9 @@ __x86.get_pc_thunk.bx:
 	.file 35 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\wchar.h"
 	.file 36 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\pthread.h"
 	.file 37 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\android\\log.h"
-	.file 38 "jni/scrcap/../util/Mutex.hpp"
-	.file 39 "jni/scrcap/../util/logger.h"
-	.file 40 "jni/scrcap/../util/PtraceUtil.hpp"
+	.file 38 "jni/tracer/../util/Mutex.hpp"
+	.file 39 "jni/tracer/../util/logger.h"
+	.file 40 "jni/tracer/../util/PtraceUtil.hpp"
 	.file 41 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/../../gabi++/include/new"
 	.file 42 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\ctype.h"
 	.file 43 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\errno.h"
@@ -11106,8 +11106,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x70
 	.long	0x4c05
 	.long	.LASF721
-	.long	.LFB1599
-	.long	.LFE1599-.LFB1599
+	.long	.LFB1607
+	.long	.LFE1607-.LFB1607
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x4c41
@@ -11200,8 +11200,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x70
 	.long	0x4c05
 	.long	.LASF722
-	.long	.LFB1601
-	.long	.LFE1601-.LFB1601
+	.long	.LFB1609
+	.long	.LFE1609-.LFB1609
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x4d28
@@ -11246,8 +11246,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x70
 	.long	0x4d53
 	.long	.LASF723
-	.long	.LFB1596
-	.long	.LFE1596-.LFB1596
+	.long	.LFB1604
+	.long	.LFE1604-.LFB1604
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x4d86
@@ -11311,8 +11311,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.uleb128 0x80
 	.long	0x402d
-	.long	.LFB1602
-	.long	.LFE1602-.LFB1602
+	.long	.LFB1610
+	.long	.LFE1610-.LFB1610
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x4e19
@@ -11424,8 +11424,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.uleb128 0x80
 	.long	0x4050
-	.long	.LFB1603
-	.long	.LFE1603-.LFB1603
+	.long	.LFB1611
+	.long	.LFE1611-.LFB1611
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x4eee
@@ -11529,8 +11529,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.uleb128 0x80
 	.long	0x406e
-	.long	.LFB1604
-	.long	.LFE1604-.LFB1604
+	.long	.LFB1612
+	.long	.LFE1612-.LFB1612
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x4fb4
@@ -11631,8 +11631,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.uleb128 0x80
 	.long	0x3ece
-	.long	.LFB1605
-	.long	.LFE1605-.LFB1605
+	.long	.LFB1613
+	.long	.LFE1613-.LFB1613
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x5071
@@ -11723,8 +11723,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.uleb128 0x80
 	.long	0x3f6f
-	.long	.LFB1609
-	.long	.LFE1609-.LFB1609
+	.long	.LFB1617
+	.long	.LFE1617-.LFB1617
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x5134
@@ -11747,8 +11747,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x70
 	.long	0x4128
 	.long	.LASF687
-	.long	.LFB1611
-	.long	.LFE1611-.LFB1611
+	.long	.LFB1619
+	.long	.LFE1619-.LFB1619
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x516c
@@ -11865,8 +11865,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x70
 	.long	0x4168
 	.long	.LASF675
-	.long	.LFB1608
-	.long	.LFE1608-.LFB1608
+	.long	.LFB1616
+	.long	.LFE1616-.LFB1616
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x5254
@@ -12008,8 +12008,8 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x70
 	.long	0x41c4
 	.long	.LASF685
-	.long	.LFB1612
-	.long	.LFE1612-.LFB1612
+	.long	.LFB1620
+	.long	.LFE1620-.LFB1620
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x5372
@@ -12124,8 +12124,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.uleb128 0x80
 	.long	0x3f42
-	.long	.LFB1610
-	.long	.LFE1610-.LFB1610
+	.long	.LFB1618
+	.long	.LFE1618-.LFB1618
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x544f
@@ -12279,8 +12279,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.uleb128 0x80
 	.long	0x3fba
-	.long	.LFB1607
-	.long	.LFE1607-.LFB1607
+	.long	.LFB1615
+	.long	.LFE1615-.LFB1615
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x5571
@@ -12437,8 +12437,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.uleb128 0x80
 	.long	0x3ef1
-	.long	.LFB1613
-	.long	.LFE1613-.LFB1613
+	.long	.LFB1621
+	.long	.LFE1621-.LFB1621
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x5670
@@ -12561,8 +12561,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.uleb128 0x80
 	.long	0x408c
-	.long	.LFB1614
-	.long	.LFE1614-.LFB1614
+	.long	.LFB1622
+	.long	.LFE1622-.LFB1622
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x5746
@@ -12819,8 +12819,8 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.uleb128 0x80
 	.long	0x1a5e
-	.long	.LFB1803
-	.long	.LFE1803-.LFB1803
+	.long	.LFB1827
+	.long	.LFE1827-.LFB1827
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x58f9
@@ -13446,8 +13446,8 @@ __x86.get_pc_thunk.bx:
 	.long	0x3d09
 	.uleb128 0x80
 	.long	0x3f92
-	.long	.LFB1606
-	.long	.LFE1606-.LFB1606
+	.long	.LFB1614
+	.long	.LFE1614-.LFB1614
 	.uleb128 0x1
 	.byte	0x9c
 	.long	0x5f56
@@ -16200,7 +16200,7 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x14
 	.byte	0x9f
 	.long	.LVL8
-	.long	.LFE1599
+	.long	.LFE1607
 	.value	0x3
 	.byte	0x76
 	.sleb128 20
@@ -16215,7 +16215,7 @@ __x86.get_pc_thunk.bx:
 	.sleb128 28
 	.byte	0x9f
 	.long	.LVL8
-	.long	.LFE1599
+	.long	.LFE1607
 	.value	0x3
 	.byte	0x76
 	.sleb128 28
@@ -16299,7 +16299,7 @@ __x86.get_pc_thunk.bx:
 	.sleb128 20
 	.byte	0x9f
 	.long	.LVL18
-	.long	.LFE1596
+	.long	.LFE1604
 	.value	0x6
 	.byte	0x91
 	.sleb128 0
@@ -16317,7 +16317,7 @@ __x86.get_pc_thunk.bx:
 	.sleb128 28
 	.byte	0x9f
 	.long	.LVL18
-	.long	.LFE1596
+	.long	.LFE1604
 	.value	0x6
 	.byte	0x91
 	.sleb128 0
@@ -16363,7 +16363,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x50
 	.long	.LVL44-1
-	.long	.LFE1604
+	.long	.LFE1612
 	.value	0x1
 	.byte	0x56
 	.long	0
@@ -16469,7 +16469,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x50
 	.long	.LVL66-1
-	.long	.LFE1611
+	.long	.LFE1619
 	.value	0x1
 	.byte	0x56
 	.long	0
@@ -16542,7 +16542,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x50
 	.long	.LVL90-1
-	.long	.LFE1612
+	.long	.LFE1620
 	.value	0x1
 	.byte	0x56
 	.long	0
@@ -16775,7 +16775,7 @@ __x86.get_pc_thunk.bx:
 	.value	0x1
 	.byte	0x56
 	.long	.LVL187
-	.long	.LFE1803
+	.long	.LFE1827
 	.value	0x2
 	.byte	0x91
 	.sleb128 16
@@ -17669,40 +17669,40 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.value	0
 	.value	0
-	.long	.LFB1599
-	.long	.LFE1599-.LFB1599
-	.long	.LFB1601
-	.long	.LFE1601-.LFB1601
-	.long	.LFB1596
-	.long	.LFE1596-.LFB1596
-	.long	.LFB1602
-	.long	.LFE1602-.LFB1602
-	.long	.LFB1603
-	.long	.LFE1603-.LFB1603
-	.long	.LFB1604
-	.long	.LFE1604-.LFB1604
-	.long	.LFB1605
-	.long	.LFE1605-.LFB1605
-	.long	.LFB1609
-	.long	.LFE1609-.LFB1609
-	.long	.LFB1611
-	.long	.LFE1611-.LFB1611
-	.long	.LFB1608
-	.long	.LFE1608-.LFB1608
-	.long	.LFB1612
-	.long	.LFE1612-.LFB1612
-	.long	.LFB1610
-	.long	.LFE1610-.LFB1610
 	.long	.LFB1607
 	.long	.LFE1607-.LFB1607
+	.long	.LFB1609
+	.long	.LFE1609-.LFB1609
+	.long	.LFB1604
+	.long	.LFE1604-.LFB1604
+	.long	.LFB1610
+	.long	.LFE1610-.LFB1610
+	.long	.LFB1611
+	.long	.LFE1611-.LFB1611
+	.long	.LFB1612
+	.long	.LFE1612-.LFB1612
 	.long	.LFB1613
 	.long	.LFE1613-.LFB1613
+	.long	.LFB1617
+	.long	.LFE1617-.LFB1617
+	.long	.LFB1619
+	.long	.LFE1619-.LFB1619
+	.long	.LFB1616
+	.long	.LFE1616-.LFB1616
+	.long	.LFB1620
+	.long	.LFE1620-.LFB1620
+	.long	.LFB1618
+	.long	.LFE1618-.LFB1618
+	.long	.LFB1615
+	.long	.LFE1615-.LFB1615
+	.long	.LFB1621
+	.long	.LFE1621-.LFB1621
+	.long	.LFB1622
+	.long	.LFE1622-.LFB1622
+	.long	.LFB1827
+	.long	.LFE1827-.LFB1827
 	.long	.LFB1614
 	.long	.LFE1614-.LFB1614
-	.long	.LFB1803
-	.long	.LFE1803-.LFB1803
-	.long	.LFB1606
-	.long	.LFE1606-.LFB1606
 	.long	0
 	.long	0
 	.section	.debug_ranges,"",@progbits
@@ -17887,40 +17887,40 @@ __x86.get_pc_thunk.bx:
 	.long	.LBE651
 	.long	0
 	.long	0
-	.long	.LFB1599
-	.long	.LFE1599
-	.long	.LFB1601
-	.long	.LFE1601
-	.long	.LFB1596
-	.long	.LFE1596
-	.long	.LFB1602
-	.long	.LFE1602
-	.long	.LFB1603
-	.long	.LFE1603
-	.long	.LFB1604
-	.long	.LFE1604
-	.long	.LFB1605
-	.long	.LFE1605
-	.long	.LFB1609
-	.long	.LFE1609
-	.long	.LFB1611
-	.long	.LFE1611
-	.long	.LFB1608
-	.long	.LFE1608
-	.long	.LFB1612
-	.long	.LFE1612
-	.long	.LFB1610
-	.long	.LFE1610
 	.long	.LFB1607
 	.long	.LFE1607
+	.long	.LFB1609
+	.long	.LFE1609
+	.long	.LFB1604
+	.long	.LFE1604
+	.long	.LFB1610
+	.long	.LFE1610
+	.long	.LFB1611
+	.long	.LFE1611
+	.long	.LFB1612
+	.long	.LFE1612
 	.long	.LFB1613
 	.long	.LFE1613
+	.long	.LFB1617
+	.long	.LFE1617
+	.long	.LFB1619
+	.long	.LFE1619
+	.long	.LFB1616
+	.long	.LFE1616
+	.long	.LFB1620
+	.long	.LFE1620
+	.long	.LFB1618
+	.long	.LFE1618
+	.long	.LFB1615
+	.long	.LFE1615
+	.long	.LFB1621
+	.long	.LFE1621
+	.long	.LFB1622
+	.long	.LFE1622
+	.long	.LFB1827
+	.long	.LFE1827
 	.long	.LFB1614
 	.long	.LFE1614
-	.long	.LFB1803
-	.long	.LFE1803
-	.long	.LFB1606
-	.long	.LFE1606
 	.long	0
 	.long	0
 	.section	.debug_line,"",@progbits
@@ -18258,8 +18258,6 @@ __x86.get_pc_thunk.bx:
 	.string	"putwchar"
 .LASF739:
 	.string	"ptrace"
-.LASF478:
-	.string	"atexit"
 .LASF522:
 	.string	"modf"
 .LASF130:
@@ -18268,8 +18266,8 @@ __x86.get_pc_thunk.bx:
 	.string	"_Z3cose"
 .LASF446:
 	.string	"__gnuc_va_list"
-.LASF674:
-	.string	"ReadProcessMemory"
+.LASF747:
+	.string	"jni/tracer/../util/PtraceUtil.cpp"
 .LASF336:
 	.string	"_ZNSt6vectorI12MemoryBackupSaIS0_EE6_M_setEPS0_S3_S3_"
 .LASF743:
@@ -18390,8 +18388,8 @@ __x86.get_pc_thunk.bx:
 	.string	"_ZNKSt6vectorI12MemoryBackupSaIS0_EE6rbeginEv"
 .LASF281:
 	.string	"_ZNSt6vectorI12MemoryBackupSaIS0_EE5frontEv"
-.LASF747:
-	.string	"jni/scrcap/../util/PtraceUtil.cpp"
+.LASF478:
+	.string	"atexit"
 .LASF271:
 	.string	"_ZNKSt6vectorI12MemoryBackupSaIS0_EE4sizeEv"
 .LASF101:
@@ -18660,6 +18658,8 @@ __x86.get_pc_thunk.bx:
 	.string	"_ZNSt6vectorI12MemoryBackupSaIS0_EE5eraseEPS0_S3_"
 .LASF318:
 	.string	"_ZNSt6vectorI12MemoryBackupSaIS0_EE8pop_backEv"
+.LASF674:
+	.string	"ReadProcessMemory"
 .LASF346:
 	.string	"_ZNSt16reverse_iteratorIP12MemoryBackupEaSERKS2_"
 .LASF201:
