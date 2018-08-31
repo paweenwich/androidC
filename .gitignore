@@ -1,4 +1,8 @@
 *.so
+*.bin
+*.s
+*.ii
+*.lst
 ndk/*
 lua-5.2.4/*
 lua-5.2.4_arm/*
