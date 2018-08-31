@@ -164,6 +164,7 @@ bool ProcessScanner::read(unsigned int targetAddr,int size,unsigned int bufferAd
     }
     if(fread((void *)bufferAddr,size,1,f)!=1){
 	printf("read %08X for %d fail: %s\n",targetAddr,size,strerror(errno));
+	return false;
     }
     return true;
 }

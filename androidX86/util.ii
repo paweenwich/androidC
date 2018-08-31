@@ -21320,11 +21320,17 @@ void Test()
     __android_log_print(ANDROID_LOG_DEBUG, "utils", "gettid=%d",gettid());
 }
 
+
 std::vector<unsigned char> hex2bin(std::string const& s)
 {
+
     std::vector<unsigned char> ret;
     char *ptr = (char *)s.c_str();
+
     for(int i=0;i<strlen(ptr);i+=2){
+ if(ptr[i]==' '){
+     i++;
+ }
  char buf[3];
  strncpy(buf,&ptr[i],2);
  buf[2] = 0;
@@ -21384,7 +21390,7 @@ extern int scandir(const char* dir, struct dirent*** namelist,
 extern int getdents(unsigned int, struct dirent*, unsigned int);
 
 }
-# 462 "jni/tracer/../util/util.cpp" 2
+# 468 "jni/tracer/../util/util.cpp" 2
 std::vector<std::string> DirectoryListFile(std::string& dirName,std::string filter){
     std::vector<std::string> ret;
 

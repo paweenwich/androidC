@@ -424,11 +424,17 @@ void Test()
     LOGD("gettid=%d",gettid());
 }
 
+//Support XXXXXX and XX XX XX]
 std::vector<unsigned char> hex2bin(std::string const& s)
 {
+    
     std::vector<unsigned char> ret;
     char *ptr = (char *)s.c_str();
+    //printf("%s\n",ptr);
     for(int i=0;i<strlen(ptr);i+=2){
+	if(ptr[i]==' '){
+	    i++;
+	}
 	char buf[3];
 	strncpy(buf,&ptr[i],2);
 	buf[2] = 0;

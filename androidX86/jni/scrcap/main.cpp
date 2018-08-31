@@ -72,7 +72,7 @@ public:
 
 	    }
 	    if(ret.type == 'h'){
-		//printf("[%s]\n",ret.sValue);
+		printf("[%s]\n",data);
 		ret.hValue = hex2bin(&data[2]);
 		//logger.logHex(ret.hValue.begin(),ret.hValue.size());
 	    }
@@ -131,12 +131,13 @@ void dumpToDir(std::vector<ProcMapData>& vMaps, ProcessScanner& pscan, char *pat
 	    char dumpFileName[1024];
 	    sprintf(dumpFileName,"%s/%08X-%08X.bin",path,vMaps[i].startAddr,vMaps[i].endAddr);
 	    pscan.buffToFile((unsigned int)&buf[0],vMaps[i].size(),dumpFileName);
-	    printf("dump %s\n",dumpFileName);
+	    //printf("dump %s\n",dumpFileName);
 	}else{
-	    printf("Read fail\n");
+	    //printf("Read fail %08X\n",vMaps[i].startAddr);
 	}
 	free(buf);
     }
+    printf("Done\n");
 }
 
 void searchDir(std::string dirName,SearchCommand &cmd)
@@ -182,6 +183,11 @@ int main(int argc, char** argv) {
     if(argc<=1){
         printf("Usage:\n");
         printf("%s pid|pname -c cmd [-o outfile] [-i infile]\n",argv[0]);
+	printf("%s pid|pname -c :dir ;to dump\n",argv[0]);
+	printf("%s pid|pname -c =ixxx ;to search int xxxx\n",argv[0]);
+	printf("%s pid|pname -c =sxxx ;to search string xxxx\n",argv[0]);
+	printf("%s pid|pname -c =hxxx ;to search hex xxxx\n",argv[0]);
+	printf("%s pid|pname search dir -c cmd \n",argv[0]);
         return 0;
     }
     int pid;
