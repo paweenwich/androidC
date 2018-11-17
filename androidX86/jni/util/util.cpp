@@ -3,6 +3,7 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,6 +15,8 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 #include <cctype>
 #include <android/log.h>
 #include "util.hpp"
@@ -419,4 +422,89 @@ void Test()
     LOGD("dlsym=%08X",(unsigned int)dlsym);
     LOGD("pid=%d",getpid());
     LOGD("gettid=%d",gettid());
+}
+
+//Support XXXXXX and XX XX XX]
+std::vector<unsigned char> hex2bin(std::string const& s)
+{
+    
+    std::vector<unsigned char> ret;
+    char *ptr = (char *)s.c_str();
+    //printf("%s\n",ptr);
+    for(int i=0;i<strlen(ptr);i+=2){
+	if(ptr[i]==' '){
+	    i++;
+	}
+	char buf[3];
+	strncpy(buf,&ptr[i],2);
+	buf[2] = 0;
+	int c;
+	sscanf(buf,"%x",&c);
+	ret.push_back(c);
+	//printf("%x\n",c);
+    }
+    return ret;
+}
+
+bool isDirectoryExist(const char* dir){
+    struct stat sb;
+    if (stat(dir, &sb) == 0 && S_ISDIR(sb.st_mode))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+size_t GetFilesize(const char* filename) { 
+    struct stat st; 
+    stat(filename, &st); 
+    return st.st_size; 
+} 
+
+#include <dirent.h>
+std::vector<std::string> DirectoryListFile(std::string& dirName,std::string filter){
+    std::vector<std::string> ret;
+    //len = strlen(name);
+    DIR *dirp = opendir(dirName.c_str());
+    struct dirent *dp;
+    while ((dp = readdir(dirp)) != NULL){
+	if(filter!=""){
+	    if(strstr(dp->d_name,filter.c_str())!=NULL){
+		ret.push_back(dp->d_name);
+	    }
+	}else{
+	    ret.push_back(dp->d_name);
+	}
+	//if (dp->d_namlen == len && !strcmp(dp->d_name, name)) {
+		//(void)closedir(dirp);
+	//}
+	//printf("[%s]\n",dp->d_name);
+    }
+    closedir(dirp);
+    return ret;
+}
+
+std::string StringReplaceChar(std::string src,char c1,char c2)
+{
+    std::string s = src;
+    std::replace(s.begin(), s.end(), c1, c2 );
+    return s;
+}
+
+std::vector<std::string> SplitByChar(std::string src, char c)
+{
+    std::vector<std::string> result;
+    char *str = (char *)src.c_str();
+    do
+    {
+        const char *begin = str;
+        while(*str != c && *str)
+            str++;
+
+        result.push_back(std::string((char *)begin, str));
+    } while (0 != *str++);
+    return result;
 }
