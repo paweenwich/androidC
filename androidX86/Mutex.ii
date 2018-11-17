@@ -1,8 +1,8 @@
-# 1 "jni/scrcap/../util/Mutex.cpp"
-# 1 "C:\\cygwin64\\home\\kwang\\C\\androidX86//"
+# 1 "jni/tracer/../util/Mutex.cpp"
+# 1 "C:\\cygwin64\\home\\Administrator\\C\\androidX86//"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "jni/scrcap/../util/Mutex.cpp"
+# 1 "jni/tracer/../util/Mutex.cpp"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -632,7 +632,7 @@ int vfdprintf(int, const char*, __va_list);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 2
-# 2 "jni/scrcap/../util/Mutex.cpp" 2
+# 2 "jni/tracer/../util/Mutex.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\ptrace.h" 1 3 4
 # 34 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\ptrace.h" 3 4
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\ptrace.h" 1 3 4
@@ -681,7 +681,7 @@ extern "C" {
 extern long ptrace(int request, ...);
 
 }
-# 3 "jni/scrcap/../util/Mutex.cpp" 2
+# 3 "jni/tracer/../util/Mutex.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\wait.h" 1 3 4
 # 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\wait.h" 3 4
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\resource.h" 1 3 4
@@ -1425,7 +1425,7 @@ typedef int idtype_t;
 extern int waitid(idtype_t which, id_t id, siginfo_t *info, int options);
 
 }
-# 4 "jni/scrcap/../util/Mutex.cpp" 2
+# 4 "jni/tracer/../util/Mutex.cpp" 2
 
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\mman.h" 1 3 4
 # 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\mman.h" 3 4
@@ -1460,7 +1460,7 @@ extern int munlock(const void *addr, size_t len);
 extern int mincore(void* start, size_t length, unsigned char* vec);
 
 }
-# 6 "jni/scrcap/../util/Mutex.cpp" 2
+# 6 "jni/tracer/../util/Mutex.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\unistd.h" 1 3 4
 # 31 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\unistd.h" 3 4
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stddef.h" 1 3 4
@@ -1681,7 +1681,7 @@ extern pid_t tcgetpgrp(int fd);
 extern int tcsetpgrp(int fd, pid_t _pid);
 # 205 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\unistd.h" 3 4
 }
-# 7 "jni/scrcap/../util/Mutex.cpp" 2
+# 7 "jni/tracer/../util/Mutex.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1861,7 +1861,7 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 61 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h" 2
-# 8 "jni/scrcap/../util/Mutex.cpp" 2
+# 8 "jni/tracer/../util/Mutex.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1872,7 +1872,7 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 2
-# 9 "jni/scrcap/../util/Mutex.cpp" 2
+# 9 "jni/tracer/../util/Mutex.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h" 1
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1883,7 +1883,7 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 62 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h" 2
-# 10 "jni/scrcap/../util/Mutex.cpp" 2
+# 10 "jni/tracer/../util/Mutex.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h" 1
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1902,7 +1902,7 @@ extern "C" {
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h" 2
-# 11 "jni/scrcap/../util/Mutex.cpp" 2
+# 11 "jni/tracer/../util/Mutex.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h" 1
 # 26 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1913,7 +1913,7 @@ extern "C" {
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 60 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h" 2
-# 12 "jni/scrcap/../util/Mutex.cpp" 2
+# 12 "jni/tracer/../util/Mutex.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dlfcn.h" 1 3 4
 # 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dlfcn.h" 3 4
 extern "C" {
@@ -1947,7 +1947,7 @@ enum {
 
 
 }
-# 13 "jni/scrcap/../util/Mutex.cpp" 2
+# 13 "jni/tracer/../util/Mutex.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\android\\log.h" 1 3 4
 # 70 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\android\\log.h" 3 4
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 1 3 4
@@ -2024,7 +2024,7 @@ void __android_log_assert(const char *cond, const char *tag,
 
 
 }
-# 14 "jni/scrcap/../util/Mutex.cpp" 2
+# 14 "jni/tracer/../util/Mutex.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/pthread.h" 1
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/pthread.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
@@ -2389,9 +2389,9 @@ extern void __pthread_cleanup_pop(__pthread_cleanup_t* c,
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 36 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/pthread.h" 2
-# 15 "jni/scrcap/../util/Mutex.cpp" 2
-# 1 "jni/scrcap/../util/Mutex.hpp" 1
-# 17 "jni/scrcap/../util/Mutex.hpp"
+# 15 "jni/tracer/../util/Mutex.cpp" 2
+# 1 "jni/tracer/../util/Mutex.hpp" 1
+# 17 "jni/tracer/../util/Mutex.hpp"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/pthread.h" 1
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/pthread.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
@@ -2410,7 +2410,7 @@ extern void __pthread_cleanup_pop(__pthread_cleanup_t* c,
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 36 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/pthread.h" 2
-# 18 "jni/scrcap/../util/Mutex.hpp" 2
+# 18 "jni/tracer/../util/Mutex.hpp" 2
 
 extern "C" {
 
@@ -2424,7 +2424,7 @@ void MutexUnlock( Mutex* m );
 
 
 }
-# 16 "jni/scrcap/../util/Mutex.cpp" 2
+# 16 "jni/tracer/../util/Mutex.cpp" 2
 
 
 

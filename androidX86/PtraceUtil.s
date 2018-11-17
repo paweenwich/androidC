@@ -15,7 +15,7 @@
 	.type	_ZN10PtraceUtilD2Ev, @function
 _ZN10PtraceUtilD2Ev:
 .LFB1599:
-	.file 1 "jni/scrcap/../util/PtraceUtil.cpp"
+	.file 1 "jni/tracer/../util/PtraceUtil.cpp"
 	.loc 1 42 0
 	.cfi_startproc
 .LVL0:
@@ -2642,9 +2642,9 @@ __x86.get_pc_thunk.bx:
 	.file 35 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\wchar.h"
 	.file 36 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\pthread.h"
 	.file 37 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\android\\log.h"
-	.file 38 "jni/scrcap/../util/Mutex.hpp"
-	.file 39 "jni/scrcap/../util/logger.h"
-	.file 40 "jni/scrcap/../util/PtraceUtil.hpp"
+	.file 38 "jni/tracer/../util/Mutex.hpp"
+	.file 39 "jni/tracer/../util/logger.h"
+	.file 40 "jni/tracer/../util/PtraceUtil.hpp"
 	.file 41 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/../../gabi++/include/new"
 	.file 42 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\ctype.h"
 	.file 43 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\errno.h"
@@ -18258,8 +18258,6 @@ __x86.get_pc_thunk.bx:
 	.string	"putwchar"
 .LASF739:
 	.string	"ptrace"
-.LASF478:
-	.string	"atexit"
 .LASF522:
 	.string	"modf"
 .LASF130:
@@ -18268,8 +18266,8 @@ __x86.get_pc_thunk.bx:
 	.string	"_Z3cose"
 .LASF446:
 	.string	"__gnuc_va_list"
-.LASF674:
-	.string	"ReadProcessMemory"
+.LASF747:
+	.string	"jni/tracer/../util/PtraceUtil.cpp"
 .LASF336:
 	.string	"_ZNSt6vectorI12MemoryBackupSaIS0_EE6_M_setEPS0_S3_S3_"
 .LASF743:
@@ -18390,8 +18388,8 @@ __x86.get_pc_thunk.bx:
 	.string	"_ZNKSt6vectorI12MemoryBackupSaIS0_EE6rbeginEv"
 .LASF281:
 	.string	"_ZNSt6vectorI12MemoryBackupSaIS0_EE5frontEv"
-.LASF747:
-	.string	"jni/scrcap/../util/PtraceUtil.cpp"
+.LASF478:
+	.string	"atexit"
 .LASF271:
 	.string	"_ZNKSt6vectorI12MemoryBackupSaIS0_EE4sizeEv"
 .LASF101:
@@ -18410,6 +18408,8 @@ __x86.get_pc_thunk.bx:
 	.string	"_ZNSt13__move_sourceISaIwEEaSERKS1_"
 .LASF295:
 	.string	"~vector"
+.LASF748:
+	.string	"C:\\\\cygwin64\\\\home\\\\Administrator\\\\C\\\\androidX86"
 .LASF550:
 	.string	"ftell"
 .LASF471:
@@ -18660,6 +18660,8 @@ __x86.get_pc_thunk.bx:
 	.string	"_ZNSt6vectorI12MemoryBackupSaIS0_EE5eraseEPS0_S3_"
 .LASF318:
 	.string	"_ZNSt6vectorI12MemoryBackupSaIS0_EE8pop_backEv"
+.LASF674:
+	.string	"ReadProcessMemory"
 .LASF346:
 	.string	"_ZNSt16reverse_iteratorIP12MemoryBackupEaSERKS2_"
 .LASF201:
@@ -19242,8 +19244,6 @@ __x86.get_pc_thunk.bx:
 	.string	"_tolower_tab_"
 .LASF132:
 	.string	"_M_deallocate"
-.LASF748:
-	.string	"C:\\\\cygwin64\\\\home\\\\kwang\\\\C\\\\androidX86"
 .LASF252:
 	.string	"_M_insert_overflow"
 .LASF143:

@@ -35,7 +35,7 @@
         <df name="local">
           <df name="x86">
             <df name="objs">
-              <df name="scrcapX86">
+              <df name="scrcapx86">
                 <df name="__">
                   <df name="util">
                   </df>
@@ -58,6 +58,7 @@
         </df>
       </df>
       <in>Mutex.s</in>
+      <in>ProcessScanner.s</in>
       <in>PtraceUtil.s</in>
       <in>logger.s</in>
       <in>main.s</in>

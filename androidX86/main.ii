@@ -1,5 +1,5 @@
 # 1 "jni/scrcap/main.cpp"
-# 1 "C:\\cygwin64\\home\\kwang\\C\\androidX86//"
+# 1 "C:\\cygwin64\\home\\Administrator\\C\\androidX86//"
 # 1 "<built-in>"
 # 1 "<command-line>"
 # 1 "jni/scrcap/main.cpp"
@@ -23526,7 +23526,7 @@ int main(int argc, char** argv) {
       printf("dump %s\n",dumpFileName);
   }
      }else{
-  printf("Read fail\n");
+  printf("Read fail \n");
      }
  }
  std::vector<SnapShotResult> currentAddrs;

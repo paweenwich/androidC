@@ -157,7 +157,7 @@ int main(int argc, char** argv) {
 		    printf("dump %s\n",dumpFileName);
 		}
 	    }else{
-		printf("Read fail\n");
+		printf("Read fail \n");
 	    }
 	}
 	std::vector<SnapShotResult> currentAddrs;

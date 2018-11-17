@@ -18,7 +18,7 @@
 	.type	_ZN6LoggerC2EPcb, @function
 _ZN6LoggerC2EPcb:
 .LFB30:
-	.file 1 "jni/scrcap/../util/logger.cpp"
+	.file 1 "jni/tracer/../util/logger.cpp"
 	.loc 1 11 0
 	.cfi_startproc
 .LVL0:
@@ -1010,8 +1010,8 @@ __x86.get_pc_thunk.bx:
 	.file 8 "d:\\android-ndk-r12b\\toolchains\\x86-4.9\\prebuilt\\windows-x86_64\\lib\\gcc\\i686-linux-android\\4.9.x\\include\\stdarg.h"
 	.file 9 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\stdio.h"
 	.file 10 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\pthread.h"
-	.file 11 "jni/scrcap/../util/Mutex.hpp"
-	.file 12 "jni/scrcap/../util/logger.h"
+	.file 11 "jni/tracer/../util/Mutex.hpp"
+	.file 12 "jni/tracer/../util/logger.h"
 	.file 13 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\stat.h"
 	.file 14 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\string.h"
 	.file 15 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\time.h"
@@ -3928,6 +3928,8 @@ __x86.get_pc_thunk.bx:
 	.string	"short unsigned int"
 .LASF80:
 	.string	"fclose"
+.LASF98:
+	.string	"C:\\\\cygwin64\\\\home\\\\Administrator\\\\C\\\\androidX86"
 .LASF60:
 	.string	"bool"
 .LASF56:
@@ -3961,13 +3963,11 @@ __x86.get_pc_thunk.bx:
 .LASF94:
 	.string	"fputc"
 .LASF97:
-	.string	"jni/scrcap/../util/logger.cpp"
+	.string	"jni/tracer/../util/logger.cpp"
 .LASF86:
 	.string	"time"
 .LASF61:
 	.string	"logfile"
-.LASF98:
-	.string	"C:\\\\cygwin64\\\\home\\\\kwang\\\\C\\\\androidX86"
 .LASF24:
 	.string	"time_t"
 .LASF78:

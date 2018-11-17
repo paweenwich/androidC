@@ -13,7 +13,7 @@
 	.type	MutexCreate, @function
 MutexCreate:
 .LFB22:
-	.file 1 "jni/scrcap/../util/Mutex.cpp"
+	.file 1 "jni/tracer/../util/Mutex.cpp"
 	.loc 1 20 0
 	.cfi_startproc
 .LVL0:
@@ -175,7 +175,7 @@ __x86.get_pc_thunk.bx:
 .Letext_cold0:
 	.file 2 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/config/features.h"
 	.file 3 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\pthread.h"
-	.file 4 "jni/scrcap/../util/Mutex.hpp"
+	.file 4 "jni/tracer/../util/Mutex.hpp"
 	.file 5 "<built-in>"
 	.section	.debug_info,"",@progbits
 .Ldebug_info0:
@@ -750,14 +750,10 @@ __x86.get_pc_thunk.bx:
 	.string	"pthread_mutex_lock"
 .LASF28:
 	.string	"decltype(nullptr)"
-.LASF27:
-	.string	"C:\\\\cygwin64\\\\home\\\\kwang\\\\C\\\\androidX86"
 .LASF31:
 	.string	"pthread_mutex_unlock"
 .LASF15:
 	.string	"pthread_mutex_t"
-.LASF26:
-	.string	"jni/scrcap/../util/Mutex.cpp"
 .LASF7:
 	.string	"unsigned char"
 .LASF2:
@@ -792,6 +788,8 @@ __x86.get_pc_thunk.bx:
 	.string	"pthread_mutexattr_t"
 .LASF8:
 	.string	"short int"
+.LASF26:
+	.string	"jni/tracer/../util/Mutex.cpp"
 .LASF29:
 	.string	"15pthread_mutex_t"
 .LASF21:
@@ -804,6 +802,8 @@ __x86.get_pc_thunk.bx:
 	.string	"long double"
 .LASF6:
 	.string	"signed char"
+.LASF27:
+	.string	"C:\\\\cygwin64\\\\home\\\\Administrator\\\\C\\\\androidX86"
 .LASF17:
 	.string	"Mutex"
 	.ident	"GCC: (GNU) 4.9.x 20150123 (prerelease)"

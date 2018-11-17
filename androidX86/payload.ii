@@ -1,8 +1,8 @@
-# 1 "jni/scrcap/../util/payload.cpp"
-# 1 "C:\\cygwin64\\home\\kwang\\C\\androidX86//"
+# 1 "jni/tracer/../util/payload.cpp"
+# 1 "C:\\cygwin64\\home\\Administrator\\C\\androidX86//"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "jni/scrcap/../util/payload.cpp"
+# 1 "jni/tracer/../util/payload.cpp"
 
 
 
@@ -638,7 +638,7 @@ int vfdprintf(int, const char*, __va_list);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 2
-# 8 "jni/scrcap/../util/payload.cpp" 2
+# 8 "jni/tracer/../util/payload.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\ptrace.h" 1 3 4
 # 34 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\ptrace.h" 3 4
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\linux\\ptrace.h" 1 3 4
@@ -687,7 +687,7 @@ extern "C" {
 extern long ptrace(int request, ...);
 
 }
-# 9 "jni/scrcap/../util/payload.cpp" 2
+# 9 "jni/tracer/../util/payload.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\wait.h" 1 3 4
 # 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\wait.h" 3 4
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\resource.h" 1 3 4
@@ -1431,7 +1431,7 @@ typedef int idtype_t;
 extern int waitid(idtype_t which, id_t id, siginfo_t *info, int options);
 
 }
-# 10 "jni/scrcap/../util/payload.cpp" 2
+# 10 "jni/tracer/../util/payload.cpp" 2
 
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\mman.h" 1 3 4
 # 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\sys\\mman.h" 3 4
@@ -1466,7 +1466,7 @@ extern int munlock(const void *addr, size_t len);
 extern int mincore(void* start, size_t length, unsigned char* vec);
 
 }
-# 12 "jni/scrcap/../util/payload.cpp" 2
+# 12 "jni/tracer/../util/payload.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\unistd.h" 1 3 4
 # 31 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\unistd.h" 3 4
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stddef.h" 1 3 4
@@ -1687,7 +1687,7 @@ extern pid_t tcgetpgrp(int fd);
 extern int tcsetpgrp(int fd, pid_t _pid);
 # 205 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\unistd.h" 3 4
 }
-# 13 "jni/scrcap/../util/payload.cpp" 2
+# 13 "jni/tracer/../util/payload.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1867,7 +1867,7 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 61 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdlib.h" 2
-# 14 "jni/scrcap/../util/payload.cpp" 2
+# 14 "jni/tracer/../util/payload.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1878,7 +1878,7 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdio.h" 2
-# 15 "jni/scrcap/../util/payload.cpp" 2
+# 15 "jni/tracer/../util/payload.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h" 1
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1889,7 +1889,7 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 62 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/errno.h" 2
-# 16 "jni/scrcap/../util/payload.cpp" 2
+# 16 "jni/tracer/../util/payload.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h" 1
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1908,7 +1908,7 @@ extern "C" {
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/assert.h" 2
-# 17 "jni/scrcap/../util/payload.cpp" 2
+# 17 "jni/tracer/../util/payload.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h" 1
 # 26 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1919,7 +1919,7 @@ extern "C" {
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 60 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string.h" 2
-# 18 "jni/scrcap/../util/payload.cpp" 2
+# 18 "jni/tracer/../util/payload.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dlfcn.h" 1 3 4
 # 33 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dlfcn.h" 3 4
 extern "C" {
@@ -1953,7 +1953,7 @@ enum {
 
 
 }
-# 19 "jni/scrcap/../util/payload.cpp" 2
+# 19 "jni/tracer/../util/payload.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 1
 # 24 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_cprolog.h" 1
@@ -1972,7 +1972,7 @@ typedef __gnuc_va_list va_list;
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 2
-# 20 "jni/scrcap/../util/payload.cpp" 2
+# 20 "jni/tracer/../util/payload.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string" 1
 # 23 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
@@ -16407,7 +16407,7 @@ getline(basic_istream<_CharT, _Traits>& __is,
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/string" 2
-# 21 "jni/scrcap/../util/payload.cpp" 2
+# 21 "jni/tracer/../util/payload.cpp" 2
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/vector" 1
 # 27 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/vector"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
@@ -17979,7 +17979,7 @@ struct _DefaultZeroValue<vector<_Tp, _Alloc> >
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 51 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/vector" 2
-# 22 "jni/scrcap/../util/payload.cpp" 2
+# 22 "jni/tracer/../util/payload.cpp" 2
 # 1 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dirent.h" 1 3 4
 # 34 "d:\\android-ndk-r12b\\platforms\\android-9\\arch-x86\\usr\\include\\dirent.h" 3 4
 extern "C" {
@@ -18010,8 +18010,8 @@ extern int scandir(const char* dir, struct dirent*** namelist,
 extern int getdents(unsigned int, struct dirent*, unsigned int);
 
 }
-# 23 "jni/scrcap/../util/payload.cpp" 2
-# 1 "jni/scrcap/../util/../util/logger.h" 1
+# 23 "jni/tracer/../util/payload.cpp" 2
+# 1 "jni/tracer/../util/../util/logger.h" 1
 
 
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 1
@@ -18024,9 +18024,9 @@ extern int getdents(unsigned int, struct dirent*, unsigned int);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 42 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stdarg.h" 2
-# 4 "jni/scrcap/../util/../util/logger.h" 2
-# 1 "jni/scrcap/../util/../util/Mutex.hpp" 1
-# 17 "jni/scrcap/../util/../util/Mutex.hpp"
+# 4 "jni/tracer/../util/../util/logger.h" 2
+# 1 "jni/tracer/../util/../util/Mutex.hpp" 1
+# 17 "jni/tracer/../util/../util/Mutex.hpp"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/pthread.h" 1
 # 18 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/pthread.h"
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_prolog.h" 1
@@ -18045,7 +18045,7 @@ extern int getdents(unsigned int, struct dirent*, unsigned int);
 # 1 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_config_compat_post.h" 1
 # 20 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/stl/_epilog.h" 2
 # 36 "D:/android-ndk-r12b/build//../sources/cxx-stl/stlport/stlport/pthread.h" 2
-# 18 "jni/scrcap/../util/../util/Mutex.hpp" 2
+# 18 "jni/tracer/../util/../util/Mutex.hpp" 2
 
 extern "C" {
 
@@ -18059,7 +18059,7 @@ void MutexUnlock( Mutex* m );
 
 
 }
-# 5 "jni/scrcap/../util/../util/logger.h" 2
+# 5 "jni/tracer/../util/../util/logger.h" 2
 class Logger {
 public:
  Mutex mutex;
@@ -18073,9 +18073,9 @@ public:
  char *toHex(unsigned char *p,int len);
         void printf(char *format, ...);
 };
-# 24 "jni/scrcap/../util/payload.cpp" 2
-# 1 "jni/scrcap/../util/../util/payload.hpp" 1
-# 17 "jni/scrcap/../util/../util/payload.hpp"
+# 24 "jni/tracer/../util/payload.cpp" 2
+# 1 "jni/tracer/../util/../util/payload.hpp" 1
+# 17 "jni/tracer/../util/../util/payload.hpp"
 struct _PayloadData {
     char libName[64];
     unsigned int dlopenAddr;
@@ -18107,7 +18107,7 @@ unsigned char *ReadAllBytes(char *fileName,int *size);
 std::vector<unsigned char> _ReadFile(const char *fileName);
 unsigned char * CreateBranchToAddressCommand(unsigned int jumpToAddr);
 int GetBranchToAddressCommandSize();
-# 25 "jni/scrcap/../util/payload.cpp" 2
+# 25 "jni/tracer/../util/payload.cpp" 2
 
 
 unsigned char _branchToAddressCmd[] = {

@@ -35153,8 +35153,6 @@ __x86.get_pc_thunk.bx:
 	.string	"wcscspn"
 .LASF985:
 	.string	"wordAlignSize"
-.LASF1109:
-	.string	"C:\\\\cygwin64\\\\home\\\\kwang\\\\C\\\\androidX86"
 .LASF1031:
 	.string	"__len"
 .LASF221:
@@ -35285,6 +35283,8 @@ __x86.get_pc_thunk.bx:
 	.string	"_Z10inject_armbiPcj"
 .LASF422:
 	.string	"_ZNKSs17find_first_not_ofERKSsj"
+.LASF1109:
+	.string	"C:\\\\cygwin64\\\\home\\\\Administrator\\\\C\\\\androidX86"
 .LASF274:
 	.string	"const_iterator"
 .LASF112:

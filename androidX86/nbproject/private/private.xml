@@ -10,10 +10,16 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/scrcap/Android.mk</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/scrcap/main.cpp</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/tracer/tracer.cpp</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/Makefile</file>
+            <file>file:/C:/cygwin64/home/Administrator/C/androidX86/jni/scrcap/main.cpp</file>
+            <file>file:/C:/cygwin64/home/Administrator/C/androidX86/jni/util/PtraceUtil.hpp</file>
         </group>
     </open-files>
+    <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">
+        <module name="org-netbeans-modules-cnd-discovery">
+            <property name="rootFolder" value="C:\cygwin64\home\Administrator\C\androidX86"/>
+            <property name="make-log-file" value="C:\cygwin64\home\Administrator\C\androidX86"/>
+            <property name="folder" value="C:\cygwin64\home\Administrator\C\androidX86"/>
+            <property name="model-folder" value="C:\cygwin64\home\Administrator\C\androidX86"/>
+        </module>
+    </preferences>
 </project-private>
