@@ -289,7 +289,7 @@ int main(int argc, char** argv) {
 	SnapShot snapShot;
 	//printf("%d\n",heapMap.size());
 	for(int i=0;i<heapMap.size();i++){
-	    //heapMap[i].show();
+	    heapMap[i].show();
 	    char *buf = (char *)malloc(heapMap[i].size());
 	    if(buf == NULL){
 		printf("malloc fail for %d",heapMap[i].size());
@@ -311,6 +311,7 @@ int main(int argc, char** argv) {
 		printf("Read fail \n");
 	    }
 	}
+        
 	std::vector<SnapShotResult> currentAddrs;
 	if(cmd.op == '='){
 	    if(cmd.type=='i'){

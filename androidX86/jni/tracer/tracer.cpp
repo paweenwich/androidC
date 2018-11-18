@@ -44,13 +44,21 @@ void *_free;
 
 std::string lib;
 
-#define offset_dlopen 0x00001300
+/*#define offset_dlopen 0x00001300
 #define offset_dlsym 0x00001130
 #define offset_dlerror 0x00000F90
 #define offset_dlclose 0x00001000
 
 #define offset_calloc 0x0000D290
-#define offset_free 0x0000D260
+#define offset_free 0x0000D260*/
+
+unsigned int offset_dlopen=0;
+unsigned int offset_dlsym=0;
+unsigned int offset_dlerror=0;
+unsigned int offset_dlclose=0;
+
+unsigned int offset_calloc=0;
+unsigned int offset_free=0;
 
 #define TRACE_BIN   "/data/local/tmp/tracer.bin"
 
@@ -60,6 +68,30 @@ Logger logger(NULL,0);
 unsigned long call(int pid,void *function, int nargs, ...);
 int wordAlignSize(int size);
 void PrintAllAddress();
+
+void GetOffsets()
+{
+    int pid = getpid();
+    unsigned int linkerBase = FindBaseLibrary("/system/bin/linker",pid);
+    printf("[%d] linkerBase=%08X\n",pid,linkerBase);
+    offset_dlopen = (unsigned int)dlopen - linkerBase;
+    offset_dlsym = (unsigned int)dlsym - linkerBase;
+    offset_dlerror = (unsigned int)dlerror - linkerBase;
+    offset_dlclose = (unsigned int)dlclose - linkerBase;
+    
+    unsigned int libCBase = FindBaseLibrary("/system/lib/libc.so",pid);
+    printf("[%d] libCBase=%08X\n",pid, libCBase);
+    offset_calloc = (unsigned int)calloc - libCBase;
+    offset_free = (unsigned int)free - libCBase;
+
+    printf("offset_dlopen=%08X\n",(unsigned int)offset_dlopen);
+    printf("offset_dlsym=%08X\n",(unsigned int)offset_dlsym);
+    printf("offset_dlerror=%08X\n",(unsigned int)offset_dlerror);
+    printf("offset_dlclose=%08X\n",(unsigned int)offset_dlclose);
+    printf("offset_calloc=%08X\n",(unsigned int)offset_calloc);
+    printf("offset_free=%08X\n",(unsigned int)offset_free);
+
+}
 
 long Attach(int pid)
 {
@@ -221,14 +253,14 @@ int GetRemoteAddress(int pid)
         printf("/system/bin/linker of pid=%d not found\n",pid);
         return -1;
     }
-    printf("linkerBase=%08X\n",linkerBase);
+    printf("[%d] linkerBase=%08X\n",pid,linkerBase);
     _dlopen = (void *)(linkerBase +  offset_dlopen);
     _dlsym = (void *)(linkerBase +  offset_dlsym);
     _dlerror = (void *)(linkerBase +  offset_dlerror);
     _dlclose = (void *)(linkerBase +  offset_dlclose);
 
     unsigned int libCBase = FindBaseLibrary("/system/lib/libc.so",pid);
-    printf("libCBase=%08X\n",libCBase);
+    printf("[%d] libCBase=%08X\n",pid,libCBase);
     _calloc = (void *)(libCBase +  offset_calloc);    
     _free = (void *)(libCBase +  offset_free);    
     if((linkerBase == 0)||(libCBase == 0)){
@@ -824,6 +856,17 @@ int main(int argc, char** argv) {
 		i++;
 		strcpy(libraryName,argv[i]);
 	    }
+            if(strcmp(argv[i],"-t")==0){
+                printf("test with pid %d\n",pid);
+                PrintAllAddress();
+                GetOffsets();
+                GetRemoteAddress(pid);
+                //dlopen("aaaa",0);
+                //_dlopen("aaaa",0);
+                //Attach(pid);
+                //Detach(pid);
+                return 0;
+            }
 	}
     }
     if((pid!=0)&&(strlen(libraryName)!=0)){
@@ -834,10 +877,10 @@ int main(int argc, char** argv) {
     }else{
 	printf("Usage:%s [option]\n",argv[0]);
 	printf("option:\n");
-	printf("-d				    ;dump mode");
-	printf("-p processID|processName	    ");
-	printf("-f functName			    ");
-	printf("-l libraryName			    ");
+	printf("-d				    ;dump mode\n");
+	printf("-p processID|processName	    \n");
+	printf("-f functName			    \n");
+	printf("-l libraryName			    \n");
     }
     /*
     if(argc!=4){
