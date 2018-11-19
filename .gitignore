@@ -11,6 +11,8 @@ tolua-5.2.4_arm/*
 androidarm/data/*
 androidarm/libs/*
 androidarm/obj/*
+androidarm/private/*
 androidX86/data/*
 androidX86/libs/*
 androidX86/obj/*
+androidX86/private/*
