@@ -2,6 +2,8 @@
 <configurationDescriptor version="97">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
+      <df name="data">
+      </df>
       <df name="jni">
         <df name="scrcap">
           <in>main.cpp</in>
@@ -58,6 +60,7 @@
         </df>
       </df>
       <in>Mutex.s</in>
+      <in>ProcessScanner.s</in>
       <in>PtraceUtil.s</in>
       <in>logger.s</in>
       <in>main.s</in>
