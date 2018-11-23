@@ -59,8 +59,14 @@ unsigned int offset_dlclose=0;
 
 unsigned int offset_calloc=0;
 unsigned int offset_free=0;
+unsigned int offset_getpid=0;
 
 #define TRACE_BIN   "/data/local/tmp/tracer.bin"
+
+#define  LOG_TAG    "loader"
+#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+
 
 PtraceUtil ptraceUtil;
 Logger logger(NULL,0);
@@ -83,6 +89,7 @@ void GetOffsets()
     printf("[%d] libCBase=%08X\n",pid, libCBase);
     offset_calloc = (unsigned int)calloc - libCBase;
     offset_free = (unsigned int)free - libCBase;
+    offset_getpid = (unsigned int)getpid - libCBase;
 
     printf("offset_dlopen=%08X\n",(unsigned int)offset_dlopen);
     printf("offset_dlsym=%08X\n",(unsigned int)offset_dlsym);
@@ -90,6 +97,7 @@ void GetOffsets()
     printf("offset_dlclose=%08X\n",(unsigned int)offset_dlclose);
     printf("offset_calloc=%08X\n",(unsigned int)offset_calloc);
     printf("offset_free=%08X\n",(unsigned int)offset_free);
+    printf("offset_getpid=%08X %08X\n",(unsigned int)offset_getpid,(unsigned int)getpid);
 
 }
 
@@ -812,6 +820,16 @@ unsigned int GetFunctionOffset(char *fileName,char *funcName)
     return 0;
 }
 
+int test1()
+{
+    return 1414;
+}
+
+int test2()
+{
+    LOGD("test2\n");
+}
+
 int main(int argc, char** argv) {
     bool flgDump = false;
     char funcName[128] = {0};
@@ -858,15 +876,117 @@ int main(int argc, char** argv) {
 	    }
             if(strcmp(argv[i],"-t")==0){
                 printf("test with pid %d\n",pid);
-                PrintAllAddress();
                 GetOffsets();
                 GetRemoteAddress(pid);
+		//void* handle = dlopen("/data/local/tmp/libloader.so",RTLD_LAZY);
+		//printf("test with pid %08X\n",(unsigned int)handle);
+		//dlclose(handle);
                 //dlopen("aaaa",0);
                 //_dlopen("aaaa",0);
-                //Attach(pid);
-                //Detach(pid);
+		printf("Trying to ATTACH\n");
+		if(ptraceUtil.Attach(pid)!=0){
+		    //sleep(100);		    
+		    return -1;
+		}
+		printf("ATTACH Success\n");
+		if(waitForStop(pid)==0){
+		    long parameters[10];    
+
+		    struct pt_regs oldReg,regs;
+		    ptraceUtil.GetRegs(&regs);
+		    memcpy(&oldReg,&regs,sizeof(struct pt_regs));
+		    ShowRegs(&oldReg);
+		    if(ptraceUtil.SetRegs(&regs)==0){
+			unsigned int freeAddr = (unsigned int)FindFreeSpace(pid,NULL) + sizeof(long);
+			printf("freespaceaddr=%08X\n",freeAddr);
+			unsigned char backupCode[256] = {0};
+			unsigned char currentCode[256] = {0};
+			/*ptraceUtil.ReadProcessMemory(freeAddr,&backupCode[0],256);
+			logger.logHex(&backupCode[0],256);
+			char *dllFile = "/data/local/tmp/libloader.so";
+			if(!ptraceUtil.WriteProcessMemory(freeAddr,(unsigned char *)dllFile,32)){
+			    printf("WriteProcessMemory fail\n");
+			}
+			ptraceUtil.ReadProcessMemory(freeAddr,&currentCode[0],256);
+			logger.logHex(&currentCode[0],256);
+
+			//parameters[0] = freeAddr;       
+			parameters[0] = 0x08049E60;
+			parameters[1] = RTLD_NOW| RTLD_GLOBAL;
+			if (ptraceUtil.Call((uint32_t)_dlopen, parameters, 2, &regs) == -1){    
+			    printf("Call  fail\n");
+			}else{
+			    printf("Call  Success %08X\n",(uint32_t) _dlopen);
+			    ptraceUtil.GetRegs(&regs);
+			    int returnValue  = (int)ptraceUtil.GetReturnValue(&regs);
+			    printf("Return %d %s\n",returnValue,strerror(returnValue));
+			    ShowRegs(&regs);
+			}
+			
+			ptraceUtil.WriteProcessMemory(freeAddr,&backupCode[0],256);
+			//ptraceUtil.ReadProcessMemory(freeAddr,&currentCode[0],256);
+			//logger.logHex(&currentCode[0],256);
+			
+			SetRegs(pid,&oldReg);
+			*/
+			
+			//ptraceUtil.Continue();			
+			ptraceUtil.Push(0,&regs);
+			regs.eip = 0x08049DD0; 
+			SetRegs(pid,&regs);
+			//ptraceUtil.Continue();
+			int stat = 0;
+			//waitpid(pid, &stat, WUNTRACED);  
+			//waitpid(pid, &stat, 0);  
+			while(stat != 0xb7f){
+			    if(ptraceUtil.Continue()==-1){
+				printf("error");
+			    }
+			    waitpid(pid, &stat, 0);  
+			    printf("%08X\n",stat);
+			    if (WIFSTOPPED(stat)){
+				printf("STOP\n");
+			    }
+			}
+			printf("Here\n");
+			ptraceUtil.GetRegs(&regs);
+			int returnValue  = (int)ptraceUtil.GetReturnValue(&regs);
+			printf("Return %d %s\n",returnValue,strerror(returnValue));
+			ShowRegs(&regs);			
+			
+			SetRegs(pid,&oldReg);
+		    }else{
+			printf("SetRegs Fail\n");
+		    }
+		    /*unsigned int addr = 0x08052F51;
+		    printf("Stop 1\n");
+		    unsigned char buf[32];
+		    memset(&buf[0],0,sizeof(buf));
+		    ptraceUtil.ReadProcessMemory(addr,&buf[0],32);
+		    logger.logHex(&buf[0],sizeof(buf));
+		    buf[0] = 'P';
+		    ptraceUtil.WriteProcessMemory(addr,&buf[0],32);
+		    ptraceUtil.ReadProcessMemory(addr,&buf[0],32);
+		    logger.logHex(&buf[0],sizeof(buf));
+		    */
+		    
+		    //TraceContinue(pid);
+		    //if(waitForStop(pid)==0){
+		    //sleep(1);
+		    //}
+		    ptraceUtil.Detach();
+		}
                 return 0;
             }
+	    if(strcmp(argv[i],"-dummy")==0){
+		printf("Dummy Mode\n");
+		while(true){
+		    sleep(3);
+		    LOGD("kwangpid=%d %08X %08X\n",getpid(),(unsigned int)test1,(unsigned int)test2);
+		    //printf("kwangpid=%d\n",getpid());
+		    fflush(stdout);
+		}
+	    }
 	}
     }
     if((pid!=0)&&(strlen(libraryName)!=0)){

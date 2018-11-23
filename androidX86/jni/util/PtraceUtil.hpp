@@ -57,6 +57,12 @@ public:
     long Detach();
     long Continue();
     int waitForStop();
+    int GetRegs(pt_regs *reg);
+    int SetRegs(pt_regs *reg);
+    unsigned int GetReturnValue(pt_regs *reg);
+    unsigned int GetIP(pt_regs *reg);
+    int Push(unsigned int value,pt_regs *reg);
+    long Call(uint32_t addr, long *params, uint32_t num_params,  struct pt_regs *regs);
 private:
 
 };

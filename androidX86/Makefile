@@ -9,6 +9,9 @@ all:
 	
 	adb push libs/x86/tracerx86 /data/local/tmp/tracerx86
 	adb shell chmod 777 /data/local/tmp/tracerx86
+
+	adb push libs/x86/libloader.so /data/local/tmp/libloader.so
+
 clean:
 	@rm -rf obj libs
 

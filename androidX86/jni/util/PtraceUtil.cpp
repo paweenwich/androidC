@@ -177,7 +177,7 @@ int PtraceUtil::PeekText(unsigned int addr,size_t *value)
     long ret = ptrace( PTRACE_PEEKTEXT, pid,addr,0);
     if( ret == -1){
         if(errno){
-            LOGE("PeekText: %s",strerror(errno));
+            LOGE("PeekText: %s %d",strerror(errno),pid);
             return -1;
         }
     }
@@ -204,6 +204,39 @@ void PtraceUtil::DumpHex(unsigned int addr,int size)
     }
     free(buf);
 }
+
+int PtraceUtil::GetRegs(pt_regs *reg)
+{
+    long ret = ptrace(PTRACE_GETREGS, pid, 0,reg );
+    if( ret == -1){
+        //perror("ptrace PTRACE_GETREGS");
+        LOGE("GetRegs Errorno = %d\n",errno);
+        return -1;
+    }
+    return ret;
+}
+
+int PtraceUtil::SetRegs(pt_regs *reg)
+{
+    long ret = ptrace( PTRACE_SETREGS, pid, 0,reg );
+    if( ret == -1){
+        //perror("ptrace PTRACE_SETREGS");
+        LOGE("SetRegs Errorno = %d\n",errno);
+        return -1;
+    }
+    return ret;
+}
+
+unsigned int PtraceUtil::GetReturnValue(pt_regs *regs)
+{
+     return regs->eax;    
+}
+unsigned int PtraceUtil::GetIP(pt_regs *regs)
+{
+     return regs->eip;    
+}
+
+
 
 int PtraceUtil::waitForStop()
 {
@@ -243,6 +276,54 @@ int PtraceUtil::waitForStop()
     }
     return 0;
 }
+
+int PtraceUtil::Push(unsigned int value,pt_regs *regs)
+{
+    regs->esp -= sizeof(value);   
+    WriteProcessMemory((unsigned int) regs->esp, (unsigned char *)&value, sizeof(value));
+    return 0;
+}
+
+long PtraceUtil::Call(uint32_t addr, long *params, uint32_t num_params,  struct pt_regs *regs)
+{    
+    regs->esp -= (num_params) * sizeof(long) ;  
+   // 将mmap函数参数写到stack上 
+    WriteProcessMemory((unsigned int) regs->esp, (unsigned char *)params, (num_params) * sizeof(long));
+    //ptrace_writedata(pid, (void *)regs->esp, (uint8_t *)params, (num_params) * sizeof(long));    
+    
+    long tmp_addr = 0x00;    
+    regs->esp -= sizeof(long);   
+    /**
+    push mmap所需要的参数
+    push tmp_addr
+    */ 
+    WriteProcessMemory((unsigned int) regs->esp, (unsigned char *)&tmp_addr, sizeof(tmp_addr));
+    //ptrace_writedata(pid, regs->esp, (char *)&tmp_addr, sizeof(tmp_addr));     
+    
+    //eip指向mmap
+    regs->eip = addr;    
+    
+
+    //让被调试进程继续运行
+    if (SetRegs(regs) == -1     
+            || Continue() == -1) {    
+        //printf("error\n");    
+        return -1;    
+    }    
+    
+    int stat = 0;  
+    waitpid(pid, &stat, WUNTRACED);  
+    
+    while (stat != 0xb7f) {  
+        if (Continue() == -1) {  
+            //printf("error\n");  
+            return -1;  
+        }  
+        waitpid(pid, &stat, WUNTRACED);  
+    }  
+    return 0;    
+}    
+
 
 
 

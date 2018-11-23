@@ -69,8 +69,13 @@ public:
 	    if(ret.type == 's'){
 		//sscanf(&data[2],"%s",ret.sValue);
 		ret.hValue.insert(ret.hValue.end(), &data[2], &data[strlen(data)]);
-
 	    }
+	    
+	    if(ret.type == 'S'){
+		//sscanf(&data[2],"%s",ret.sValue);
+		ret.hValue.insert(ret.hValue.end(), &data[2], &data[strlen(data)+1]);
+	    }
+	    
 	    if(ret.type == 'h'){
 		printf("[%s]\n",data);
 		ret.hValue = hex2bin(&data[2]);
@@ -186,6 +191,7 @@ int main(int argc, char** argv) {
 	printf("%s pid|pname -c :dir ;to dump\n",argv[0]);
 	printf("%s pid|pname -c =ixxx ;to search int xxxx\n",argv[0]);
 	printf("%s pid|pname -c =sxxx ;to search string xxxx\n",argv[0]);
+	printf("%s pid|pname -c =Sxxx ;to search string xxxx with null terminate\n",argv[0]);	
 	printf("%s pid|pname -c =hxxx ;to search hex xxxx\n",argv[0]);
 	printf("%s pid|pname search dir -c cmd \n",argv[0]);
         return 0;
@@ -238,7 +244,26 @@ int main(int argc, char** argv) {
 		i++;
 		argv1 = std::string(argv[i]);
 	    }
-	    
+	    if(strcmp(argv[i],"show")==0){
+		printf("Show [%d] i=%s\n",pid,inputFileName);
+		std::vector<SnapShotResult> prevAddrs;
+		if(inputFileName[0]!=0){
+		    ProcessScanner pscan;
+		    if(pscan.open(pid)){
+			prevAddrs = SnapShot::readFromFile(inputFileName);
+			printf("prevAddrs=%d\n",prevAddrs.size());
+			for(int j=0;j<prevAddrs.size();j++){
+			    printf("%08X\n",prevAddrs[j].addr);
+			    unsigned char buffer[32];
+			    pscan.read(prevAddrs[j].addr,sizeof(buffer),(unsigned int) &buffer[0]);
+			    logger.logHex(&buffer[0],sizeof(buffer));
+			}
+			pscan.close();			
+		    }
+
+		}
+		return 0;
+	    }
 	}
     }
     if(flgParseOnly){
@@ -269,7 +294,9 @@ int main(int argc, char** argv) {
 	//printf("Open success %d\n",pid);
 	pscan.readMap();
 	//std::vector<ProcMapData> heapMap = pscan.getHeap();
-	std::vector<ProcMapData> heapMap = pscan.getWriteable();
+	//std::vector<ProcMapData> heapMap = pscan.getWriteable();
+	//std::vector<ProcMapData> heapMap = pscan.getNotExecute();
+	std::vector<ProcMapData> heapMap = pscan.getAll();
 	
 	if(cmd.op == ':'){
 	    if(cmd.sValue.size()==0){

@@ -134,6 +134,8 @@ public:
     void dump(unsigned int targetAddr,int size);
     std::vector<ProcMapData> getHeap();
     std::vector<ProcMapData> getWriteable();
+    std::vector<ProcMapData> getNotExecute();
+    std::vector<ProcMapData> getAll();
     bool buffToFile(unsigned int bufferAddr,int size,char *fileName);
     static void memScan(unsigned int dataAddr,int dataSize,unsigned int memAddr,int memSize,std::vector<ScanResult> &result,int step);
 private:

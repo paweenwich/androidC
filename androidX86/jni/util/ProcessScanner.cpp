@@ -240,6 +240,26 @@ std::vector<ProcMapData> ProcessScanner::getWriteable()
     return ret;
 }
 
+std::vector<ProcMapData> ProcessScanner::getNotExecute()
+{
+    std::vector<ProcMapData> ret;
+    for(int i=0;i<vProcMap.size();i++){
+	if(strcmp(vProcMap[i].protection,"r--p")==0){
+	    ret.push_back(vProcMap[i]);
+	}
+    }
+    return ret;
+}
+
+std::vector<ProcMapData> ProcessScanner::getAll()
+{
+    std::vector<ProcMapData> ret;
+    for(int i=0;i<vProcMap.size();i++){
+	ret.push_back(vProcMap[i]);
+    }
+    return ret;
+}
+
 bool ProcessScanner::buffToFile(unsigned int bufferAddr,int size,char *fileName)
 {
     FILE *f = fopen(fileName,"wb");
