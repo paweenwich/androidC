@@ -15,6 +15,7 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -24,10 +25,13 @@
 #include <dlfcn.h>
 #include <stdarg.h>
 #include <fcntl.h>
+#include <dirent.h>
 #include <string>
 #include <vector>
+#include <cctype>
 #include <fstream>
 #include <android/log.h>
+
 
 #ifndef UTIL_HPP
 #define UTIL_HPP
@@ -39,7 +43,9 @@ std::vector<unsigned char> hex2bin(std::string const& s);
 std::vector<std::string> DirectoryListFile(std::string& dirName,std::string filter = "");
 std::string StringReplaceChar(std::string src,char c1,char c2);
 std::vector<std::string> SplitByChar(std::string src, char c = ' ');
-
+std::vector<std::string> ReadAllLines(char *fileName);
+std::string GetCurrentExecutable();
+std::string GetCurrentExecutableDirectory();
 
 // interface for unity
 extern "C" {
@@ -57,6 +63,12 @@ extern "C" {
     unsigned int GetBaseLibraryTextSize(const char* libname,int pid);
     bool isDirectoryExist(const char* dir);
     size_t GetFilesize(const char* filename); 
+    double GetTickCount(void); 
+    int GetMyTracerPID();
+    void Panic(const char* fmt, ...);
+    void DisableSelinux();
+    bool IsSelinuxEnabled();
+
 };
 
 class FileMap
@@ -97,6 +109,45 @@ public:
 	}
     }
 
+};
+
+class TempDirectory {
+ public:
+  TempDirectory() {
+    snprintf(path_, sizeof path_, "/data/local/tmp/temp-XXXXXX");
+    if (!mktemp(path_))
+      Panic("Could not create temporary directory name: %s\n", strerror(errno));
+    if (mkdir(path_, 0700) < 0)
+      Panic("Could not create temporary directory %s: %s\n", strerror(errno));
+  }
+
+  ~TempDirectory() {
+    // Remove any file in this directory.
+    DIR* d = opendir(path_);
+    if (!d)
+      Panic("Could not open directory %s: %s\n", strerror(errno));
+
+    struct dirent* entry;
+    while ((entry = readdir(d)) != NULL) {
+      if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
+        continue;
+      char file_path[PATH_MAX*2];
+      //String file_path;
+      //file_path.Format("%s/%s", path_, entry->d_name);
+      sprintf(file_path,"%s/%s", path_, entry->d_name);
+      if (unlink(file_path) < 0)
+        Panic("Could not remove %s: %s\n", file_path, strerror(errno));
+    }
+    closedir(d);
+
+    if (rmdir(path_) < 0)
+      Panic("Could not remove dir %s: %s\n", path_, strerror(errno));
+  }
+
+  const char* path() const { return path_; }
+
+ private:
+  char path_[PATH_MAX];
 };
 
 

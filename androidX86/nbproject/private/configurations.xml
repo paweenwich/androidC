@@ -5,6 +5,9 @@
       <df name="data">
       </df>
       <df name="jni">
+        <df name="libloader">
+          <in>loader.cpp</in>
+        </df>
         <df name="scrcap">
           <in>main.cpp</in>
         </df>
@@ -21,6 +24,7 @@
           <in>ProcessScanner.hpp</in>
           <in>PtraceUtil.cpp</in>
           <in>PtraceUtil.hpp</in>
+          <in>elf_help.h</in>
           <in>logger.cpp</in>
           <in>logger.h</in>
           <in>payload.cpp</in>
@@ -37,7 +41,13 @@
         <df name="local">
           <df name="x86">
             <df name="objs">
-              <df name="scrcapx86">
+              <df name="loader">
+                <df name="__">
+                  <df name="util">
+                  </df>
+                </df>
+              </df>
+              <df name="scrcapX86">
                 <df name="__">
                   <df name="util">
                   </df>

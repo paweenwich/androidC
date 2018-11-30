@@ -508,3 +508,129 @@ std::vector<std::string> SplitByChar(std::string src, char c)
     } while (0 != *str++);
     return result;
 }
+
+double GetTickCount(void) 
+{
+  struct timespec now;
+  if (clock_gettime(CLOCK_MONOTONIC, &now))
+    return 0;
+  return now.tv_sec * 1000.0 + now.tv_nsec / 1000000.0;
+}
+
+std::vector<std::string> ReadAllLines(char *fileName)
+{
+    char buffer[2048];
+    std::vector<std::string> out;
+    FILE *fp = NULL;
+    //sprintf(filename, "/proc/%d/maps", pid);
+    fp = fopen(fileName, "rt");
+    if (fp == NULL) {
+        LOGD("ReadAllLines: cannot open %s",fileName);
+        goto done;
+    }
+    out.clear();
+    while (fgets(buffer, sizeof (buffer), fp)) {
+        //printf("[%s] [%s]\n",buffer,library);
+        buffer[strlen(buffer)-1] = 0;
+        std::string line = buffer;
+        out.push_back(line);
+    }
+    done:
+    if (fp) {
+        fclose(fp);
+    }    
+    return out;
+}
+
+int GetMyTracerPID()
+{
+    char fileName[128];
+    sprintf(fileName,"/proc/%d/status",getpid());
+    std::vector<std::string> lines = ReadAllLines(fileName);
+    int tracerID = 0;    
+    for(int i=0;i<lines.size();i++){
+	char *line = (char *)lines[i].c_str();
+	if(strstr(line,"TracerPid:")==line){
+	    //printf("%s\n",lines[i].c_str());
+	    char key[64];
+	    if(sscanf(line,"%s%d",key,&tracerID)==2){
+		//printf("TracerPid=%d\n",tracerID);
+		break;
+	    }
+	}
+    }
+    return tracerID;
+}
+
+inline void Panic(const char* fmt, ...) 
+{
+  va_list args;
+  fprintf(stderr, "PANIC: ");
+  va_start(args, fmt);
+  vfprintf(stderr, fmt, args);
+  va_end(args);
+  exit(1);
+}
+
+std::string GetCurrentExecutable() 
+{
+  char path[PATH_MAX];  
+  ssize_t ret = readlink("/proc/self/exe", path, sizeof(path));
+  if (ret < 0)
+    Panic("Could not read /proc/self/exe: %s\n", strerror(errno));
+  return path;
+}
+
+// Retrieve current executable directory as a String.
+std::string GetCurrentExecutableDirectory() 
+{
+  std::string path = GetCurrentExecutable();
+  // Find basename.
+  char* p = reinterpret_cast<char*>(strrchr(path.c_str(), '/'));
+  if (p == NULL)
+    Panic("Current executable does not have directory root?: %s\n",
+          path.c_str());
+
+  int pos = path.find(p);
+  //path.Resize(p - path.c_str());
+  return path.substr(0,pos);
+}
+
+bool IsSelinuxEnabled()
+{
+  FILE* fp = fopen("/proc/filesystems", "r");
+  char* line = (char*) calloc(50, sizeof(char));
+  bool result = false;
+  while(fgets(line, 50, fp)) {
+    if (strstr(line, "selinuxfs")) {
+      result = true;
+    }
+  }
+  if (line) {
+    free(line);
+  }
+  fclose(fp);
+  return result;
+}
+
+void DisableSelinux() {
+  FILE* fp = fopen("/proc/mounts", "r");
+  char* line = (char*) calloc(1024, sizeof(char));
+  while(fgets(line, 1024, fp)) {
+    if (strstr(line, "selinuxfs")) {
+      strtok(line, " ");
+      char* selinux_dir = strtok(NULL, " ");
+      char* selinux_path = strcat(selinux_dir, "/enforce");
+      FILE* fp_selinux = fopen(selinux_path, "w");
+      char* buf = (char*)"0"; // set selinux to permissive
+      fwrite(buf, strlen(buf), 1, fp_selinux);
+      fclose(fp_selinux);
+      break;
+    }
+  }
+  fclose(fp);
+  if (line) {
+    free(line);
+  }
+}
+

@@ -284,6 +284,31 @@ int PtraceUtil::Push(unsigned int value,pt_regs *regs)
     return 0;
 }
 
+void PtraceUtil::ShowRegs()
+{
+    pt_regs regs;
+    pt_regs* reg;
+    GetRegs(&regs);
+    reg = &regs;
+    printf("ebx\t%08lX\n",reg->ebx);
+    printf("ecx\t%08lX\n",reg->ecx);
+    printf("edx\t%08lX\n",reg->edx);
+    printf("esi\t%08lX\n",reg->esi);
+    printf("ebp\t%08lX\n",reg->ebp);
+    printf("eax\t%08lX\n",reg->eax);
+    printf("xds\t%08X\n",reg->xds);
+    
+    printf("xes\t%08X\n",reg->xes);
+    printf("xfs\t%08X\n",reg->xfs);
+    printf("xgs\t%08X\n",reg->xgs);
+    printf("orig_eax\t%08lX\n",reg->orig_eax);
+    printf("eip\t%08lX\n",reg->eip);
+    printf("xcs\t%08X\n",reg->xcs);
+    printf("eflags\t%08lX\n",reg->eflags);
+    printf("esp\t%08lX\n",reg->esp);
+    printf("xss\t%08X\n",reg->xss);
+}
+
 long PtraceUtil::Call(uint32_t addr, long *params, uint32_t num_params,  struct pt_regs *regs)
 {    
     regs->esp -= (num_params) * sizeof(long) ;  

@@ -13,9 +13,16 @@
 #include <stdarg.h>
 #include <string>
 #include <vector>
-#include <fstream>
-#include <android/log.h>
+#include <cctype>
+#include <dirent.h>
+#include <pthread.h>
+
 #include <../util/util.hpp>
+#include <../util/PtraceUtil.hpp>
+#include <../util/logger.h>
+#include <../util/payload.hpp>
+#include <../util/elf_help.h>
+
 
 #define  LOG_TAG    "loader"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)

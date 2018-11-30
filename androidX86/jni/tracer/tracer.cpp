@@ -28,10 +28,13 @@
 #include <vector>
 #include <cctype>
 #include <dirent.h>
+#include <pthread.h>
+
 #include <../util/util.hpp>
 #include <../util/PtraceUtil.hpp>
 #include <../util/logger.h>
 #include <../util/payload.hpp>
+#include <../util/elf_help.h>
 
 #define stricmp strcasecmp
 
@@ -820,15 +823,57 @@ unsigned int GetFunctionOffset(char *fileName,char *funcName)
     return 0;
 }
 
+int counter = 0;
+
 int test1()
 {
-    return 1414;
+    counter++;
+    printf("test1 %d\n",counter);
+    __asm__(
+	"movl $0x1414,%eax \n"
+	"int $0x3\n"
+    );
 }
 
 int test2()
 {
+    counter++;    
+    printf("test2 %d\n",counter);
     LOGD("test2\n");
+
 }
+
+void *AntiStopThreadFunc(void *mesg)
+{
+    printf("AntiStopThreadFunc start with param [%s]\n",(char *)mesg);
+    while(true){
+	double start = GetTickCount();
+	sleep(5);
+	double end = GetTickCount();
+	double diff = end - start;
+	LOGD("%f\n",diff);
+	if(diff > 6000){
+	    printf("Someone stop me %f\n",diff);
+	    exit(0);
+	}
+    }
+}
+
+void *AntiDebugThreadFunc(void *mesg)
+{
+    
+    printf("AntiDebugThreadFunc with param [%s]\n",(char *)mesg);
+    while(true){
+	int tracerID = GetMyTracerPID();
+	if(tracerID!=0){
+	    printf("Someone debug me %d\n",tracerID);
+	    exit(0);
+	}
+    }
+    
+}
+
+
 
 int main(int argc, char** argv) {
     bool flgDump = false;
@@ -874,8 +919,25 @@ int main(int argc, char** argv) {
 		i++;
 		strcpy(libraryName,argv[i]);
 	    }
+	    if(strcmp(argv[i],"-t2")==0){
+		void (*mono_set_dirs)(const char *assembly_dir, const char *config_dir);
+		void *(*mono_jit_init)(const char *file);
+		void *handle = dlopen("/data/app-lib/com.gravity.romg-1/libmono.so",RTLD_NOW);
+		printf("%08X\n",(unsigned int)handle);
+		mono_set_dirs = (void (*)(const char *,const char *))dlsym(handle, "mono_set_dirs");
+		printf("mono_set_dirs %08X\n",(unsigned int)mono_set_dirs);
+		mono_jit_init = (void* (*)(const char *))dlsym(handle, "mono_jit_init");
+		
+		mono_set_dirs("/data/local/tmp/Managed","/data/local/tmp/Managed");
+		void *domain = mono_jit_init("kwang");
+		printf("domain %08X\n",(unsigned int)domain);
+		return 0;
+	    }
             if(strcmp(argv[i],"-t")==0){
-                printf("test with pid %d\n",pid);
+		unsigned int targetIP = 0;
+		i++;
+		sscanf(argv[i],"%X",&targetIP);
+                printf("test with pid %d %08X\n",pid,targetIP);
                 GetOffsets();
                 GetRemoteAddress(pid);
 		//void* handle = dlopen("/data/local/tmp/libloader.so",RTLD_LAZY);
@@ -883,13 +945,21 @@ int main(int argc, char** argv) {
 		//dlclose(handle);
                 //dlopen("aaaa",0);
                 //_dlopen("aaaa",0);
+		printf("Trying to STOP\n");
+		kill(pid, SIGSTOP);
+		if(waitForStop(pid)==0){
+		    printf("stop by signal\n");
+		}
 		printf("Trying to ATTACH\n");
 		if(ptraceUtil.Attach(pid)!=0){
 		    //sleep(100);		    
 		    return -1;
 		}
 		printf("ATTACH Success\n");
+		//ptraceUtil.Detach();
+		//return 0;
 		if(waitForStop(pid)==0){
+		    
 		    long parameters[10];    
 
 		    struct pt_regs oldReg,regs;
@@ -931,29 +1001,54 @@ int main(int argc, char** argv) {
 			*/
 			
 			//ptraceUtil.Continue();			
-			ptraceUtil.Push(0,&regs);
-			regs.eip = 0x08049DD0; 
-			SetRegs(pid,&regs);
-			//ptraceUtil.Continue();
-			int stat = 0;
-			//waitpid(pid, &stat, WUNTRACED);  
-			//waitpid(pid, &stat, 0);  
-			while(stat != 0xb7f){
-			    if(ptraceUtil.Continue()==-1){
-				printf("error");
-			    }
-			    waitpid(pid, &stat, 0);  
-			    printf("%08X\n",stat);
-			    if (WIFSTOPPED(stat)){
-				printf("STOP\n");
-			    }
-			}
-			printf("Here\n");
-			ptraceUtil.GetRegs(&regs);
-			int returnValue  = (int)ptraceUtil.GetReturnValue(&regs);
-			printf("Return %d %s\n",returnValue,strerror(returnValue));
-			ShowRegs(&regs);			
+			//ptraceUtil.Push(0,&regs);
+			unsigned char codetmp[256];
+			ptraceUtil.ReadProcessMemory(regs.eip,&codetmp[0],256);
+			logger.logHex(&codetmp[0],256);
 			
+			if(targetIP!=0){
+			    regs.eip = targetIP; 
+
+			    ptraceUtil.SetRegs(&regs);
+			    //ptraceUtil.ShowRegs();
+
+			    //ptraceUtil.Continue();
+			    int stat = 0;
+			    //waitpid(pid, &stat, WUNTRACED);  
+			    //waitpid(pid, &stat, 0);  
+			    while(stat != 0xb7f){
+				if(ptraceUtil.Continue()==-1){
+				    printf("error");
+				}
+				waitpid(pid, &stat, 0);  
+				if (WIFSTOPPED(stat)){
+				    printf("WIFSTOPPED [%d]",WSTOPSIG(stat));
+				}
+				//if(WSTOPSIG(stat)){
+				    //printf("WSTOPSIG ");
+				//}
+				//if(WTERMSIG(stat)){
+				    //printf("WTERMSIG ");
+				//}
+				if(WIFSIGNALED(stat)){
+				    printf("WIFSIGNALED [%d]",WTERMSIG(stat));
+				}
+				//if(WEXITSTATUS(stat)){
+				    //printf("WEXITSTATUS ");
+				    //break;
+				//}
+				if(WIFEXITED(stat)){
+				    printf("WIFEXITED [%d]",WEXITSTATUS(stat));
+				    break;
+				}
+				printf(" %08X\n",stat);			    
+			    }
+			    printf("Here\n");
+			    ptraceUtil.GetRegs(&regs);
+			    int returnValue  = (int)ptraceUtil.GetReturnValue(&regs);
+			    printf("Return %d %s\n",returnValue,strerror(returnValue));
+			    ShowRegs(&regs);			
+			}
 			SetRegs(pid,&oldReg);
 		    }else{
 			printf("SetRegs Fail\n");
@@ -974,19 +1069,56 @@ int main(int argc, char** argv) {
 		    //if(waitForStop(pid)==0){
 		    //sleep(1);
 		    //}
+		    //printf("Enter to continue\n");
+		    //getchar();
 		    ptraceUtil.Detach();
+		    kill(pid, SIGCONT);
 		}
                 return 0;
             }
 	    if(strcmp(argv[i],"-dummy")==0){
+		std::string exeName = GetCurrentExecutable();
+		std::string exePath = GetCurrentExecutableDirectory();
+		printf("%s %s\n",exeName.c_str(),exePath.c_str());
+		
+		if(IsSelinuxEnabled()){
+		    printf("SelinuxEnabled\n");
+		}
+		//TempDirectory tmpDir;
+		//printf("tempdir = %\n",tmpDir.path());
+		
+		pthread_t thread1;
+		int iret1 = pthread_create( &thread1, NULL, AntiDebugThreadFunc, (void*) "1234");
+		int iret2 = pthread_create( &thread1, NULL, AntiStopThreadFunc, (void*) "1234");
+		printf("%d %d\n",iret1,iret2);
+
 		printf("Dummy Mode\n");
+		printf("kwangpid=%d %08X %08X %d\n",getpid(),(unsigned int)test1,(unsigned int)test2,counter);
+		//IsDebugDetect();
+		while(true){
+		    sleep(2);
+		    LOGD("kwangpid=%d %08X %08X %d\n",getpid(),(unsigned int)test1,(unsigned int)test2,counter);
+		    //printf("kwangpid=%d\n",getpid());
+		    //fflush(stdout);
+		}
+	    }
+	    if(strcmp(argv[i],"-sleep")==0){
+		printf("Sleep Mode\n");
+		printf("kwangpid=%d %08X %08X %d\n",getpid(),(unsigned int)test1,(unsigned int)test2,counter);
 		while(true){
 		    sleep(3);
-		    LOGD("kwangpid=%d %08X %08X\n",getpid(),(unsigned int)test1,(unsigned int)test2);
-		    //printf("kwangpid=%d\n",getpid());
+		    LOGD("kwangpid=%d %08X %08X %d\n",getpid(),(unsigned int)test1,(unsigned int)test2,counter);
 		    fflush(stdout);
 		}
 	    }
+	    if(strcmp(argv[i],"-getchar")==0){
+		printf("getchar Mode\n");
+		printf("kwangpid=%d %08X %08X %d\n",getpid(),(unsigned int)test1,(unsigned int)test2,counter);
+		while(true){
+		    getchar();
+		}
+	    }	    
+	    
 	}
     }
     if((pid!=0)&&(strlen(libraryName)!=0)){
@@ -1095,4 +1227,5 @@ int main(int argc, char** argv) {
     }
     */
 }
+
 

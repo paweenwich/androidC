@@ -59,6 +59,7 @@ public:
     int waitForStop();
     int GetRegs(pt_regs *reg);
     int SetRegs(pt_regs *reg);
+    void ShowRegs();
     unsigned int GetReturnValue(pt_regs *reg);
     unsigned int GetIP(pt_regs *reg);
     int Push(unsigned int value,pt_regs *reg);

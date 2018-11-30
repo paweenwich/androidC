@@ -1,40 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
-    <code-assistance-data xmlns="http://www.netbeans.org/ns/make-project-private/1">
-        <code-model-enabled>true</code-model-enabled>
-    </code-assistance-data>
     <data xmlns="http://www.netbeans.org/ns/make-project-private/1">
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
-    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-<<<<<<< HEAD
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/util/util.hpp</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/util/PtraceUtil.hpp</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/scrcap/Android.mk</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/util/ProcessScanner.hpp</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/scrcap/main.cpp</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/upgrade/upgrade.cpp</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/util/util.cpp</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/util/Android.mk</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/util/logger.h</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/Makefile</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/util/ProcessScanner.cpp</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/util/logger.cpp</file>
-=======
-            <file>file:/C:/cygwin64/home/Administrator/C/androidX86/jni/scrcap/main.cpp</file>
-            <file>file:/C:/cygwin64/home/Administrator/C/androidX86/jni/util/PtraceUtil.hpp</file>
->>>>>>> 23b8917f777e2973a6bb8729eb5b99d530d43a7c
-        </group>
-    </open-files>
-    <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">
-        <module name="org-netbeans-modules-cnd-discovery">
-            <property name="rootFolder" value="C:\cygwin64\home\Administrator\C\androidX86"/>
-            <property name="make-log-file" value="C:\cygwin64\home\Administrator\C\androidX86"/>
-            <property name="folder" value="C:\cygwin64\home\Administrator\C\androidX86"/>
-            <property name="model-folder" value="C:\cygwin64\home\Administrator\C\androidX86"/>
-        </module>
-    </preferences>
 </project-private>
