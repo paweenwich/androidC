@@ -873,8 +873,6 @@ void *AntiDebugThreadFunc(void *mesg)
     
 }
 
-
-
 int main(int argc, char** argv) {
     bool flgDump = false;
     char funcName[128] = {0};
@@ -920,17 +918,71 @@ int main(int argc, char** argv) {
 		strcpy(libraryName,argv[i]);
 	    }
 	    if(strcmp(argv[i],"-t2")==0){
-		void (*mono_set_dirs)(const char *assembly_dir, const char *config_dir);
-		void *(*mono_jit_init)(const char *file);
 		void *handle = dlopen("/data/app-lib/com.gravity.romg-1/libmono.so",RTLD_NOW);
+
+#define MONO_API(h, r, n, p) \
+    r (* n) p;\
+    n = ( r (*) p )dlsym(h, #n);\
+    if(n==NULL){ printf("ERROR %s not found\n",#n); exit(-1); }
+#define MONO_LOAD(n) \
+    {\
+        void *assembly = mono_domain_assembly_open(domain,"/data/local/tmp/Managed/mono/1.0/" n);\
+        void *image = mono_assembly_get_image(assembly);\
+        printf("%s assembly=%08X image=%08X\n",n,(unsigned int)assembly,(unsigned int)image);\
+    }
+
 		printf("%08X\n",(unsigned int)handle);
-		mono_set_dirs = (void (*)(const char *,const char *))dlsym(handle, "mono_set_dirs");
-		printf("mono_set_dirs %08X\n",(unsigned int)mono_set_dirs);
-		mono_jit_init = (void* (*)(const char *))dlsym(handle, "mono_jit_init");
-		
-		mono_set_dirs("/data/local/tmp/Managed","/data/local/tmp/Managed");
+                MONO_API(handle,void *,mono_get_root_domain,(void));
+                MONO_API(handle,void  ,mono_set_dirs,(const char *,const char *));
+                MONO_API(handle,void *,mono_jit_init,(const char *));
+                MONO_API(handle,void *,mono_jit_init_version,(const char *,const char *));
+                MONO_API(handle,void *,mono_domain_assembly_open,(void *,const char *));
+                MONO_API(handle,void *,mono_jit_exec,(void *,void *,int,void *));
+                MONO_API(handle,void *,mono_config_parse,(void *));
+                MONO_API(handle,void *,mono_assembly_load,(char *));
+                MONO_API(handle,void *,mono_assembly_get_image,(void *));
+                MONO_API(handle,char *,mono_unity_get_data_dir,(void));
+                MONO_API(handle,void  ,mono_unity_set_data_dir,(char *));
+                MONO_API(handle,void *,mono_unity_set_vprintf_func,(void *));
+                MONO_API(handle,void *,mono_trace_set_level_string,(char *));
+                MONO_API(handle,void *,mono_trace_set_mask_string,(char *));
+
+               // mono_get_runtime_build_info = (char *(*)(void))dlsym(handle, "mono_get_runtime_build_info");
+                printf("addr %08X\n",(unsigned int)mono_trace_set_level_string);
+                
+		mono_config_parse(NULL);
+		mono_set_dirs("/data/local/tmp/Managed/",NULL);
+                mono_unity_set_data_dir("/data/local/tmp/Managed/mono/1.0");
 		void *domain = mono_jit_init("kwang");
-		printf("domain %08X\n",(unsigned int)domain);
+                void *rootDomain = mono_get_root_domain();                
+                
+                printf("%s\n",mono_unity_get_data_dir());                
+                
+                mono_unity_set_vprintf_func((void *)vprintf);                
+                mono_trace_set_level_string("debug");
+                mono_trace_set_mask_string("all");
+                
+                
+                //void *domain = mono_jit_init_version("kwang","v1.1.4322");
+		printf("domain %08X rootDomain %08X\n",(unsigned int)domain,(unsigned int)rootDomain);
+                MONO_LOAD("System.dll");
+                MONO_LOAD("System.Core.dll");
+                MONO_LOAD("System.Xml.dll");
+                MONO_LOAD("Mono.Security.dll");
+                
+                //void *assembly = mono_domain_assembly_open(domain,"/data/local/tmp/Managed/mono/1.0/mscorlib.dll");
+                void *assembly = mono_domain_assembly_open(domain,"/data/local/tmp/hello.exe");
+                void *image = mono_assembly_get_image(assembly);
+                printf("assembly %08X image %08X\n",(unsigned int)assembly,(unsigned int)image);
+
+                if(assembly != NULL){
+                    try{
+                        mono_jit_exec(domain,assembly,0,NULL);
+                    }catch(...){
+                        printf("Exception \n");
+                    }
+                }
+                //printf("info %s\n",mono_get_runtime_build_info());
 		return 0;
 	    }
             if(strcmp(argv[i],"-t")==0){

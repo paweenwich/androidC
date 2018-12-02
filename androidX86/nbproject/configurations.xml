@@ -22,6 +22,9 @@
           <in>util.cpp</in>
         </df>
       </df>
+      <df name="mono">
+        <in>hello.cs</in>
+      </df>
     </df>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -231,6 +234,8 @@
             <pElem></pElem>
           </incDir>
         </ccTool>
+      </item>
+      <item path="mono/hello.cs" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>
