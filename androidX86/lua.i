@@ -1,5 +1,5 @@
 # 1 "jni/luac/lua.c"
-# 1 "C:\\cygwin64\\home\\kwang\\C\\androidX86//"
+# 1 "C:\\cygwin64\\home\\Administrator\\C\\androidX86//"
 # 1 "<built-in>"
 # 1 "<command-line>"
 # 1 "jni/luac/lua.c"
