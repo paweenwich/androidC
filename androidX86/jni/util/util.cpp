@@ -36,51 +36,21 @@ typedef void* MonoString;
 typedef int gboolean;
 typedef void* gpointer;
 
-/*
-MonoDomain *mono_domain_get();
-MonoAssembly *mono_domain_assembly_open(MonoDomain *domain, const char *assemblyName);
-MonoImage *mono_assembly_get_image(MonoAssembly *assembly);
-MonoMethodDesc *mono_method_desc_new(const char *methodString, gboolean useNamespace);
-MonoMethodDesc *mono_method_desc_free(MonoMethodDesc *desc);
-MonoMethod *mono_method_desc_search_in_image(MonoMethodDesc *methodDesc, MonoImage *image);
-MonoObject *mono_runtime_invoke(MonoMethod *method, void *obj, void **params, MonoObject **exc);
-MonoClass *mono_class_from_name(MonoImage *image, const char *namespaceString, const char *classnameString);
-MonoMethod *mono_class_get_methods(MonoClass*, gpointer* iter);
-MonoString *mono_string_new(MonoDomain *domain, const char *text);
-char* mono_method_get_name (MonoMethod *method);
-*/
 
+#define MONO_FUNC(r,n,p)\
+    typedef r (* n##_t) p;\
+    n##_t n;
 
-
-typedef void * (*mono_domain_get_t)();
-mono_domain_get_t mono_domain_get;
-
-typedef void * (*mono_image_open_from_data_t)(unsigned char *data,int size,int num,int *status);
-mono_image_open_from_data_t mono_image_open_from_data;
-
-typedef void * (*mono_domain_assembly_open_t)(unsigned int domain, const char *assemblyName);
-mono_domain_assembly_open_t mono_domain_assembly_open;
-
-typedef void * (*mono_get_root_domain_t)();
-mono_get_root_domain_t mono_get_root_domain;
-
-typedef void (*mono_thread_attach_t)(unsigned int domain);
-mono_thread_attach_t mono_thread_attach;
-
-typedef void* (*mono_assembly_load_from_full_t)(unsigned int image, const char *fname,int *status,int readonly);
-mono_assembly_load_from_full_t mono_assembly_load_from_full;
-
-typedef void* (*mono_assembly_get_image_t)(unsigned int assembly);
-mono_assembly_get_image_t mono_assembly_get_image;
-
-typedef void* (*mono_class_from_name_t)(unsigned int image, const char* name_space, const char *name);
-mono_class_from_name_t mono_class_from_name;
-
-typedef void* (*mono_class_get_method_from_name_t)(unsigned int klass, const char *name, int param_count);
-mono_class_get_method_from_name_t mono_class_get_method_from_name;
-
-typedef void* (*mono_runtime_invoke_t)(unsigned int method, unsigned int obj, unsigned int params, unsigned int exc);
-mono_runtime_invoke_t mono_runtime_invoke;
+MONO_FUNC(void *,mono_domain_get,(void));
+MONO_FUNC(void *,mono_image_open_from_data,(unsigned char *data,int size,int num,int *status));
+MONO_FUNC(void *,mono_domain_assembly_open,(unsigned int domain, const char *assemblyName));
+MONO_FUNC(void *,mono_get_root_domain,(void));
+MONO_FUNC(void *,mono_thread_attach,(unsigned int domain));
+MONO_FUNC(void *,mono_assembly_load_from_full,(unsigned int image, const char *fname,int *status,int readonly));
+MONO_FUNC(void *,mono_assembly_get_image,(unsigned int assembly));
+MONO_FUNC(void *,mono_class_from_name,(unsigned int image, const char* name_space, const char *name));
+MONO_FUNC(void *,mono_class_get_method_from_name,(unsigned int klass, const char *name, int param_count));
+MONO_FUNC(void *,mono_runtime_invoke,(unsigned int method, unsigned int obj, unsigned int params, unsigned int exc));
 
 void MonoLoadAndInvokeAssembly(const char* fileName,const char* name_space,char *className,const char* methodName)
 {
@@ -92,42 +62,29 @@ void MonoLoadAndInvokeAssembly(const char* fileName,const char* name_space,char 
     }
     LOGD("MonoLoadAndInvokeAssembly: found libmono.so [%s]\n",monoLibraryFile);
     void* handle = dlopen(monoLibraryFile,0);
-    mono_domain_get = (mono_domain_get_t)dlsym(handle,"mono_domain_get");
-    LOGD("mono_domain_get %08X",(unsigned int) mono_domain_get);
+    
+#define MONO_LOAD(n)\
+    n = (n ## _t)dlsym(handle,#n);\
+    LOGD(#n " %08X",(unsigned int) n);
+    
+    MONO_LOAD(mono_domain_get);
     unsigned int domain = (unsigned int)mono_domain_get();
     LOGD("domain %08X",(unsigned int) domain);
     
-    mono_image_open_from_data = (mono_image_open_from_data_t)dlsym(handle,"mono_image_open_from_data");
-    LOGD("mono_image_open_from_data %08X",(unsigned int) mono_image_open_from_data);
-
-    mono_domain_assembly_open  = (mono_domain_assembly_open_t)dlsym(handle,"mono_domain_assembly_open");
-    LOGD("mono_domain_assembly_open %08X",(unsigned int) mono_domain_assembly_open);
-
-    mono_get_root_domain  = (mono_get_root_domain_t)dlsym(handle,"mono_get_root_domain");
-    LOGD("mono_get_root_domain %08X",(unsigned int) mono_get_root_domain);
+    MONO_LOAD(mono_image_open_from_data);
+    MONO_LOAD(mono_domain_assembly_open);
+    MONO_LOAD(mono_get_root_domain);
     unsigned int rootdomain = (unsigned int)mono_get_root_domain(); 
     LOGD("rootdomain %08X",rootdomain);
 
-    mono_thread_attach  = (mono_thread_attach_t)dlsym(handle,"mono_thread_attach");
-    LOGD("mono_thread_attach %08X",(unsigned int) mono_thread_attach);
+    MONO_LOAD(mono_thread_attach);
     mono_thread_attach(rootdomain);
     
-    mono_assembly_load_from_full  = (mono_assembly_load_from_full_t)dlsym(handle,"mono_assembly_load_from_full");
-    LOGD("mono_assembly_load_from_full %08X",(unsigned int) mono_assembly_load_from_full);
-    
-    mono_assembly_get_image  = (mono_assembly_get_image_t)dlsym(handle,"mono_assembly_get_image");
-    LOGD("mono_assembly_get_image %08X",(unsigned int) mono_assembly_get_image);
-    
-    mono_class_from_name  = (mono_class_from_name_t)dlsym(handle,"mono_class_from_name");
-    LOGD("mono_class_from_name %08X",(unsigned int) mono_class_from_name);
-
-    mono_class_get_method_from_name  = (mono_class_get_method_from_name_t)dlsym(handle,"mono_class_get_method_from_name");
-    LOGD("mono_class_get_method_from_name %08X",(unsigned int) mono_class_get_method_from_name);
-
-    mono_runtime_invoke  = (mono_runtime_invoke_t)dlsym(handle,"mono_runtime_invoke");
-    LOGD("mono_runtime_invoke %08X",(unsigned int) mono_runtime_invoke);
-    
-    
+    MONO_LOAD(mono_assembly_load_from_full);
+    MONO_LOAD(mono_assembly_get_image);
+    MONO_LOAD(mono_class_from_name);
+    MONO_LOAD(mono_class_get_method_from_name);
+    MONO_LOAD(mono_runtime_invoke);
     
     //loading file
     std::vector<unsigned char> buffer = ReadFile(fileName);

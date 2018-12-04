@@ -2,6 +2,8 @@
 <configurationDescriptor version="97">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
+      <df name="data">
+      </df>
       <df name="jni">
         <df name="libloader">
           <in>loader.cpp</in>
@@ -48,7 +50,7 @@
                   </df>
                 </df>
               </df>
-              <df name="scrcapx86">
+              <df name="scrcapX86">
                 <df name="__">
                   <df name="util">
                   </df>
@@ -70,9 +72,12 @@
           </df>
         </df>
       </df>
+      <in>Mutex.s</in>
       <in>ProcessScanner.s</in>
       <in>PtraceUtil.s</in>
+      <in>logger.s</in>
       <in>main.s</in>
+      <in>payload.s</in>
       <in>tracer.s</in>
       <in>util.s</in>
     </df>
