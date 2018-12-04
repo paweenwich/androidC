@@ -24,6 +24,8 @@
           <in>ProcessScanner.hpp</in>
           <in>PtraceUtil.cpp</in>
           <in>PtraceUtil.hpp</in>
+          <in>SimpleTCPServer.cpp</in>
+          <in>SimpleTCPServer.hpp</in>
           <in>elf_help.h</in>
           <in>logger.cpp</in>
           <in>logger.h</in>
@@ -75,6 +77,7 @@
       <in>Mutex.s</in>
       <in>ProcessScanner.s</in>
       <in>PtraceUtil.s</in>
+      <in>SimpleTCPServer.s</in>
       <in>logger.s</in>
       <in>main.s</in>
       <in>payload.s</in>

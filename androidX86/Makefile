@@ -22,3 +22,11 @@ install_C:
 	
 	adb push libs/x86/upgrade /data/local/tmp/upgradex86
 	adb shell chmod 777 /data/local/tmp/upgradex86
+
+lua:
+	ndk-build.cmd
+	adb push libs/x86/luaexec /data/local/tmp/luaexec
+	adb shell chmod 777 /data/local/tmp/luaexec
+
+	adb push libs/x86/luac /data/local/tmp/luac
+	adb shell chmod 777 /data/local/tmp/luac
