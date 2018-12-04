@@ -3,10 +3,9 @@
 *.s
 *.ii
 *.lst
+*.o
 ndk/*
-lua-5.2.4/*
 lua-5.2.4_arm/*
-tolua-5.2.4/*
 tolua-5.2.4_arm/*
 androidarm/data/*
 androidarm/libs/*
