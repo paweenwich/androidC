@@ -2,14 +2,108 @@
 <configurationDescriptor version="97">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
-      <df name="data">
-      </df>
       <df name="jni">
         <df name="libloader">
+          <in>BaseCommandService.cpp</in>
+          <in>BaseCommandService.h</in>
           <in>loader.cpp</in>
+        </df>
+        <df name="luac">
+          <in>lapi.c</in>
+          <in>lapi.h</in>
+          <in>lauxlib.c</in>
+          <in>lauxlib.h</in>
+          <in>lbaselib.c</in>
+          <in>lbitlib.c</in>
+          <in>lcode.c</in>
+          <in>lcode.h</in>
+          <in>lcorolib.c</in>
+          <in>lctype.c</in>
+          <in>lctype.h</in>
+          <in>ldblib.c</in>
+          <in>ldebug.c</in>
+          <in>ldebug.h</in>
+          <in>ldo.c</in>
+          <in>ldo.h</in>
+          <in>ldump.c</in>
+          <in>lfunc.c</in>
+          <in>lfunc.h</in>
+          <in>lgc.c</in>
+          <in>lgc.h</in>
+          <in>linit.c</in>
+          <in>liolib.c</in>
+          <in>llex.c</in>
+          <in>llex.h</in>
+          <in>llimits.h</in>
+          <in>lmathlib.c</in>
+          <in>lmem.c</in>
+          <in>lmem.h</in>
+          <in>loadlib.c</in>
+          <in>lobject.c</in>
+          <in>lobject.h</in>
+          <in>lopcodes.c</in>
+          <in>lopcodes.h</in>
+          <in>loslib.c</in>
+          <in>lparser.c</in>
+          <in>lparser.h</in>
+          <in>lstate.c</in>
+          <in>lstate.h</in>
+          <in>lstring.c</in>
+          <in>lstring.h</in>
+          <in>lstrlib.c</in>
+          <in>ltable.c</in>
+          <in>ltable.h</in>
+          <in>ltablib.c</in>
+          <in>ltm.c</in>
+          <in>ltm.h</in>
+          <in>lua.c</in>
+          <in>lua.h</in>
+          <in>lua.hpp</in>
+          <in>luac.c</in>
+          <in>luaconf.h</in>
+          <in>lualib.h</in>
+          <in>lundump.c</in>
+          <in>lundump.h</in>
+          <in>lvm.c</in>
+          <in>lvm.h</in>
+          <in>lzio.c</in>
+          <in>lzio.h</in>
         </df>
         <df name="scrcap">
           <in>main.cpp</in>
+        </df>
+        <df name="tolua">
+          <df name="bin">
+          </df>
+          <in>lauxlib.h</in>
+          <in>lua.h</in>
+          <in>luaconf.h</in>
+          <in>lualib.h</in>
+          <in>tolua.c</in>
+          <in>tolua.h</in>
+          <in>tolua_event.c</in>
+          <in>tolua_event.h</in>
+          <in>tolua_is.c</in>
+          <in>tolua_map.c</in>
+          <in>tolua_push.c</in>
+          <in>tolua_to.c</in>
+          <in>toluabind.c</in>
+        </df>
+        <df name="toluapp">
+          <df name="lua">
+          </df>
+          <in>tolua++.h</in>
+          <in>tolua.c</in>
+          <in>tolua_event.c</in>
+          <in>tolua_event.h</in>
+          <in>tolua_is.c</in>
+          <in>tolua_map.c</in>
+          <in>tolua_push.c</in>
+          <in>tolua_to.c</in>
+          <in>toluabind.c</in>
+          <in>toluabind.h</in>
+          <in>toluabind_default.c</in>
+          <in>toluabind_default.h</in>
         </df>
         <df name="tracer">
           <in>tracer.cpp</in>
@@ -52,11 +146,25 @@
                   </df>
                 </df>
               </df>
-              <df name="scrcapX86">
+              <df name="lua">
+              </df>
+              <df name="luac">
+              </df>
+              <df name="lualib">
+              </df>
+              <df name="scrcapx86">
                 <df name="__">
                   <df name="util">
                   </df>
                 </df>
+              </df>
+              <df name="tolua">
+              </df>
+              <df name="tolualib">
+              </df>
+              <df name="toluapp">
+              </df>
+              <df name="toluapplib">
               </df>
               <df name="tracerx86">
                 <df name="__">
@@ -79,8 +187,16 @@
       <in>PtraceUtil.s</in>
       <in>SimpleTCPServer.s</in>
       <in>logger.s</in>
+      <in>lua.i</in>
+      <in>lua.s</in>
+      <in>luac.i</in>
+      <in>luac.s</in>
       <in>main.s</in>
       <in>payload.s</in>
+      <in>tolua.i</in>
+      <in>tolua.s</in>
+      <in>toluabind.i</in>
+      <in>toluabind.s</in>
       <in>tracer.s</in>
       <in>util.s</in>
     </df>

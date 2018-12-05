@@ -58,7 +58,7 @@ SimpleTCPServer::SimpleTCPServer(const SimpleTCPServer& orig) {
 SimpleTCPServer::~SimpleTCPServer() {
 }
 
-void SimpleTCPServer::Start(int port,void *threadServiceFunc)
+void SimpleTCPServer::Start(int port,void *threadServiceFunc, void *param)
 {
     LOGE("ServerStart %d",port);
     struct sockaddr_in addr;
@@ -103,7 +103,10 @@ void SimpleTCPServer::Start(int port,void *threadServiceFunc)
 
 	    int clientSocket = accept(sd, 0, 0);	     /* accept connection */
 	    LOGD("Client connect");
-	    pthread_create(&child, 0, (void * (*)(void *))threadServiceFunc, (void *)clientSocket);       /* start thread */
+            SimpleTCPServerParam *sp = new SimpleTCPServerParam();
+            sp->clientSocket = clientSocket;
+            sp->service = param;
+	    pthread_create(&child, 0, (void * (*)(void *))threadServiceFunc, (void *)sp);       /* start thread */
 	    pthread_detach(child);                      /* don't track it */
 	}
     }
@@ -162,13 +165,24 @@ void SimpleSocket::NonBlocking()
     fcntl(sock, F_SETFL, flags | O_NONBLOCK);
 }
 
+bool SimpleSocket::printf(const char *format, ...)
+{
+    char buff[2048];
+    va_list args;
+    va_start(args, format);
+    vsprintf(buff,format, args);
+    va_end(args);
+    return SendString(buff);
+}
+
+
 bool SimpleSocket::SendString(char *mesg)
 {
     int ret = send(sock, mesg, strlen(mesg), MSG_NOSIGNAL);
     if(ret==-1){
 	return false;
     }else{
-	LOGD("SendLine %s %d",mesg,ret);
+	LOGD("SendString %s %d",mesg,ret);
     }
     return true;
 }
@@ -178,6 +192,34 @@ bool SimpleSocket::SendLine(char *mesg)
     char buf[strlen(mesg)+20];
     sprintf(buf,"%s\n",mesg);
     return(SendString(buf));
+}
+
+std::string SimpleSocket::ReadLine()
+{
+    char c = '0';
+    int status = 0;
+    int i = 0;
+    std::string ret;
+    while(true)
+    {
+        if(IsClosed()){
+            break;
+        }
+        status = recv(sock,&c, 1,0);
+        //LOGD("readline recv %d",status);
+        if(status <=0){
+            return ret;
+        }
+        else if(status > 0)
+        {
+            if(c == '\n' || c == '\r')
+            {
+                break;
+            }
+            ret += c;            
+        }
+    }
+    return ret;
 }
 
 void SimpleSocket::Close()

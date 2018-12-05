@@ -34,3 +34,5 @@ lua:
 	adb push libs/x86/tolua /data/local/tmp/tolua
 	adb shell chmod 777 /data/local/tmp/tolua
 	
+	adb push libs/x86/toluapp /data/local/tmp/toluapp
+	adb shell chmod 777 /data/local/tmp/toluapp
