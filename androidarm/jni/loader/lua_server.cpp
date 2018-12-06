@@ -44,24 +44,24 @@ static int tolua_collect_RunTimeInvokeData (lua_State* tolua_S)
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)
 {
- tolua_usertype(tolua_S,"RunTimeInvokeQueue");
- tolua_usertype(tolua_S,"uint32_t");
  tolua_usertype(tolua_S,"MonoObject");
- tolua_usertype(tolua_S,"MonoClassField");
- tolua_usertype(tolua_S,"MonoProperty");
- tolua_usertype(tolua_S,"MonoImage");
- tolua_usertype(tolua_S,"MonoClass");
- tolua_usertype(tolua_S,"MonoAssembly");
- tolua_usertype(tolua_S,"MonoEval");
- tolua_usertype(tolua_S,"MonoString");
- tolua_usertype(tolua_S,"MonoAssemblyName");
- tolua_usertype(tolua_S,"MonoDomain");
- tolua_usertype(tolua_S,"Mutex");
- tolua_usertype(tolua_S,"Logger");
- tolua_usertype(tolua_S,"MonoThreadsSync");
  tolua_usertype(tolua_S,"RunTimeInvokeData");
- tolua_usertype(tolua_S,"MonoVTable");
+ tolua_usertype(tolua_S,"MonoDomain");
+ tolua_usertype(tolua_S,"MonoEval");
+ tolua_usertype(tolua_S,"MonoThreadsSync");
+ tolua_usertype(tolua_S,"MonoClass");
+ tolua_usertype(tolua_S,"MonoClassField");
+ tolua_usertype(tolua_S,"MonoImage");
+ tolua_usertype(tolua_S,"MonoString");
+ tolua_usertype(tolua_S,"Logger");
+ tolua_usertype(tolua_S,"Mutex");
+ tolua_usertype(tolua_S,"RunTimeInvokeQueue");
  tolua_usertype(tolua_S,"MonoMethod");
+ tolua_usertype(tolua_S,"MonoProperty");
+ tolua_usertype(tolua_S,"MonoAssembly");
+ tolua_usertype(tolua_S,"MonoAssemblyName");
+ tolua_usertype(tolua_S,"MonoVTable");
+ tolua_usertype(tolua_S,"uint32_t");
 }
 
 /* get function: vtable of class  MonoObject */

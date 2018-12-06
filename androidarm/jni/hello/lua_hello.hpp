@@ -1,6 +1,6 @@
 /*
 ** Lua binding: lua_hello
-** Generated automatically by tolua 5.2.4 on Wed Aug 17 08:34:28 2016.
+** Generated automatically by tolua 5.2.4 on Thu Dec  6 18:55:43 2018.
 */
 
 /* Exported function */

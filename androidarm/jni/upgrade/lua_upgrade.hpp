@@ -1,6 +1,6 @@
 /*
 ** Lua binding: lua_upgrade
-** Generated automatically by tolua 5.2.4 on Sun Sep 11 15:17:23 2016.
+** Generated automatically by tolua 5.2.4 on Thu Dec  6 18:55:44 2018.
 */
 
 /* Exported function */

@@ -56,25 +56,9 @@ static int tolua_collect_MonoClassData (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_MonoTypeData (lua_State* tolua_S)
+static int tolua_collect_HeroData (lua_State* tolua_S)
 {
- MonoTypeData* self = (MonoTypeData*) tolua_tousertype(tolua_S,1,0);
- tolua_release(tolua_S,self);
- delete self;
- return 0;
-}
-
-static int tolua_collect_MonoClassFieldData (lua_State* tolua_S)
-{
- MonoClassFieldData* self = (MonoClassFieldData*) tolua_tousertype(tolua_S,1,0);
- tolua_release(tolua_S,self);
- delete self;
- return 0;
-}
-
-static int tolua_collect_MonoArrayData (lua_State* tolua_S)
-{
- MonoArrayData* self = (MonoArrayData*) tolua_tousertype(tolua_S,1,0);
+ HeroData* self = (HeroData*) tolua_tousertype(tolua_S,1,0);
  tolua_release(tolua_S,self);
  delete self;
  return 0;
@@ -88,9 +72,9 @@ static int tolua_collect_MonoVTableData (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_BattleManager (lua_State* tolua_S)
+static int tolua_collect_MonoArrayData (lua_State* tolua_S)
 {
- BattleManager* self = (BattleManager*) tolua_tousertype(tolua_S,1,0);
+ MonoArrayData* self = (MonoArrayData*) tolua_tousertype(tolua_S,1,0);
  tolua_release(tolua_S,self);
  delete self;
  return 0;
@@ -104,9 +88,9 @@ static int tolua_collect_CreatureData (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_HeroData (lua_State* tolua_S)
+static int tolua_collect_BattleManager (lua_State* tolua_S)
 {
- HeroData* self = (HeroData*) tolua_tousertype(tolua_S,1,0);
+ BattleManager* self = (BattleManager*) tolua_tousertype(tolua_S,1,0);
  tolua_release(tolua_S,self);
  delete self;
  return 0;
@@ -128,9 +112,25 @@ static int tolua_collect_MonoObjectData (lua_State* tolua_S)
  return 0;
 }
 
+static int tolua_collect_MonoClassFieldData (lua_State* tolua_S)
+{
+ MonoClassFieldData* self = (MonoClassFieldData*) tolua_tousertype(tolua_S,1,0);
+ tolua_release(tolua_S,self);
+ delete self;
+ return 0;
+}
+
 static int tolua_collect_MonoMethodData (lua_State* tolua_S)
 {
  MonoMethodData* self = (MonoMethodData*) tolua_tousertype(tolua_S,1,0);
+ tolua_release(tolua_S,self);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_MonoTypeData (lua_State* tolua_S)
+{
+ MonoTypeData* self = (MonoTypeData*) tolua_tousertype(tolua_S,1,0);
  tolua_release(tolua_S,self);
  delete self;
  return 0;
@@ -149,47 +149,47 @@ static int tolua_collect_gunichar2 (lua_State* tolua_S)
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)
 {
- tolua_usertype(tolua_S,"MonoClass");
- tolua_usertype(tolua_S,"CreatureData");
- tolua_usertype(tolua_S,"gint32");
- tolua_usertype(tolua_S,"MonoString");
- tolua_usertype(tolua_S,"gpointer");
- tolua_usertype(tolua_S,"MonoRuntimeGenericContext");
- tolua_usertype(tolua_S,"MonoClassRuntimeInfo");
- tolua_usertype(tolua_S,"MonoGenericContainer");
- tolua_usertype(tolua_S,"guint8");
- tolua_usertype(tolua_S,"MonoObjectData");
- tolua_usertype(tolua_S,"MonoMethod");
- tolua_usertype(tolua_S,"mono_array_lower_bound_t");
- tolua_usertype(tolua_S,"MonoTypeData");
- tolua_usertype(tolua_S,"MonoGenericClass");
- tolua_usertype(tolua_S,"_CreatureData");
- tolua_usertype(tolua_S,"ProcessScanner");
- tolua_usertype(tolua_S,"MonsterData");
- tolua_usertype(tolua_S,"MonoImage");
- tolua_usertype(tolua_S,"MonoArray");
- tolua_usertype(tolua_S,"LuaShell");
- tolua_usertype(tolua_S,"MonoMethodData");
- tolua_usertype(tolua_S,"MonoVTableData");
- tolua_usertype(tolua_S,"MonoMarshalType");
- tolua_usertype(tolua_S,"MonoClassFieldData");
- tolua_usertype(tolua_S,"MonoClassField");
- tolua_usertype(tolua_S,"MonoClassData");
- tolua_usertype(tolua_S,"MonoArrayBounds");
- tolua_usertype(tolua_S,"MonoThreadsSync");
- tolua_usertype(tolua_S,"MonoDomain");
- tolua_usertype(tolua_S,"BattleManager");
- tolua_usertype(tolua_S,"MonoArrayData");
- tolua_usertype(tolua_S,"MonoClassExt");
- tolua_usertype(tolua_S,"MonoType");
- tolua_usertype(tolua_S,"MonoObject");
- tolua_usertype(tolua_S,"mono_array_size_t");
- tolua_usertype(tolua_S,"guint32");
  tolua_usertype(tolua_S,"HeroData");
- tolua_usertype(tolua_S,"MonoVTable");
- tolua_usertype(tolua_S,"guint16");
- tolua_usertype(tolua_S,"MonoMethodSignature");
+ tolua_usertype(tolua_S,"MonoType");
+ tolua_usertype(tolua_S,"MonoMethod");
+ tolua_usertype(tolua_S,"MonoClassField");
+ tolua_usertype(tolua_S,"mono_array_lower_bound_t");
+ tolua_usertype(tolua_S,"MonoArray");
  tolua_usertype(tolua_S,"gunichar2");
+ tolua_usertype(tolua_S,"CreatureData");
+ tolua_usertype(tolua_S,"MonoClassRuntimeInfo");
+ tolua_usertype(tolua_S,"ProcessScanner");
+ tolua_usertype(tolua_S,"mono_array_size_t");
+ tolua_usertype(tolua_S,"MonsterData");
+ tolua_usertype(tolua_S,"_CreatureData");
+ tolua_usertype(tolua_S,"MonoThreadsSync");
+ tolua_usertype(tolua_S,"MonoClass");
+ tolua_usertype(tolua_S,"MonoObjectData");
+ tolua_usertype(tolua_S,"gpointer");
+ tolua_usertype(tolua_S,"MonoGenericClass");
+ tolua_usertype(tolua_S,"MonoVTableData");
+ tolua_usertype(tolua_S,"BattleManager");
+ tolua_usertype(tolua_S,"MonoMethodData");
+ tolua_usertype(tolua_S,"MonoClassFieldData");
+ tolua_usertype(tolua_S,"LuaShell");
+ tolua_usertype(tolua_S,"MonoTypeData");
+ tolua_usertype(tolua_S,"MonoObject");
+ tolua_usertype(tolua_S,"MonoClassData");
+ tolua_usertype(tolua_S,"MonoArrayData");
+ tolua_usertype(tolua_S,"MonoVTable");
+ tolua_usertype(tolua_S,"MonoMethodSignature");
+ tolua_usertype(tolua_S,"MonoArrayBounds");
+ tolua_usertype(tolua_S,"guint16");
+ tolua_usertype(tolua_S,"MonoMarshalType");
+ tolua_usertype(tolua_S,"MonoString");
+ tolua_usertype(tolua_S,"MonoClassExt");
+ tolua_usertype(tolua_S,"MonoRuntimeGenericContext");
+ tolua_usertype(tolua_S,"guint8");
+ tolua_usertype(tolua_S,"gint32");
+ tolua_usertype(tolua_S,"MonoDomain");
+ tolua_usertype(tolua_S,"MonoGenericContainer");
+ tolua_usertype(tolua_S,"guint32");
+ tolua_usertype(tolua_S,"MonoImage");
 }
 
 /* get function: creatureId of class  HeroData */
