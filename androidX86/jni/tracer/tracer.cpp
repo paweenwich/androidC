@@ -37,6 +37,7 @@
 #include <../util/elf_help.h>
 
 #include "../util/SimpleTCPServer.hpp"
+#include "../libloader/BaseCommandService.h"
 
 #define stricmp strcasecmp
 
@@ -937,7 +938,22 @@ int main(int argc, char** argv) {
 		SimpleTCPClient client(1414);
 		if(client.ConnectLocal()){
 		    printf("Connect success\n");
-		    //client.sock.SendLine("QUIT");
+                    while(!client.sock.IsClosed()){
+                        printf(">");fflush(stdout);
+                        char line[1024];
+                        gets(line);
+                        client.sock.SendLine(line);
+                        std::string ret;
+                        while(ret!=BSC_OK){
+                            ret = client.sock.ReadLine();
+                            //if(ret==""){
+                            //    break;
+                            //}
+                            if(ret!=""){
+                                printf("%s\n",ret.c_str());fflush(stdout);
+                            }
+                        }
+                    }
 		    //client.sock.Close();
 		}
 		exit(0);

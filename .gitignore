@@ -11,7 +11,9 @@ androidarm/data/*
 androidarm/libs/*
 androidarm/obj/*
 androidarm/private/*
+androidarm/nbproject/*
 androidX86/data/*
 androidX86/libs/*
 androidX86/obj/*
 androidX86/private/*
+androidX86/nbproject/*

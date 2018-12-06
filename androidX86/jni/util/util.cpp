@@ -591,3 +591,46 @@ void DisableSelinux() {
   }
 }
 
+unsigned int ParseAddress(char *data)
+{
+    unsigned int ret=0;
+    if(strstr(data,"0x")==data){
+        sscanf(data+2,"%x",&ret);
+    }else{
+        sscanf(data,"%d",&ret);
+    }
+    return ret;
+}
+
+bool IsReadable(unsigned int addr,int size)
+{
+    int nullfd = open("/dev/random", O_WRONLY);
+    if (write(nullfd, (void *)addr, size) < 0)
+    {
+        return false;
+    }
+    close(nullfd);
+    return true;
+}
+
+bool DumpMemory(unsigned int addr,int size,char *fileName)
+{
+    if(IsReadable(addr,size)){
+        int fd = open(fileName, O_WRONLY|O_CREAT, 777);
+        if(fd>0){
+            if (write(fd, (void *)addr, size) < 0)
+            {
+                LOGD("DumpMemory: write fail");
+                return false;
+            }
+            close(fd);
+        }else{
+            LOGD("DumpMemory: open %s fail",fileName);
+            return false;
+        }
+        return true;
+    }
+    LOGD("DumpMemory: not readable");
+    return false;
+}
+

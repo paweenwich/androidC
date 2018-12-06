@@ -25,8 +25,14 @@ install_C:
 
 lua:
 	ndk-build.cmd
-	adb push libs/x86/luaexec /data/local/tmp/luaexec
-	adb shell chmod 777 /data/local/tmp/luaexec
+	adb push libs/x86/lua /data/local/tmp/lua
+	adb shell chmod 777 /data/local/tmp/lua
 
 	adb push libs/x86/luac /data/local/tmp/luac
 	adb shell chmod 777 /data/local/tmp/luac
+	
+	adb push libs/x86/tolua /data/local/tmp/tolua
+	adb shell chmod 777 /data/local/tmp/tolua
+	
+	adb push libs/x86/toluapp /data/local/tmp/toluapp
+	adb shell chmod 777 /data/local/tmp/toluapp

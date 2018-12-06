@@ -68,7 +68,9 @@ extern "C" {
     void Panic(const char* fmt, ...);
     void DisableSelinux();
     bool IsSelinuxEnabled();
-
+    unsigned int ParseAddress(char *);
+    bool IsReadable(unsigned int addr,int size);
+    bool DumpMemory(unsigned int addr,int size,char *fileName);
 };
 
 class FileMap

@@ -19,17 +19,20 @@
 #include <dirent.h>
 #include <pthread.h>
 
-#include <../util/util.hpp>
-#include <../util/PtraceUtil.hpp>
-#include <../util/logger.h>
-#include <../util/payload.hpp>
-#include <../util/elf_help.h>
+#include "../util/util.hpp"
+#include "../util/PtraceUtil.hpp"
+#include "../util/logger.h"
+#include "../util/payload.hpp"
+#include "../util/elf_help.h"
 
-#include <../util/SimpleTCPServer.hpp>
+#include "../util/SimpleTCPServer.hpp"
 
 #define  LOG_TAG    "loader"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+
+#include "BaseCommandService.h"
+
 
 extern "C" {
     void ThreadLoadManageLibrary();
@@ -47,78 +50,64 @@ void ThreadLoadManageLibrary()
     pthread_create(&t, NULL, LoadManagedLibrary, NULL);
 }
 
-void * ServerService(void *arg)
+void * ServerService(SimpleTCPServerParam *arg)
 {
+    //BaseCommanService *service = (BaseCommanService *)arg;
+    SimpleTCPServerParam *sp = /*(SimpleTCPServerParam *)*/arg;
     LOGD("%d Start",gettid());
-    char line[1024];
-    int socket = (int)arg;
+    int socket = sp->clientSocket;
+    BaseCommandService *service = (BaseCommandService *)sp->service;
     SimpleSocket sock(socket);
     int count;
     while(!sock.IsClosed()){
-    //while((count = sock.hasData())>=0){
-	count = sock.hasData();
+        //char line[1024];
+    	count = sock.hasData();
 	LOGD("%d count=[%d]",gettid(),count);
 	if(count > 0){
-	    FILE *f = fdopen(socket, "r+");
-	    if(fgets(line,sizeof(line),f)!=NULL){
+            std::string sline = sock.ReadLine();
+            //sprintf("%s")
+	    //FILE *f = fdopen(socket, "r+");
+	    //if(fgets(line,sizeof(line),f)!=NULL){
 		//remove new line
-		line[strlen(line)-1]=0;
-		LOGD("%d [%s]",gettid(),line);
-		if(strcmp(line,"QUIT")==0){
+		//line[strlen(line)-1]=0;
+		LOGD("%d [%s]",gettid(),sline.c_str());
+                // hard code QUIT
+		if(strcmp(sline.c_str(),"QUIT")==0){
+                    sock.SendLine((char *)"BYE\nOK");
 		    sock.Close();
 		    break;
 		}
-		if(!sock.SendLine((char *)"OK")){
-		    LOGD("Write fail");
-		    sock.Close();
-		    break;
-		}
-	    }
+                if(service!=NULL){
+                    service->doLine(sock,(char *)sline.c_str());
+                }
+                //Always answer back
+                sock.SendLine((char *)"OK");                
+	    //}
 	}
 	//sleep(3);
     }
     LOGD("%d End",gettid());
-    /*currentFile = f;
-    luaLogger = new Logger();
-    luaLogger->fp = f;
-    LOGD("ServerService %d",gettid());
-    lua->execFile(scriptfile);
-    ServerLog(">");*/
-    /*while(fgets(line,sizeof(line),f)!=NULL){
-	line[strlen(line)-2] = 0;
-	LOGD("CMD[%d]=[%s]",gettid(),line);
-	if(strcmp(line,"QUIT")==0){
-	    //ServerLog("Goodbye\n");
-	    fclose(f);
-	    break;
-	}
-	if(strcmp(line,"RELOAD")==0){
-	    //lua->execFile(scriptfile);
-	}else{
-	    //lua->execString(line);
-	}
-	//ServerLog(">");
-    }*/
 }
 
 
-void *ServerStart(void *)
+void *ServerStart(void *param)
 {
     SimpleTCPServer server;
-    server.Start(1414,(void *)ServerService);
+    server.Start(1414,(void *)ServerService,param);
 }
 
 void __attribute__ ((constructor)) armhlp_load()
 {
-    LOGD("LIBRARY LOADED FROM PID %d.", getpid());
+    LOGD("LIBRARY LOADED FROM PID %d", getpid());
 
     pthread_t t;
-    pthread_create(&t, NULL, ServerStart,NULL);
-    
+    //SimpleTCPServer server;
+    pthread_create(&t, NULL, ServerStart,new BaseCommandService());
+    LOGD("THREAD CREATED");
 }
 
 
 void __attribute__ ((destructor)) armhlp_unload()
 {
-    LOGD("LIBRARY UNLOADED FROM PID %d.", getpid());
+    LOGD("LIBRARY UNLOADED FROM PID %d", getpid());
 }

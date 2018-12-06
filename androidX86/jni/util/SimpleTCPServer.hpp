@@ -14,6 +14,12 @@
 #ifndef SIMPLETCPSERVER_HPP
 #define SIMPLETCPSERVER_HPP
 
+class SimpleTCPServerParam {
+public:
+    int clientSocket;
+    void *service;
+};
+
 class SimpleSocket {
 public:
     int sock;
@@ -22,6 +28,8 @@ public:
     int hasData();
     bool SendLine(char *);
     bool SendString(char *);
+    bool printf(const char *, ...);
+    std::string ReadLine();
     void Close();
     bool IsClosed();
 };
@@ -31,7 +39,7 @@ class SimpleTCPServer {
 public:
     SimpleTCPServer();
     SimpleTCPServer(const SimpleTCPServer& orig);
-    void Start(int port,void *threadServiceFunc);
+    void Start(int port,void *threadServiceFunc,void *param);
     virtual ~SimpleTCPServer();
 private:
     int port;
