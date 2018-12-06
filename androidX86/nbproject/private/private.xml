@@ -8,10 +8,14 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/util/PtraceUtil.hpp</file>
+            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/luac/luac.c</file>
             <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/util/SimpleTCPServer.cpp</file>
             <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/libloader/loader.cpp</file>
             <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/tracer/tracer.cpp</file>
-            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/util/PtraceUtil.cpp</file>
+            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/libloader/Android.mk</file>
+            <file>file:/C:/cygwin64/home/kwang/C/androidX86/Makefile</file>
+            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/luac/Android.mk</file>
+            <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/Application.mk</file>
             <file>file:/C:/cygwin64/home/kwang/C/androidX86/jni/util/SimpleTCPServer.hpp</file>
         </group>
     </open-files>
