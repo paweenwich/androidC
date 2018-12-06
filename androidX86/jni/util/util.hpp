@@ -71,6 +71,7 @@ extern "C" {
     unsigned int ParseAddress(char *);
     bool IsReadable(unsigned int addr,int size);
     bool DumpMemory(unsigned int addr,int size,char *fileName);
+    bool MightContainPE(unsigned int startAddr,unsigned int endAddr);
 };
 
 class FileMap

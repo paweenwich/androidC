@@ -634,3 +634,20 @@ bool DumpMemory(unsigned int addr,int size,char *fileName)
     return false;
 }
 
+bool MightContainPE(unsigned int startAddr,unsigned int endAddr)
+{
+    unsigned char *startPtr = (unsigned char *)startAddr;
+    unsigned char *endPtr = (unsigned char *)endAddr;
+    while(startPtr < endPtr - 0x100){
+        if(startPtr[0x00] != 'M') {startPtr++;continue;}
+        if(startPtr[0x01] != 'Z') {startPtr++;continue;}
+        if(startPtr[0x80] != 'P') {startPtr++;continue;}
+        if(startPtr[0x81] != 'E') {startPtr++;continue;}
+        if(startPtr[0x80] != 'P') {startPtr++;continue;}
+        if(startPtr[0x81] != 'E') {startPtr++;continue;}
+        if(startPtr[0x82] != 0) {startPtr++;continue;}
+        if(startPtr[0x83] != 0) {startPtr++;continue;}
+    }
+    return false;
+}
+
