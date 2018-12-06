@@ -616,7 +616,7 @@ bool IsReadable(unsigned int addr,int size)
 bool DumpMemory(unsigned int addr,int size,char *fileName)
 {
     if(IsReadable(addr,size)){
-        int fd = open(fileName, O_WRONLY|O_CREAT, 777);
+        int fd = open(fileName, O_WRONLY|O_CREAT, 0777);
         if(fd>0){
             if (write(fd, (void *)addr, size) < 0)
             {

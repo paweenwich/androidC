@@ -953,6 +953,7 @@ int main(int argc, char** argv) {
                                 printf("%s\n",ret.c_str());fflush(stdout);
                             }
                         }
+			usleep(500);
                     }
 		    //client.sock.Close();
 		}
