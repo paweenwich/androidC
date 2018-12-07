@@ -38,6 +38,9 @@
 
 #include "../util/SimpleTCPServer.hpp"
 #include "../libloader/BaseCommandService.h"
+#include "../util/ProcessScanner.hpp"
+#include "../util/luascript.h"
+#include "../luaserver/lua_server.hpp"
 
 #define stricmp strcasecmp
 
@@ -889,6 +892,106 @@ void *mono_search_hook (char *aname, void *user_data)
     return NULL;
 }
 
+void loadMono()
+{
+    void *handle = dlopen("/data/app-lib/com.gravity.romg-2/libmono.so",RTLD_NOW);
+
+#define MONO_API(h, r, n, p) \
+    r (* n) p;\
+    n = ( r (*) p )dlsym(h, #n);\
+    if(n==NULL){ printf("ERROR %s not found\n",#n); exit(-1); }
+
+#define MONO_LOAD(n) \
+    {\
+    void *assembly = mono_domain_assembly_open(domain,"/data/local/tmp/Managed/mono/1.0/" n);\
+    void *image = mono_assembly_get_image(assembly);\
+    printf("%s assembly=%08X image=%08X\n",n,(unsigned int)assembly,(unsigned int)image);\
+    }
+
+    printf("%08X\n",(unsigned int)handle);
+    MONO_API(handle,void *,mono_get_root_domain,(void));
+    MONO_API(handle,void  ,mono_set_dirs,(const char *,const char *));
+    MONO_API(handle,void *,mono_jit_init,(const char *));
+    MONO_API(handle,void *,mono_jit_init_version,(const char *,const char *));
+    MONO_API(handle,void *,mono_jit_exec,(void *,void *,int,void *));		
+    MONO_API(handle,void *,mono_domain_assembly_open,(void *,const char *));
+    MONO_API(handle,void *,mono_config_parse,(void *));
+    MONO_API(handle,void *,mono_assembly_load,(char *,char *,MonoImageOpenStatus *));
+    MONO_API(handle,void *,mono_assembly_loaded,(char *));
+    MONO_API(handle,void *,mono_assembly_get_image,(void *));
+    MONO_API(handle,char *,mono_assembly_getrootdir,(void));
+    MONO_API(handle,char *,mono_unity_get_data_dir,(void));
+    MONO_API(handle,void  ,mono_unity_set_data_dir,(char *));
+    MONO_API(handle,void *,mono_unity_set_vprintf_func,(void *));
+    MONO_API(handle,void *,mono_trace_set_level_string,(char *));
+    MONO_API(handle,void *,mono_trace_set_mask_string,(char *));
+    MONO_API(handle,void  ,mono_install_assembly_search_hook,(void *,void *));
+
+   // mono_get_runtime_build_info = (char *(*)(void))dlsym(handle, "mono_get_runtime_build_info");
+    printf("addr %08X\n",(unsigned int)mono_trace_set_level_string);
+
+    mono_config_parse(NULL);
+    mono_set_dirs("/data/local/tmp/Managed","/data/local/tmp/Managed");
+    mono_unity_set_data_dir("/data/local/tmp/Managed/mono/1.0");
+    void *domain = mono_jit_init("kwang");
+    void *rootDomain = mono_get_root_domain();                
+    printf("%s\n",mono_unity_get_data_dir());                
+    printf("mono_assembly_getrootdir = %s\n",mono_assembly_getrootdir());                
+    printf("domain %08X rootDomain %08X\n",(unsigned int)domain,(unsigned int)rootDomain);
+
+    mono_unity_set_vprintf_func((void *)vprintf);                
+    mono_trace_set_level_string("debug");
+    mono_trace_set_mask_string("all");
+
+
+    //void *domain = mono_jit_init_version("kwang","v1.1.4322");
+
+    MONO_LOAD("System.dll");
+    MONO_LOAD("System.Core.dll");
+    MONO_LOAD("System.Xml.dll");
+    MONO_LOAD("Mono.Security.dll");
+
+    printf("begin install search hook\n");
+    mono_install_assembly_search_hook ((void *)mono_search_hook, NULL);
+    printf("end install search hook\n");
+
+    //MonoImageOpenStatus openStatus;
+    //void *loadassembly = mono_assembly_load("System.dll","/data/local/tmp/Managed",&openStatus);
+    //printf("loadassembly %08X %d\n",(unsigned int)loadassembly,(int)openStatus);
+
+    //void *assembly = mono_domain_assembly_open(domain,"/data/local/tmp/Managed/mono/1.0/mscorlib.dll");
+    void *assembly = mono_domain_assembly_open(domain,"/data/local/tmp/hello.exe");
+    if(assembly==NULL){
+	printf("hello.exe not found\n");
+	exit(0);
+    }
+    void *image = mono_assembly_get_image(assembly);
+    printf("assembly %08X image %08X\n",(unsigned int)assembly,(unsigned int)image);
+
+    /*if(assembly != NULL){
+	try{
+	    mono_jit_exec(domain,assembly,0,NULL);
+	}catch(...){
+	    printf("Exception \n");
+	}
+    }*/
+    //printf("info %s\n",mono_get_runtime_build_info());
+
+}
+
+void testLoader()
+{
+    void *handle = dlopen("/data/local/tmp/libloader.so",RTLD_NOW);
+    printf("load success\n");
+    /*FileMap m;
+    void *mapAddr = m.map("/data/local/tmp/hello.exe");
+    printf("mapAddr=%08X\n",(unsigned int)mapAddr);*/
+    while(1){
+        sleep(1);
+    }
+    //m.unMap();
+}
+
 
 int main(int argc, char** argv) {
     bool flgDump = false;
@@ -960,97 +1063,18 @@ int main(int argc, char** argv) {
 		exit(0);
 	    }
 	    if(strcmp(argv[i],"-tloader")==0){
-		void *handle = dlopen("/data/local/tmp/libloader.so",RTLD_NOW);
-		printf("load success\n");
-		while(1){
-		    sleep(1);
-		}
+		//loadMono();
+		testLoader();
+		exit(0);
+	    }
+	    if(strcmp(argv[i],"-tlua")==0){
+		LuaScript *lua = new LuaScript(tolua_lua_server_open);
 		exit(0);
 	    }
 	    
 	    if(strcmp(argv[i],"-t2")==0){
-		void *handle = dlopen("/data/app-lib/com.gravity.romg-1/libmono.so",RTLD_NOW);
-
-#define MONO_API(h, r, n, p) \
-    r (* n) p;\
-    n = ( r (*) p )dlsym(h, #n);\
-    if(n==NULL){ printf("ERROR %s not found\n",#n); exit(-1); }
-#define MONO_LOAD(n) \
-    {\
-        void *assembly = mono_domain_assembly_open(domain,"/data/local/tmp/Managed/mono/1.0/" n);\
-        void *image = mono_assembly_get_image(assembly);\
-        printf("%s assembly=%08X image=%08X\n",n,(unsigned int)assembly,(unsigned int)image);\
-    }
-
-		printf("%08X\n",(unsigned int)handle);
-                MONO_API(handle,void *,mono_get_root_domain,(void));
-                MONO_API(handle,void  ,mono_set_dirs,(const char *,const char *));
-                MONO_API(handle,void *,mono_jit_init,(const char *));
-                MONO_API(handle,void *,mono_jit_init_version,(const char *,const char *));
-		MONO_API(handle,void *,mono_jit_exec,(void *,void *,int,void *));		
-		MONO_API(handle,void *,mono_domain_assembly_open,(void *,const char *));
-                MONO_API(handle,void *,mono_config_parse,(void *));
-                MONO_API(handle,void *,mono_assembly_load,(char *,char *,MonoImageOpenStatus *));
-		MONO_API(handle,void *,mono_assembly_loaded,(char *));
-                MONO_API(handle,void *,mono_assembly_get_image,(void *));
-		MONO_API(handle,char *,mono_assembly_getrootdir,(void));
-                MONO_API(handle,char *,mono_unity_get_data_dir,(void));
-                MONO_API(handle,void  ,mono_unity_set_data_dir,(char *));
-                MONO_API(handle,void *,mono_unity_set_vprintf_func,(void *));
-                MONO_API(handle,void *,mono_trace_set_level_string,(char *));
-                MONO_API(handle,void *,mono_trace_set_mask_string,(char *));
-		MONO_API(handle,void  ,mono_install_assembly_search_hook,(void *,void *));
-
-               // mono_get_runtime_build_info = (char *(*)(void))dlsym(handle, "mono_get_runtime_build_info");
-                printf("addr %08X\n",(unsigned int)mono_trace_set_level_string);
-                
-		mono_config_parse(NULL);
-		mono_set_dirs("/data/local/tmp/Managed","/data/local/tmp/Managed");
-                mono_unity_set_data_dir("/data/local/tmp/Managed/mono/1.0");
-		void *domain = mono_jit_init("kwang");
-                void *rootDomain = mono_get_root_domain();                
-                printf("%s\n",mono_unity_get_data_dir());                
-		printf("mono_assembly_getrootdir = %s\n",mono_assembly_getrootdir());                
-		printf("domain %08X rootDomain %08X\n",(unsigned int)domain,(unsigned int)rootDomain);
-                
-                mono_unity_set_vprintf_func((void *)vprintf);                
-                mono_trace_set_level_string("debug");
-                mono_trace_set_mask_string("all");
-                
-                
-                //void *domain = mono_jit_init_version("kwang","v1.1.4322");
-
-                MONO_LOAD("System.dll");
-                MONO_LOAD("System.Core.dll");
-                MONO_LOAD("System.Xml.dll");
-                MONO_LOAD("Mono.Security.dll");
-		
-		printf("begin install search hook\n");
-		mono_install_assembly_search_hook ((void *)mono_search_hook, NULL);
-		printf("end install search hook\n");
-		
-		MonoImageOpenStatus openStatus;
-		void *loadassembly = mono_assembly_load("System.dll","/data/local/tmp/Managed",&openStatus);
-		printf("loadassembly %08X %d\n",(unsigned int)loadassembly,(int)openStatus);
-                
-                //void *assembly = mono_domain_assembly_open(domain,"/data/local/tmp/Managed/mono/1.0/mscorlib.dll");
-                void *assembly = mono_domain_assembly_open(domain,"/data/local/tmp/hello.exe");
-		if(assembly==NULL){
-		    printf("hello.exe not found\n");
-		    exit(0);
-		}
-                void *image = mono_assembly_get_image(assembly);
-                printf("assembly %08X image %08X\n",(unsigned int)assembly,(unsigned int)image);
-
-                if(assembly != NULL){
-                    try{
-                        mono_jit_exec(domain,assembly,0,NULL);
-                    }catch(...){
-                        printf("Exception \n");
-                    }
-                }
-                //printf("info %s\n",mono_get_runtime_build_info());
-		return 0;
+		loadMono();
+		exit(0);
 	    }
             if(strcmp(argv[i],"-t")==0){
 		unsigned int targetIP = 0;

@@ -31,7 +31,11 @@ public:
 	return strstr(protection,"w")!=NULL;
     }
     void show(){
-	printf("%08X %08X %s %s\n",startAddr,endAddr,protection,desc);
+	//printf("%08X %08X %s %s\n",startAddr,endAddr,protection,desc);
+	printf("%s\n",ToString().c_str());
+    }
+    std::string ToString(){
+	return StringPrintf("%08X %08X %s %s",startAddr,endAddr,protection,desc);
     }
 };
 

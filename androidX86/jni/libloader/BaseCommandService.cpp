@@ -64,6 +64,7 @@ void BaseCommandService::help(SimpleSocket &sock)
     sock.SendLine((char *)BSC_HELP);
     sock.SendLine((char *)BSC_DUMPMEM);
     sock.SendLine((char *)BSC_DUMPALL);
+    sock.SendLine((char *)BSC_DUMPPE);
 }
 
 void BaseCommandService::dumpmem(SimpleSocket &sock,std::string sstart,std::string ssize,std::string sfileName)
@@ -110,6 +111,28 @@ void BaseCommandService::dump(SimpleSocket &sock,std::string mode)
     }
 }
 
+void BaseCommandService::dumpPE(SimpleSocket &sock)
+{
+    sock.printf("dumpPE start\n");
+    ProcessScanner pscan;
+    pscan.open(getpid());
+    std::vector<ProcMapData> ret = pscan.getAll();
+    mkdir(StringPrintf("/data/local/tmp/%d",getpid()).c_str(),0777);
+    for(int i=0;i<ret.size();i++){
+	if(IsReadable(ret[i].startAddr,ret[i].size())){
+	    if(MightContainPE(ret[i].startAddr,ret[i].endAddr)){
+		sock.printf("Found %s\n",ret[i].ToString().c_str());
+		DumpMemory(ret[i].startAddr,ret[i].size(),
+			(char *)StringPrintf("/data/local/tmp/%d/%08X-%08X.dump",getpid(),ret[i].startAddr,ret[i].endAddr).c_str()
+		);
+	    }
+	}else{
+	    sock.printf("Fail %s\n",ret[i].ToString().c_str());
+	}
+    }
+    sock.printf("dumpPE end\n");
+}
+
 void BaseCommandService::doLine(SimpleSocket &sock,char *data){
     LOGD("doLine %s",data);
     std::string text = data;
@@ -138,6 +161,10 @@ void BaseCommandService::doLine(SimpleSocket &sock,char *data){
 	}else{
 	    dump(sock,vTokens[1]);
 	}
+	return;
+    }
+    if(cmd == BSC_DUMPPE){
+	dumpPE(sock);
 	return;
     }
     help(sock);

@@ -18,6 +18,7 @@
 #define BSC_HELP    "HELP"          //HELP
 #define BSC_DUMPMEM    "DUMPMEM"    // DUMPMEM addr size
 #define BSC_DUMPALL    "DUMPALL"    // DUMPALL [H|W|N|A]
+#define BSC_DUMPPE    "DUMPPE"    // DUMPPE
 
 class BaseCommandService {
 public:
@@ -27,6 +28,7 @@ public:
     virtual void help(SimpleSocket &sock);
     virtual void dumpmem(SimpleSocket &sock,std::string sstart,std::string ssize,std::string sfileName);
     virtual void dump(SimpleSocket &sock,std::string mode);
+    virtual void dumpPE(SimpleSocket &sock);
     virtual ~BaseCommandService();
 private:
 

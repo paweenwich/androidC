@@ -647,7 +647,18 @@ bool MightContainPE(unsigned int startAddr,unsigned int endAddr)
         if(startPtr[0x81] != 'E') {startPtr++;continue;}
         if(startPtr[0x82] != 0) {startPtr++;continue;}
         if(startPtr[0x83] != 0) {startPtr++;continue;}
+	return true;
     }
     return false;
+}
+
+std::string StringPrintf(const char* fmt, ...)
+{
+    char buf[1024];
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(buf, fmt, args);
+    va_end(args);
+    return std::string(buf);
 }
 

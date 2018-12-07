@@ -46,6 +46,7 @@ std::vector<std::string> SplitByChar(std::string src, char c = ' ');
 std::vector<std::string> ReadAllLines(char *fileName);
 std::string GetCurrentExecutable();
 std::string GetCurrentExecutableDirectory();
+std::string StringPrintf(const char* fmt, ...);
 
 // interface for unity
 extern "C" {
