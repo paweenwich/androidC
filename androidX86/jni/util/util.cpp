@@ -24,7 +24,7 @@
 #define  LOG_TAG    "utils"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-
+/*/
 typedef void* MonoDomain;
 typedef void* MonoAssembly;
 typedef void* MonoImage;
@@ -112,7 +112,7 @@ void MonoLoadAndInvokeAssembly(const char* fileName,const char* name_space,char 
     LOGD("invoke done");
 }
 
-
+*/
 
 std::vector<unsigned char> ReadFile(const char *fileName)
 {
@@ -662,3 +662,33 @@ std::string StringPrintf(const char* fmt, ...)
     return std::string(buf);
 }
 
+void FindLibraryPathEx(const char* libname,char *path,unsigned int *baseAddr,unsigned int *libSize)
+{
+   std::vector<std::string> lines;
+   ReadMaps(0,lines);
+   LOGD("FindLibraryPath line=%d\n",lines.size());
+   for(int i=0;i<lines.size();i++){
+	std::string line = lines[i];
+	std::replace(line.begin(), line.end(), '-', ' ');
+       
+	char *ptr;
+	if((ptr=strstr(lines[i].c_str(),libname))){
+	    LOGD("FindLibraryPath: found %s",lines[i].c_str());
+	    while(*ptr != ' ') ptr--;
+	    ptr++;
+	    strcpy(path,ptr);
+	   
+	    unsigned int from,to;
+	    if(sscanf(line.c_str(),"%X%X",&from,&to)==2){
+		
+		*baseAddr = from;
+		*libSize = to - from;
+		LOGD("%s",line.c_str());
+		LOGD("%08X %08X",from,to);
+		LOGD("%08X %08X",*baseAddr,*libSize);
+		return;
+	    }
+            break;
+       }
+   }
+}

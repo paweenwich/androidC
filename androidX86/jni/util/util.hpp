@@ -56,6 +56,7 @@ extern "C" {
     unsigned int FindBaseLibraryFromAddress(unsigned int address, int pid);
     char *GetBaseLibraryNameFromAddress(unsigned int address, int pid);
     void FindLibraryPath(const char* libname,char *path,int len);
+    void FindLibraryPathEx(const char* libname,char *path,unsigned int *baseAddr,unsigned int *libSize);
     void MonoLoadAndInvokeAssembly(const char* fileName,const char* name_space,char *className,const char* methodName);
     void Test();
     int FindProcessByName(char *processName,char *filter);

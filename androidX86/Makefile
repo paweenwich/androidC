@@ -3,7 +3,7 @@ make_and_install:   all	install_C
 install:    all install_C 
 all:	jni/luaServer/lua_server.cpp
 #	ndk-build.cmd V=1
-	ndk-build.cmd
+	ndk-build.cmd V=1
 	adb push libs/x86/scrcapx86 /data/local/tmp/scrcapx86
 	adb shell chmod 777 /data/local/tmp/scrcapx86
 	
