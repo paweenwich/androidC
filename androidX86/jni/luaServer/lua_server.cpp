@@ -23,7 +23,7 @@ LUALIB_API int luaopen_lua_server (lua_State* tolua_S);
 #include "MonoHooker.hpp"
 #include "MonoEval.hpp"
 //void ServerLog(char *str);
-extern Logger *logger;
+extern Logger *serverLogger;
 MonoEval *monoEval;
 bool flgLogMonoRuntimeInvoke;
 bool flgLoadAssemblySuccess;
@@ -44,23 +44,23 @@ static int tolua_collect_RunTimeInvokeData (lua_State* tolua_S)
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)
 {
- tolua_usertype(tolua_S,"Mutex");
- tolua_usertype(tolua_S,"MonoMethod");
- tolua_usertype(tolua_S,"MonoImage");
- tolua_usertype(tolua_S,"MonoClassField");
- tolua_usertype(tolua_S,"MonoAssembly");
- tolua_usertype(tolua_S,"MonoThreadsSync");
  tolua_usertype(tolua_S,"RunTimeInvokeData");
- tolua_usertype(tolua_S,"MonoEval");
+ tolua_usertype(tolua_S,"MonoMethod");
  tolua_usertype(tolua_S,"MonoAssemblyName");
- tolua_usertype(tolua_S,"MonoObject");
+ tolua_usertype(tolua_S,"MonoEval");
  tolua_usertype(tolua_S,"MonoProperty");
+ tolua_usertype(tolua_S,"MonoImage");
  tolua_usertype(tolua_S,"RunTimeInvokeQueue");
- tolua_usertype(tolua_S,"MonoDomain");
+ tolua_usertype(tolua_S,"MonoAssembly");
+ tolua_usertype(tolua_S,"MonoClassField");
+ tolua_usertype(tolua_S,"Mutex");
+ tolua_usertype(tolua_S,"MonoThreadsSync");
  tolua_usertype(tolua_S,"Logger");
- tolua_usertype(tolua_S,"MonoVTable");
  tolua_usertype(tolua_S,"uint32_t");
+ tolua_usertype(tolua_S,"MonoVTable");
+ tolua_usertype(tolua_S,"MonoObject");
  tolua_usertype(tolua_S,"MonoString");
+ tolua_usertype(tolua_S,"MonoDomain");
  tolua_usertype(tolua_S,"MonoClass");
 }
 
@@ -2496,25 +2496,6 @@ static int tolua_lua_server_Logger_toHex00(lua_State* tolua_S)
 #endif
 }
 
-/* get function: logger */
-static int tolua_get_logger_ptr(lua_State* tolua_S)
-{
- tolua_pushusertype(tolua_S,(void*)logger,"Logger");
- return 1;
-}
-
-/* set function: logger */
-static int tolua_set_logger_ptr(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (!tolua_isusertype(tolua_S,2,"Logger",0,&tolua_err))
- tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  logger = ((Logger*)  tolua_tousertype(tolua_S,2,0));
- return 0;
-}
-
 /* get function: monoEval */
 static int tolua_get_monoEval_ptr(lua_State* tolua_S)
 {
@@ -2596,6 +2577,25 @@ static int tolua_lua_server_sleep00(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'sleep'.",&tolua_err);
  return 0;
 #endif
+}
+
+/* get function: serverLogger */
+static int tolua_get_serverLogger_ptr(lua_State* tolua_S)
+{
+ tolua_pushusertype(tolua_S,(void*)serverLogger,"Logger");
+ return 1;
+}
+
+/* set function: serverLogger */
+static int tolua_set_serverLogger_ptr(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isusertype(tolua_S,2,"Logger",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  serverLogger = ((Logger*)  tolua_tousertype(tolua_S,2,0));
+ return 0;
 }
 
 /* Open lib function */
@@ -2739,11 +2739,11 @@ LUALIB_API int luaopen_lua_server (lua_State* tolua_S)
  tolua_function(tolua_S,"logHex",tolua_lua_server_Logger_logHex00);
  tolua_function(tolua_S,"toHex",tolua_lua_server_Logger_toHex00);
  tolua_endmodule(tolua_S);
- tolua_variable(tolua_S,"logger",tolua_get_logger_ptr,tolua_set_logger_ptr);
  tolua_variable(tolua_S,"monoEval",tolua_get_monoEval_ptr,tolua_set_monoEval_ptr);
  tolua_variable(tolua_S,"flgLogMonoRuntimeInvoke",tolua_get_flgLogMonoRuntimeInvoke,tolua_set_flgLogMonoRuntimeInvoke);
  tolua_variable(tolua_S,"flgLoadAssemblySuccess",tolua_get_flgLoadAssemblySuccess,tolua_set_flgLoadAssemblySuccess);
  tolua_function(tolua_S,"sleep",tolua_lua_server_sleep00);
+ tolua_variable(tolua_S,"serverLogger",tolua_get_serverLogger_ptr,tolua_set_serverLogger_ptr);
  tolua_endmodule(tolua_S);
  return 1;
 }

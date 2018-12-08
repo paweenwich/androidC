@@ -1,9 +1,9 @@
 make_and_install:   all	install_C
 
 install:    all install_C 
-all:	jni/luaServer/lua_server.cpp
+all:	jni/luaServer/lua_server.cpp ragnarok
 #	ndk-build.cmd V=1
-	ndk-build.cmd V=1
+	ndk-build.cmd
 	adb push libs/x86/scrcapx86 /data/local/tmp/scrcapx86
 	adb shell chmod 777 /data/local/tmp/scrcapx86
 	
@@ -15,6 +15,8 @@ all:	jni/luaServer/lua_server.cpp
 clean:
 	@rm -rf obj libs
 
+ragnarok:
+	adb push  jni/luaServer/ragnarok.lua /data/local/tmp
 
 install_C:
 	adb push libs/x86/tracerx86 /data/local/tmp/tracerx86

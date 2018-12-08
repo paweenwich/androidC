@@ -32,7 +32,7 @@
 
 #include <../util/util.hpp>
 #include <../util/PtraceUtil.hpp>
-#include <../util/logger.h>
+#include <../util/AndroidLogger.h>
 #include <../util/payload.hpp>
 #include <../util/elf_help.h>
 
@@ -79,6 +79,7 @@ unsigned int offset_getpid=0;
 
 PtraceUtil ptraceUtil;
 Logger logger(NULL,0);
+Logger *serverLogger = new AndroidLogger("tracer",true);
 
 unsigned long call(int pid,void *function, int nargs, ...);
 int wordAlignSize(int size);
@@ -1068,7 +1069,12 @@ int main(int argc, char** argv) {
 		exit(0);
 	    }
 	    if(strcmp(argv[i],"-tlua")==0){
+                luaLogger = new AndroidLogger("testlua",true);
 		LuaScript *lua = new LuaScript(tolua_lua_server_open);
+                luaLogger->logStr("Hello");
+                luaLogger->logHex((unsigned char *)strcmp,35);
+                luaLogger->logStr("Hello");
+                lua->execFile("ragnarok.lua");
 		exit(0);
 	    }
 	    

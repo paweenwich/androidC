@@ -4,7 +4,7 @@ $#include "MonoHooker.hpp"
 $#include "MonoEval.hpp"
 
 $//void ServerLog(char *str);
-$extern Logger *logger;
+$extern Logger *serverLogger;
 $MonoEval *monoEval;
 $bool flgLogMonoRuntimeInvoke;
 $bool flgLoadAssemblySuccess;
@@ -168,11 +168,11 @@ public:
     char *toHex(unsigned int,int len);
 };
 
-
-extern Logger *logger;
+//extern Logger *logger;
 extern MonoEval *monoEval;
 extern bool flgLogMonoRuntimeInvoke;
 extern bool flgLoadAssemblySuccess;
 
 //void ServerLog(char *str);
 void sleep(int);
+extern Logger *serverLogger;
