@@ -17,4 +17,13 @@ public:
         void printf(char *format, ...);
         virtual void _logStr(char *);
 };
+
+class StdOutLogger: public Logger {
+public:
+    char name[64];
+    StdOutLogger(char *name);
+    virtual ~StdOutLogger();
+    virtual void _logStr(char *p);
+private:
+};
 #endif

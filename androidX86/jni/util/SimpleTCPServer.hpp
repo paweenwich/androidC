@@ -30,6 +30,7 @@ public:
     bool SendString(char *);
     bool printf(const char *, ...);
     std::string ReadLine();
+    std::vector<std::string> ReadUntil(char *str);
     void Close();
     bool IsClosed();
 };

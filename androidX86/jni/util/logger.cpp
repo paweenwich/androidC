@@ -4,7 +4,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <cstdio>
 #include "logger.h"
+
 //
 // Log message 
 //
@@ -133,3 +135,19 @@ void Logger::logHex(unsigned char *p,int len)
 }
 
 
+/*
+ * Stdout logger
+*/
+StdOutLogger::StdOutLogger(char *name)
+{
+    strcpy(this->name,name);    
+}
+StdOutLogger::~StdOutLogger()
+{
+}
+
+void StdOutLogger::_logStr(char *p)
+{
+    std::printf("%s: %s",name,p);
+    fflush(stdout);
+}

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: lua_server
-** Generated automatically by tolua 5.2.4 on Sat Dec  8 16:56:52 2018.
+** Generated automatically by tolua 5.2.4 on Tue Dec 11 10:19:33 2018.
 */
 
 /* Exported function */

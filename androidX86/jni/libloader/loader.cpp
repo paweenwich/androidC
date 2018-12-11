@@ -92,8 +92,15 @@ void * ServerService(SimpleTCPServerParam *arg)
 
 void *ServerStart(void *param)
 {
-    SimpleTCPServer server;
-    server.Start(1414,(void *)ServerService,param);
+
+    std::string exeName = GetCurrentExecutable();
+    LOGD("EXENAME %s",exeName.c_str());
+    SimpleTCPServer server;    
+    if(strstr(exeName.c_str(),"tracer")!=NULL){
+	server.Start(1415,(void *)ServerService,param);
+    }else{
+	server.Start(1414,(void *)ServerService,param);
+    }
 }
 
 void __attribute__ ((constructor)) armhlp_load()
@@ -101,7 +108,6 @@ void __attribute__ ((constructor)) armhlp_load()
     LOGD("LIBRARY LOADED FROM PID %d", getpid());
 
     pthread_t t;
-    //SimpleTCPServer server;
     pthread_create(&t, NULL, ServerStart,new BaseCommandService());
     LOGD("THREAD CREATED");
 }

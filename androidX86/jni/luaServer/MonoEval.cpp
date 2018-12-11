@@ -26,13 +26,13 @@
 #include "../util/payload.hpp"
 #include "MonoEval.hpp"
 
-extern Logger *logger;
+extern Logger *serverLogger;
 
 RunTimeInvokeQueue *runTimeInvokeQueue=NULL;
 
-#define  LOGD(...)  logger->printf(__VA_ARGS__)
-#define  LOGE(...)  logger->printf(__VA_ARGS__)
-#define	 LOGHEX(x,y)	logger->logHex((x),(y));
+#define  LOGD(...)  serverLogger->printf(__VA_ARGS__)
+#define  LOGE(...)  serverLogger->printf(__VA_ARGS__)
+#define	 LOGHEX(x,y)	serverLogger->logHex((x),(y));
 
 
 MonoEval::MonoEval()

@@ -37,6 +37,7 @@
 #define UTIL_HPP
 
 std::vector<unsigned char> ReadFile(const char *fileName);
+std::vector<unsigned char> ReadFileEx(const char *fileName);
 void ReadMaps(int pid,std::vector<std::string> &out);
 std::string bin2hex(std::string const &s);
 std::vector<unsigned char> hex2bin(std::string const& s);
@@ -47,6 +48,7 @@ std::vector<std::string> ReadAllLines(char *fileName);
 std::string GetCurrentExecutable();
 std::string GetCurrentExecutableDirectory();
 std::string StringPrintf(const char* fmt, ...);
+std::vector<std::string> GetCurrentCommandLine();
 
 // interface for unity
 extern "C" {
@@ -55,7 +57,7 @@ extern "C" {
     unsigned int FindBaseLibrary( const char *library, int pid);
     unsigned int FindBaseLibraryFromAddress(unsigned int address, int pid);
     char *GetBaseLibraryNameFromAddress(unsigned int address, int pid);
-    void FindLibraryPath(const char* libname,char *path,int len);
+    void FindLibraryPath(const char* libname,char *path,int pid);
     void FindLibraryPathEx(const char* libname,char *path,unsigned int *baseAddr,unsigned int *libSize);
     void MonoLoadAndInvokeAssembly(const char* fileName,const char* name_space,char *className,const char* methodName);
     void Test();
@@ -74,6 +76,7 @@ extern "C" {
     bool IsReadable(unsigned int addr,int size);
     bool DumpMemory(unsigned int addr,int size,char *fileName);
     bool MightContainPE(unsigned int startAddr,unsigned int endAddr);
+    bool ReplaceLibrary(char *fileName,char *libname,char *replacelibName);
 };
 
 class FileMap

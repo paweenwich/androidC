@@ -20,7 +20,7 @@ extern "C" {
 typedef int (*tolua_script_open_t)(lua_State* tolua_S);
 typedef int (*tolua_script_close_t)(lua_State* tolua_S);
 
-extern Logger *luaLogger;
+//extern Logger *luaLogger;
 class LuaScript {
 protected:
    void registerFunctions();
@@ -28,8 +28,8 @@ public:
    Mutex mutex;
    lua_State *lua ;
    tolua_script_open_t openFunction;
-   
-   LuaScript(tolua_script_open_t openFunc);
+   Logger *luaLogger;
+   LuaScript(tolua_script_open_t openFunc,Logger *logger=NULL);
    ~LuaScript();
 
    bool execString(char *);

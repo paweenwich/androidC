@@ -19,6 +19,7 @@
 #define BSC_DUMPMEM    "DUMPMEM"    // DUMPMEM addr size
 #define BSC_DUMPALL    "DUMPALL"    // DUMPALL [H|W|N|A]
 #define BSC_DUMPPE    "DUMPPE"    // DUMPPE
+#define BSC_LUA    "!"    // LUA expression
 
 class BaseCommandService {
 public:
@@ -29,6 +30,7 @@ public:
     virtual void dumpmem(SimpleSocket &sock,std::string sstart,std::string ssize,std::string sfileName);
     virtual void dump(SimpleSocket &sock,std::string mode);
     virtual void dumpPE(SimpleSocket &sock);
+    virtual void doLua(SimpleSocket &sock, std::string cmd);
     virtual ~BaseCommandService();
 private:
 

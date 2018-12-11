@@ -222,6 +222,20 @@ std::string SimpleSocket::ReadLine()
     return ret;
 }
 
+std::vector<std::string> SimpleSocket::ReadUntil(char *str)
+{
+    std::vector<std::string> ret;
+    std::string line;
+    while(line!=str){
+	line = ReadLine();
+	if(line!=""){
+	    //printf("%s\n",ret.c_str());fflush(stdout);
+	    ret.push_back(line);
+	}
+    }    
+    return ret;
+}
+
 void SimpleSocket::Close()
 {
     close(sock);

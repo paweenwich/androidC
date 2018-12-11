@@ -25,14 +25,14 @@
 #include "../util/payload.hpp"
 #include "MonoHooker.hpp"
 
-extern Logger *logger;
+extern Logger *serverLogger;
 extern "C" {
     void FindLibraryPathEx(const char* libname,char *path,unsigned int *baseAddr,unsigned int *libSize);
 }
 
-#define  LOGD(...)  logger->printf(__VA_ARGS__)
-#define  LOGE(...)  logger->printf(__VA_ARGS__)
-#define	 LOGHEX(x,y)	logger->logHex((x),(y));
+#define  LOGD(...)  serverLogger->printf(__VA_ARGS__)
+#define  LOGE(...)  serverLogger->printf(__VA_ARGS__)
+#define	 LOGHEX(x,y)	serverLogger->logHex((x),(y));
 
 mono_class_get_name_t mono_class_get_name;
 mono_class_get_namespace_t mono_class_get_namespace;
@@ -172,10 +172,10 @@ void InjectJumpCode(unsigned int targetAddr,int jumpToAddr)
     unsigned char *branchCommand = CreateBranchToAddressCommand(jumpToAddr);
     int cmd_size = GetBranchToAddressCommandSize();
     LOGD("Before injectCode %08X",targetAddr);
-    logger->logHex((unsigned char *)targetAddr,cmd_size);
+    LOGHEX((unsigned char *)targetAddr,cmd_size);
     memcpy((unsigned char*)targetAddr,branchCommand,cmd_size);
     LOGD("After injectCode %08X",targetAddr);
-    logger->logHex((unsigned char *)targetAddr,cmd_size);
+    LOGHEX((unsigned char *)targetAddr,cmd_size);
 }
 
 unsigned int MonoHook(char *monoFunctionName,unsigned int monoHookFuncAddr)

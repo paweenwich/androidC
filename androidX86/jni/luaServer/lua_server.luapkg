@@ -1,9 +1,9 @@
 $#include <unistd.h>
-$#include "../util/logger.h"
+$//#include "../util/logger.h"
+$#include "../util/AndroidLogger.h"
 $#include "MonoHooker.hpp"
 $#include "MonoEval.hpp"
 
-$//void ServerLog(char *str);
 $extern Logger *serverLogger;
 $MonoEval *monoEval;
 $bool flgLogMonoRuntimeInvoke;

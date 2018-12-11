@@ -38,8 +38,13 @@ int l_alert(lua_State* luaVM)
 */
 //LuaScript luaScript;
 
-LuaScript::LuaScript(tolua_script_open_t openFunc)
+LuaScript::LuaScript(tolua_script_open_t openFunc,Logger *logger)
 {
+    if(logger == NULL){
+	luaLogger = new StdOutLogger("LuaScript");
+    }else{
+	luaLogger = logger;
+    }
     openFunction = openFunc;
     MutexCreate(&mutex);
 //    lua = lua_open(1024);   //FOR VERSION 4

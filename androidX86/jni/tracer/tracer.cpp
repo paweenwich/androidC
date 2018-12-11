@@ -1038,17 +1038,40 @@ int main(int argc, char** argv) {
 		i++;
 		strcpy(libraryName,argv[i]);
 	    }
+	    if(strcmp(argv[i],"-tinstall")==0){
+		char libPath[1024];
+		libPath[0] = 0;
+		FindLibraryPath("libzipw.so",libPath,pid);
+		printf("%d %s\n",pid,libPath);
+		if(libPath[0]!=0){
+		    //bool ret = ReplaceLibrary("/data/app-lib/com.gravity.romg-2/libzipw.so","liblog.so","libmog.so");
+		    bool ret = ReplaceLibrary(libPath,"liblog.so","libmog.so");
+		    //bool ret = ReplaceLibrary("/data/local/tmp/libzipw.so","liblog.so","libmog.so");
+		}
+		exit(0);
+	    }
 	    if(strcmp(argv[i],"-tclient")==0){
-		SimpleTCPClient client(1414);
+		int port = 1414;
+		if(argv[i+1]!=NULL){
+		    sscanf(argv[i+1],"%d",&port);
+		}
+		printf("port=%d\n",port);
+		SimpleTCPClient client(port);
 		if(client.ConnectLocal()){
-		    printf("Connect success\n");
+		    printf("Connect success %d\n",port);
+		    client.sock.SendLine("! dofile('ragnarok.lua')");
+		    std::vector<std::string> lines = client.sock.ReadUntil(BSC_OK);
+		    for(int j=0;j<lines.size();j++){
+			printf("%s\n",lines[j].c_str());fflush(stdout);
+		    }
                     while(!client.sock.IsClosed()){
                         printf(">");fflush(stdout);
                         char line[1024];
                         gets(line);
                         client.sock.SendLine(line);
-                        std::string ret;
-                        while(ret!=BSC_OK){
+                        //std::string ret;
+			std::vector<std::string> lines = client.sock.ReadUntil(BSC_OK);
+                        /*while(ret!=BSC_OK){
                             ret = client.sock.ReadLine();
                             //if(ret==""){
                             //    break;
@@ -1056,7 +1079,10 @@ int main(int argc, char** argv) {
                             if(ret!=""){
                                 printf("%s\n",ret.c_str());fflush(stdout);
                             }
-                        }
+                        }*/
+			for(int j=0;j<lines.size();j++){
+			    printf("%s\n",lines[j].c_str());fflush(stdout);
+			}
 			usleep(500);
                     }
 		    //client.sock.Close();
@@ -1069,12 +1095,17 @@ int main(int argc, char** argv) {
 		exit(0);
 	    }
 	    if(strcmp(argv[i],"-tlua")==0){
-                luaLogger = new AndroidLogger("testlua",true);
-		LuaScript *lua = new LuaScript(tolua_lua_server_open);
-                luaLogger->logStr("Hello");
-                luaLogger->logHex((unsigned char *)strcmp,35);
-                luaLogger->logStr("Hello");
+		//Logger *luaLogger = new AndroidLogger("testlua",true);
+		LuaScript *lua = new LuaScript(tolua_lua_server_open/*,luaLogger*/);
+                lua->luaLogger->logStr("Hello");
+                lua->luaLogger->logHex((unsigned char *)strcmp,35);
+                lua->luaLogger->logStr("Hello");
                 lua->execFile("ragnarok.lua");
+		
+		std::vector<std::string> cmds = GetCurrentCommandLine();
+		for(int i=0;i<cmds.size();i++){
+		    printf("%s\n",cmds[i].c_str());
+		}
 		exit(0);
 	    }
 	    

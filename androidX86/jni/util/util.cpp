@@ -116,8 +116,9 @@ void MonoLoadAndInvokeAssembly(const char* fileName,const char* name_space,char 
 
 std::vector<unsigned char> ReadFile(const char *fileName)
 {
-    
-    FILE *f = fopen(fileName, "rb");
+    return ReadFileEx(fileName);
+    // below can not handle /proc/self/cmdline due to ftell return 0
+    /*FILE *f = fopen(fileName, "rb");
     fseek(f, 0, SEEK_END);
     long fsize = ftell(f);
     fseek(f, 0, SEEK_SET);  //same as rewind(f);
@@ -133,6 +134,22 @@ std::vector<unsigned char> ReadFile(const char *fileName)
         ret.push_back(ptr[i]);
     }
     free(ptr);
+    return ret;*/
+}
+
+std::vector<unsigned char> ReadFileEx(const char *fileName)
+{
+    char buf[1024*4];
+    std::vector<unsigned char> ret;
+    FILE *f = fopen(fileName, "rb");
+    if(f!=NULL){
+	int numread;
+	while((numread = fread(buf,1,sizeof(buf),f))>0){
+	    for(int i=0;i<numread;i++){
+		ret.push_back(buf[i]);
+	    }
+	}
+    }
     return ret;
 }
 
@@ -163,10 +180,10 @@ done:
     }
 }
 
-void FindLibraryPath(const char* libname,char *path,int len)
+void FindLibraryPath(const char* libname,char *path,int pid)
 {
    std::vector<std::string> lines;
-   ReadMaps(0,lines);
+   ReadMaps(pid,lines);
    //LOGD("line=%d\n",lines.size());
    for(int i=0;i<lines.size();i++){
        //LOGD("%s %s\n",lines[i].c_str(),libname);
@@ -521,11 +538,21 @@ int GetMyTracerPID()
 
 inline void Panic(const char* fmt, ...) 
 {
+    char buff[2048];
+    va_list args;
+    sprintf(buff, "PANIC: ");
+    va_start(args, fmt);
+    vsprintf(buff,fmt, args);
+    va_end(args);
+    LOGE("%s",buff);
+/*
   va_list args;
   fprintf(stderr, "PANIC: ");
   va_start(args, fmt);
   vfprintf(stderr, fmt, args);
   va_end(args);
+  LOGE("Panic:");
+ */ 
   exit(1);
 }
 
@@ -533,8 +560,11 @@ std::string GetCurrentExecutable()
 {
   char path[PATH_MAX];  
   ssize_t ret = readlink("/proc/self/exe", path, sizeof(path));
-  if (ret < 0)
-    Panic("Could not read /proc/self/exe: %s\n", strerror(errno));
+  if (ret < 0){
+    //Panic("Could not read /proc/self/exe: %s\n", strerror(errno));
+    LOGE("GetCurrentExecutable: Could not read /proc/self/exe: %s\n", strerror(errno));
+    return "";
+  }
   return path;
 }
 
@@ -544,9 +574,11 @@ std::string GetCurrentExecutableDirectory()
   std::string path = GetCurrentExecutable();
   // Find basename.
   char* p = reinterpret_cast<char*>(strrchr(path.c_str(), '/'));
-  if (p == NULL)
-    Panic("Current executable does not have directory root?: %s\n",
-          path.c_str());
+  if (p == NULL){
+    //Panic("Current executable does not have directory root?: %s\n",path.c_str());
+    LOGE("Current executable does not have directory root?: %s\n",path.c_str());
+    return "";
+  }
 
   int pos = path.find(p);
   //path.Resize(p - path.c_str());
@@ -691,4 +723,58 @@ void FindLibraryPathEx(const char* libname,char *path,unsigned int *baseAddr,uns
             break;
        }
    }
+}
+
+std::vector<std::string> GetCurrentCommandLine()
+{
+    std::vector<std::string> ret;
+    std::vector<unsigned char> data = ReadFileEx("/proc/self/cmdline");
+    LOGD("GetCurrentCommandLine size=%d\n",data.size());
+    ret.push_back((char *)&data[0]);
+    for(int i=1;i<data.size()-1;i++){
+	if(data[i]==0){
+	    ret.push_back((char *)&data[i+1]);
+	}
+    }
+    return ret;
+}
+
+bool ReplaceLibrary(char *fileName,char *libname,char *replacelibName)
+{
+    bool ret = false;
+    std::vector<unsigned char> data = ReadFileEx(fileName);
+    if(data.size()>0){
+	for(int i=0;i<data.size() - strlen(libname);i++){
+	    if(strncmp((char *)&data[i],libname,strlen(libname))==0){
+		printf("ReplaceLibrary %s found %s at %d\n",fileName,libname,i);
+		FILE *f = fopen(fileName,"r+b");
+		if(f!=NULL){
+		    fseek(f,i,SEEK_SET);
+		    // make sure it what we want
+		    char buf[1024];
+		    fread(buf,1,strlen(libname),f);buf[strlen(libname)] = 0;
+		    if(strcmp(buf,libname)==0){
+			printf("found in file\n");
+			fseek(f,i,SEEK_SET);
+			int wret = fwrite(replacelibName,1,strlen(libname),f);
+			printf("wret=%d\n",wret);
+			// verify it
+			fseek(f,i,SEEK_SET);
+			fread(buf,1,strlen(libname),f);buf[strlen(libname)] = 0;
+			if(strcmp(buf,replacelibName)==0){
+			    printf("ReplaceLibrary: success %s %s -> %s\n",fileName,libname,replacelibName);
+			    ret = true;
+			}else{
+			    printf("ReplaceLibrary: fail %s %s -> %s\n",fileName,libname,replacelibName);
+			}
+		    }
+		    fclose(f);
+		}else{
+		    printf("open file error\n");
+		}
+		break;
+	    }
+	}
+    }
+    return ret;
 }

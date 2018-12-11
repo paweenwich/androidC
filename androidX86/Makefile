@@ -18,6 +18,12 @@ clean:
 ragnarok:
 	adb push  jni/luaServer/ragnarok.lua /data/local/tmp
 
+libmog:
+	adb shell cp /data/local/tmp/libloader.so /system/lib/libmog.so
+
+liblog:
+	adb shell cp /system/lib/liblog.so /system/lib/libmog.so
+
 install_C:
 	adb push libs/x86/tracerx86 /data/local/tmp/tracerx86
 	adb shell chmod 777 /data/local/tmp/tracerx86

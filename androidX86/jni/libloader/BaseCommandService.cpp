@@ -35,12 +35,14 @@
 
 #include "../util/util.hpp"
 #include "../util/PtraceUtil.hpp"
-#include "../util/logger.h"
+#include "../util/AndroidLogger.h"
 #include "../util/payload.hpp"
 #include "../util/elf_help.h"
 #include "../util/ProcessScanner.hpp"
 
 #include "../util/SimpleTCPServer.hpp"
+#include "../util/luascript.h"
+#include "../luaserver/lua_server.hpp"
 
 #define  LOG_TAG    "BaseCommandService"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
@@ -49,7 +51,15 @@
 
 #include "BaseCommandService.h"
 
+Logger *serverLogger;
+LuaScript *baseCommandLuaScript;
+
 BaseCommandService::BaseCommandService() {
+    LOGD("BaseCommandService 1");
+    serverLogger = new AndroidLogger("LuaService",true);
+    LOGD("BaseCommandService 2");
+    baseCommandLuaScript = new LuaScript(tolua_lua_server_open,serverLogger);
+    LOGD("BaseCommandService 3");
 }
 
 BaseCommandService::BaseCommandService(const BaseCommandService& orig) {
@@ -65,6 +75,7 @@ void BaseCommandService::help(SimpleSocket &sock)
     sock.SendLine((char *)BSC_DUMPMEM);
     sock.SendLine((char *)BSC_DUMPALL);
     sock.SendLine((char *)BSC_DUMPPE);
+    sock.SendLine((char *)BSC_LUA);
 }
 
 void BaseCommandService::dumpmem(SimpleSocket &sock,std::string sstart,std::string ssize,std::string sfileName)
@@ -133,6 +144,12 @@ void BaseCommandService::dumpPE(SimpleSocket &sock)
     sock.printf("dumpPE end\n");
 }
 
+void BaseCommandService::doLua(SimpleSocket &sock, std::string cmd)
+{
+    sock.printf("doLua [%s]\n",cmd.c_str());
+    baseCommandLuaScript->execString((char *)cmd.c_str());
+}
+
 void BaseCommandService::doLine(SimpleSocket &sock,char *data){
     LOGD("doLine %s",data);
     std::string text = data;
@@ -165,6 +182,10 @@ void BaseCommandService::doLine(SimpleSocket &sock,char *data){
     }
     if(cmd == BSC_DUMPPE){
 	dumpPE(sock);
+	return;
+    }
+    if(cmd == BSC_LUA){
+	doLua(sock,&data[1]);
 	return;
     }
     help(sock);
