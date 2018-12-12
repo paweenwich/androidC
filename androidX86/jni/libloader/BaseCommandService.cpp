@@ -124,7 +124,7 @@ void BaseCommandService::dump(SimpleSocket &sock,std::string mode)
 
 void BaseCommandService::dumpPE(SimpleSocket &sock)
 {
-    sock.printf("dumpPE start\n");
+    sock.printf("dumpPE: start\n");
     ProcessScanner pscan;
     pscan.open(getpid());
     std::vector<ProcMapData> ret = pscan.getAll();
@@ -132,16 +132,21 @@ void BaseCommandService::dumpPE(SimpleSocket &sock)
     for(int i=0;i<ret.size();i++){
 	if(IsReadable(ret[i].startAddr,ret[i].size())){
 	    if(MightContainPE(ret[i].startAddr,ret[i].endAddr)){
-		sock.printf("Found %s\n",ret[i].ToString().c_str());
-		DumpMemory(ret[i].startAddr,ret[i].size(),
+		sock.printf("dumpPE: Found %s\n",ret[i].ToString().c_str());
+		bool dumpRet = DumpMemory(ret[i].startAddr,ret[i].size(),
 			(char *)StringPrintf("/data/local/tmp/%d/%08X-%08X.dump",getpid(),ret[i].startAddr,ret[i].endAddr).c_str()
 		);
+		if(!dumpRet){
+		    sock.printf("dumpPE: Fail\n");
+		}else{
+		    sock.printf("dumpPE: Success\n");
+		}
 	    }
 	}else{
-	    sock.printf("Fail %s\n",ret[i].ToString().c_str());
+	    sock.printf("dumpPE: Fail %s\n",ret[i].ToString().c_str());
 	}
     }
-    sock.printf("dumpPE end\n");
+    sock.printf("dumpPE: end\n");
 }
 
 void BaseCommandService::doLua(SimpleSocket &sock, std::string cmd)

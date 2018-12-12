@@ -1,0 +1,47 @@
+Nox
+#1 adb connect 127.0.0.1:62001
+#2 adb connect 127.0.0.1:62025
+#3 adb connect 127.0.0.1:62026
+
+pull whilecard file, need cygwin (tr and xargs
+adb shell 'ls sdcard/gps*.trace' | tr -d '\r' | xargs -n1 adb pull
+
+To Dump Assembly-CSharp
+- use X86 gdbserver, and forward port
+- use Win version of gdb connect to port
+dump memory localoutfile addrStart addrEnd
+ex. dump memory 0x774db000 0x774db000 0x77f91000
+will create 0x774db000 for dump file
+- use winhex/tool/distool/recover by file type to get dll back
+
+
+00008000-036da000 rw-p 00000000 00:00 0 
+73ce2000-77075000 rw-p 00000000 00:00 0 
+**774db000-77f91000 rw-p 00000000 00:00 0        Assembly-CSharp
+78121000-78221000 rw-s 00000000 00:04 53662      /dev/ashmem/AudioFlinger::Client (deleted)
+78221000-7834e000 rw-p 00000000 00:00 0 
+
+
+port 5228,5222
+
+dmesg
+getprop ro.build.version.release 
+
+-can stop process
+
+modify dependency of 
+/data/app-lib/com.gravity.romg-1/libzipw.so
+to make it load 
+/system/lib/libmog.so (our lib which will load /system/lib/liblog.so) 
+instead of /system/lib/liblog.so
+
+/data/app-lib/com.gravity.romg-1/
+
+seem to be unnotice.
+
+can create thread and open TCP port
+
+Assembly-CSharp.dll at 13M 
+other at 3M 
+
+there is a active tyhread that monitor read /proc/xxxx/maps if found, program end
