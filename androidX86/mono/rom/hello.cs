@@ -13,5 +13,11 @@ public class HelloWorld
     {
 	return 1;
     }
+
+    static public String Test2()
+    {
+	return "TEST2";
+    }
+
 }
 

@@ -36,7 +36,7 @@
 #include <../util/PtraceUtil.hpp>
 #include <../util/AndroidLogger.h>
 #include <../util/payload.hpp>
-#include <../util/elf_help.h>
+#include "../util/ELFHelp.h"
 
 #include "../util/SimpleTCPServer.hpp"
 #include "../libloader/BaseCommandService.h"
@@ -995,64 +995,44 @@ void testLoader()
     //m.unMap();
 }
 
-void ehdr_show(Elf32_Ehdr &ehdr)
-{
-    printf("EI_CLASS %d\n",ehdr.e_ident[EI_CLASS]);
-    printf("e_type %d\n",ehdr.e_type);
-    printf("e_machine %d\n",ehdr.e_machine);
-    printf("e_version %d\n",ehdr.e_version);
-    printf("e_entry %08X\n",ehdr.e_entry);
-    printf("e_phoff %08X\n",ehdr.e_phoff);
-    printf("e_shoff %08X\n",ehdr.e_shoff);
-    printf("e_flags %d\n",ehdr.e_flags);
-    printf("e_ehsize %d\n",ehdr.e_ehsize);
-    printf("e_phentsize %d\n",ehdr.e_phentsize);
-    printf("e_phnum %d\n",ehdr.e_phnum);
-    printf("e_shentsize %d\n",ehdr.e_shentsize);
-    printf("e_shnum %d\n",ehdr.e_shnum);
-    printf("e_shstrndx %d\n",ehdr.e_shstrndx);
-}
 
-void shdr_show(Elf32_Shdr &shdr)
+
+
+char *getshdrString(char *buffer,Elf32_Shdr &shdr_stringtable,int index)
 {
-    printf("sh_name %d\n",shdr.sh_name);
-    printf("sh_type %d\n",shdr.sh_type);
-    printf("sh_flags %d\n",shdr.sh_flags);
-    printf("sh_addr %08X\n",shdr.sh_addr); /* address */
-    printf("sh_offset %08X\n",shdr.sh_offset); /* file offset */
-    printf("sh_size %08X\n",shdr.sh_size);
-    printf("sh_link %d\n",shdr.sh_link);
-    printf("sh_info %d\n",shdr.sh_info);
-    printf("sh_addralign %d\n",shdr.sh_addralign);
-    printf("sh_entsize %d\n",shdr.sh_entsize);
+    int offset = shdr_stringtable.sh_offset + index;
+    return &buffer[offset];
 }
 
 void elf()
 {
-    printf("ELF\n");
-    std::vector<unsigned char>buf =  ReadFile("libfp.so");
-    printf("size %08X\n",buf.size());
-    Elf32_Ehdr ehdr = *(Elf32_Ehdr *)&buf[0];
-    if(!IS_ELF(ehdr)){
-	printf("Not an elf file\n");
+    ELFHelp elfHelp;
+    if(elfHelp.Load((char *)"libfp.so")<0){
+        printf("Fail: Load File\n");exit(0);
+    }
+    if(!elfHelp.IsELF()){
+	printf("Fail: Not an elf file\n");
 	exit(0);
     }
-    if(ehdr.e_ident[EI_CLASS]!=1){
-	printf("Not a 32bit elf file\n");
+    if(elfHelp.header->e_ident[EI_CLASS]!=1){
+	printf("Fail: Not a 32bit elf file\n");
 	exit(0);
     }
-    ehdr_show(ehdr);
-    for(int i=0;i<ehdr.e_shnum;i++){
-	Elf32_Shdr shdr = *(Elf32_Shdr *)&buf[ehdr.e_shoff + (i*ehdr.e_shentsize)];
-	
-	
-	if(shdr.sh_type == SHT_STRTAB){
-	    shdr_show(shdr);
-	    logger.logHex((unsigned char *)&buf[shdr.sh_offset],64);
-	    printf("\n");
-	}
-	//logger.logHex((unsigned char *)&shdr,sizeof(shdr));
+    elfHelp.Show(elfHelp.header);
+    elfHelp.Show(elfHelp.shdrStringtable);
+
+    logger.logHex((unsigned char *)elfHelp.At(elfHelp.shdrStringtable->sh_offset),64);
+
+    for(int i=0;i<elfHelp.sectionHeader.size();i++){
+	Elf32_Shdr *shdr = elfHelp.sectionHeader[i];
+        //printf("index [%d]\n",i);
+        //elfHelp.Show(shdr);
+        //printf("\n");
+        //if(shdr->sh_type == SHT_DYNSYM){
+            //break;
+        //}
     }
+    elfHelp.Show(elfHelp.shdrDynsym);
     
 }
 
