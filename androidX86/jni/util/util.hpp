@@ -36,6 +36,9 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
+#define STRINGIFY(x) #x
+
+
 std::vector<unsigned char> ReadFile(const char *fileName);
 std::vector<unsigned char> ReadFileEx(const char *fileName);
 void ReadMaps(int pid,std::vector<std::string> &out);

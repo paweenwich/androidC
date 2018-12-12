@@ -1,7 +1,7 @@
 make_and_install:   all	install_C
 
 install:    all install_C 
-all:	jni/luaServer/lua_server.cpp ragnarok
+all:	jni/luaServer/lua_server.cpp ragnarok ragnarokMono
 #	ndk-build.cmd V=1
 	ndk-build.cmd
 	adb push libs/x86/scrcapx86 /data/local/tmp/scrcapx86
@@ -14,6 +14,9 @@ all:	jni/luaServer/lua_server.cpp ragnarok
 
 clean:
 	@rm -rf obj libs
+
+ragnarokMono:
+	$(MAKE) -C mono/rom
 
 ragnarok:
 	adb push  jni/luaServer/ragnarok.lua /data/local/tmp

@@ -772,9 +772,11 @@ bool ReplaceLibrary(char *fileName,char *libname,char *replacelibName)
 		}else{
 		    printf("open file error\n");
 		}
-		break;
+		//break;
+		return ret;
 	    }
 	}
     }
+    printf("%s not found\n",libname);
     return ret;
 }
