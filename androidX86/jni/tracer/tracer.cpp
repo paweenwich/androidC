@@ -1004,10 +1004,11 @@ char *getshdrString(char *buffer,Elf32_Shdr &shdr_stringtable,int index)
     return &buffer[offset];
 }
 
-void elf()
+void elf(char *fileName)
 {
+    printf("%s\n",fileName);
     ELFHelp elfHelp;
-    if(elfHelp.Load((char *)"libfp.so")<0){
+    if(elfHelp.Load((char *)fileName)<0){
         printf("Fail: Load File\n");exit(0);
     }
     if(!elfHelp.IsELF()){
@@ -1019,21 +1020,32 @@ void elf()
 	exit(0);
     }
     elfHelp.Show(elfHelp.header);
-    elfHelp.Show(elfHelp.shdrStringtable);
+    //elfHelp.Show(elfHelp.shdrStringtable);
 
-    logger.logHex((unsigned char *)elfHelp.At(elfHelp.shdrStringtable->sh_offset),64);
+    //logger.logHex((unsigned char *)elfHelp.At(elfHelp.shdrStringtable->sh_offset),64);
 
     for(int i=0;i<elfHelp.sectionHeader.size();i++){
 	Elf32_Shdr *shdr = elfHelp.sectionHeader[i];
-        //printf("index [%d]\n",i);
-        //elfHelp.Show(shdr);
-        //printf("\n");
-        //if(shdr->sh_type == SHT_DYNSYM){
-            //break;
-        //}
+        printf("%d %08X %08X %08X [%s] %s\n",i,shdr->sh_addr,shdr->sh_offset,shdr->sh_size,
+		elfHelp.GetHeaderString(shdr->sh_name),
+		elfHelp.SectionFlagToString(shdr->sh_flags).c_str()
+		
+	);
     }
-    elfHelp.Show(elfHelp.shdrDynsym);
-    
+    //printf("%08X\n",elfHelp.shdrDynsym->sh_offset);
+    //printf("%08X\n",elfHelp.dynStrTab->d_un.d_val);
+    printf("FileSize = %08X\n",elfHelp.buffer.size());
+    printf("End = %08X\n",elfHelp.header->e_shoff + (elfHelp.header->e_shentsize * elfHelp.header->e_shnum));
+    //elfHelp.Show(elfHelp.shdrDynsym);
+    //elfHelp.Show(elfHelp.shdrDynamic);
+    //logger.logHex((unsigned char *)elfHelp.At(elfHelp.shdrDynamic->sh_offset),320);
+    //elfHelp.ShowDynamic(elfHelp.shdrDynamic);
+    //DumpHex(stdout,elfHelp.At(elfHelp.shdrDynsym->sh_offset),elfHelp.shdrDynsym->sh_size);
+    for(int i=0;i<elfHelp.programHeader.size();i++){
+	Elf32_Phdr *phdr = elfHelp.programHeader[i];
+	elfHelp.Show(phdr);
+    }
+    //elfHelp.Save();
 }
 
 
@@ -1082,7 +1094,11 @@ int main(int argc, char** argv) {
 		strcpy(libraryName,argv[i]);
 	    }
 	    if(strcmp(argv[i],"-telf")==0){
-		elf();
+		if(argv[i+1]==NULL){
+		    printf("USAGE: %s -telf fileName\n",argv[0]);
+		}else{
+		    elf(argv[i+1]);
+		}
 		exit(0);
 	    }
 	    if(strcmp(argv[i],"-tuninstall")==0){

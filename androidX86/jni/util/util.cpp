@@ -780,3 +780,48 @@ bool ReplaceLibrary(char *fileName,char *libname,char *replacelibName)
     printf("%s not found\n",libname);
     return ret;
 }
+
+void DumpHex(FILE *f,void *addr,int len)
+{
+    char tmp[128];
+    char line[128];
+    int i,j;
+    line[0] = 0;
+    unsigned char *p = (unsigned char *)addr;
+    for(i=0;i<len;i++){
+        sprintf(tmp,"%02X ",p[i]);strcat(line,tmp);
+        if(((i+1)%16)==0){
+            for(j=16;j>0;j--){
+                unsigned char ch = p[i+1-j];
+                if(isalnum(ch)){
+                    sprintf(tmp,"%c",ch);strcat(line,tmp);
+                }else{
+                    strcat(line,".");
+                }
+            }
+            strcat(line,"\n");
+	    fprintf(f,"%s",line);
+            //_logStr(line);
+            line[0]=0;
+        }
+    }
+    int index = i%16;
+    // pad space 
+    for(j=0;j<(16-index);j++){
+        //printf("   ");
+        strcat(line,"   ");
+    }
+    // add the rest if have
+    for(j=index;j>0;j--){
+        unsigned char ch = p[i-j];
+        if(isalnum(ch)){
+            sprintf(tmp,"%c",ch);strcat(line,tmp);
+        }else{
+            strcat(line,".");
+        }
+    }
+    strcat(line,"\n");
+    fprintf(f,"%s",line);
+    //_logStr(line);
+
+}

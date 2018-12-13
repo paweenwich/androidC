@@ -53,6 +53,7 @@ std::string GetCurrentExecutableDirectory();
 std::string StringPrintf(const char* fmt, ...);
 std::vector<std::string> GetCurrentCommandLine();
 
+
 // interface for unity
 extern "C" {
     unsigned int GetFuncAddress(const char* libname, const char* funcName);
@@ -80,6 +81,7 @@ extern "C" {
     bool DumpMemory(unsigned int addr,int size,char *fileName);
     bool MightContainPE(unsigned int startAddr,unsigned int endAddr);
     bool ReplaceLibrary(char *fileName,char *libname,char *replacelibName);
+    void DumpHex(FILE *f,void *add,int size);
 };
 
 class FileMap
