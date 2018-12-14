@@ -1026,7 +1026,7 @@ void elf(char *fileName)
 
     for(int i=0;i<elfHelp.sectionHeader.size();i++){
 	Elf32_Shdr *shdr = elfHelp.sectionHeader[i];
-        printf("%d %08X %08X %08X [%s] %s\n",i,shdr->sh_addr,shdr->sh_offset,shdr->sh_size,
+        printf("%d %08X %08X %08X %d [%s] %s\n",i,shdr->sh_addr,shdr->sh_offset,shdr->sh_size,shdr->sh_type,
 		elfHelp.GetHeaderString(shdr->sh_name),
 		elfHelp.SectionFlagToString(shdr->sh_flags).c_str()
 		
@@ -1043,9 +1043,11 @@ void elf(char *fileName)
     //DumpHex(stdout,elfHelp.At(elfHelp.shdrDynsym->sh_offset),elfHelp.shdrDynsym->sh_size);
     for(int i=0;i<elfHelp.programHeader.size();i++){
 	Elf32_Phdr *phdr = elfHelp.programHeader[i];
-	elfHelp.Show(phdr);
+	//elfHelp.Show(phdr);
     }
-    //elfHelp.Save();
+    //elfHelp.ShowDependency(elfHelp.shdrDynamic);
+    elfHelp.ReplaceDependency(elfHelp.shdrDynamic,"liblog.so","libmog.so");
+    elfHelp.Save();
 }
 
 
@@ -1092,6 +1094,22 @@ int main(int argc, char** argv) {
 	    if(strcmp(argv[i],"-l")==0){
 		i++;
 		strcpy(libraryName,argv[i]);
+	    }
+	    if(strcmp(argv[i],"-ttestso")==0){
+		if(argv[i+1]==NULL){
+		    printf("USAGE: %s -ttestso fileName\n",argv[0]);
+		    exit(0);
+		}
+		std::string filename = std::string("/data/local/tmp/") + ((char *)argv[i+1]);
+		void *handle = dlopen(filename.c_str(),RTLD_NOW);
+		if(handle!=NULL){
+		    printf("load success\n");
+		    MONO_API(handle,void *,Test1,(void));
+		    Test1();
+		}else{
+		    printf("load fail %s\n",dlerror());
+		}
+		exit(0);
 	    }
 	    if(strcmp(argv[i],"-telf")==0){
 		if(argv[i+1]==NULL){

@@ -55,10 +55,19 @@ int ELFHelp::Load(char *fileName)
     buffer =  ReadFile(fileName);
     if(buffer.size()>0){
         header = (Elf32_Ehdr *)At(0);
-	if(header->e_entry !=0){
-	    printf("e_entry !=0 possible executable file, only so supported\n");
+	if(!IsELF()){
+	    printf("Fail: Only elf file supported\n");
 	    return -1;
 	}
+	if(header->e_entry !=0){
+	    printf("Fail: e_entry !=0 possible executable file, only so supported\n");
+	    return -1;
+	}
+	if(header->e_ident[EI_CLASS]!=1){
+	    printf("Fail: Not a 32bit elf file\n");
+	    return -1;
+	}	
+	
         shdrStringtable = (Elf32_Shdr *)At(header->e_shoff + (header->e_shstrndx*header->e_shentsize));
         
 	//load section header
@@ -81,7 +90,18 @@ int ELFHelp::Load(char *fileName)
 	}
 	
 	//find star tab of dynamic seciont
-	int num = shdrDynamic->sh_size/shdrDynamic->sh_entsize;
+	std::vector<Elf32_Dyn *> dyns = GetDynamics(shdrDynamic);
+	for(int i=0;i<dyns.size();i++){
+	    Elf32_Dyn *dyn = dyns[i];
+	    if(dyn->d_tag == DT_STRTAB){
+		dynStrTab = dyn;
+	    }
+	    if(dyn->d_tag == DT_NULL){
+		break;
+	    }
+	}
+	
+	/*int num = shdrDynamic->sh_size/shdrDynamic->sh_entsize;
 	for(int i=0;i<num;i++){
 	    Elf32_Dyn *dyn = (Elf32_Dyn *)At(shdrDynamic->sh_offset + (i*shdrDynamic->sh_entsize));
 	    if(dyn->d_tag == DT_STRTAB){
@@ -90,7 +110,7 @@ int ELFHelp::Load(char *fileName)
 	    if(dyn->d_tag == DT_NULL){
 		break;
 	    }
-	}
+	}*/
 	if(this->dynStrTab == NULL){
 	    printf("DT_STRTAB not found\n");return -1;
 	}
@@ -206,16 +226,29 @@ void ELFHelp::Show(Elf32_Dyn *dyn)
     }
 }
 
-void ELFHelp::ShowDynamic(Elf32_Shdr *hdr)
+void ELFHelp::ShowDynamic(Elf32_Shdr *hdr,int filter)
 {
-    int num = hdr->sh_size/hdr->sh_entsize;
-    for(int i=0;i<num;i++){
-	Elf32_Dyn *dyn = (Elf32_Dyn *)At(hdr->sh_offset + (i*hdr->sh_entsize));
-	Show(dyn);
+    std::vector<Elf32_Dyn *> dyns = GetDynamics(hdr);
+    for(int i=0;i<dyns.size();i++){
+	Elf32_Dyn *dyn = dyns[i];
+	if((filter==0)||(filter == dyn->d_tag)){
+	    Show(dyn);
+	}
 	if(dyn->d_tag == DT_NULL){
 	    break;
 	}
     }
+}
+
+std::vector<Elf32_Dyn *> ELFHelp::GetDynamics(Elf32_Shdr *hdr)
+{
+    std::vector<Elf32_Dyn *> ret;
+    int num = hdr->sh_size/hdr->sh_entsize;
+    for(int i=0;i<num;i++){
+	Elf32_Dyn *dyn = (Elf32_Dyn *)At(hdr->sh_offset + (i*hdr->sh_entsize));
+	ret.push_back(dyn);
+    }
+    return ret;
 }
 
 void *ELFHelp::At(int index)
@@ -250,6 +283,45 @@ void ELFHelp::Save(char *fileName)
     DumpMemory((unsigned int)&buffer[0],buffer.size(),(char *)outFileName.c_str());
     //DumpHex(stdout,At(0),64);
 }
+
+void ELFHelp::ShowDependency(Elf32_Shdr *hdr)
+{
+    ShowDynamic(hdr,DT_NEEDED);
+}
+
+bool ELFHelp::ReplaceDependency(Elf32_Shdr *hdr,char *from,char *to)
+{
+    std::vector<Elf32_Dyn *> dyns = GetDynamics(hdr);
+    if(strlen(from)!=strlen(to)){
+	printf("only libname with the same size support [%s] [%s]",from,to);
+	return false;
+    }
+    printf("scaning DT_NEEDED\n");
+    for(int i=0;i<dyns.size();i++){
+	Elf32_Dyn *dyn = dyns[i];
+	if(dyn->d_tag == DT_NEEDED){
+	    char *soName = GetDynamicString(dyn->d_un.d_val);
+	    printf("found %s\n",soName);
+	    if(strcmp(soName,from)==0){
+		printf("Change %s -> %s\n",from,to);
+		strcpy(soName,to);
+		if(strcmp(GetDynamicString(dyn->d_un.d_val),to)==0){
+		    printf("Done\n");
+		    return true;
+		}else{
+		    printf("Verify fail\n");
+		    return false;
+		}
+		
+	    }
+	}
+
+    }
+    printf("scaning done %s not found\n",from);
+    return false;
+}
+
+
 
 ELFHelp::~ELFHelp() {
 }

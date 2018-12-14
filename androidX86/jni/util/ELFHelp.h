@@ -37,13 +37,17 @@ public:
     void Show(Elf32_Ehdr *ehdr);
     void Show(Elf32_Shdr *shdr);
     void Show(Elf32_Dyn *dyn);
-    void ShowDynamic(Elf32_Shdr *shdr);
+    void ShowDynamic(Elf32_Shdr *shdr,int filter=0);
     void *At(int index);
     char *GetHeaderString(int index);
     char *GetDynamicString(int index);
     char *GetString(int addr);
     void Save(char *fileName = NULL);
     std::string SectionFlagToString(int flag);
+    
+    std::vector<Elf32_Dyn *> GetDynamics(Elf32_Shdr *shdr);
+    void ShowDependency(Elf32_Shdr *shdr);
+    bool ReplaceDependency(Elf32_Shdr *shdr,char *from,char *to);
     
 private:
 
