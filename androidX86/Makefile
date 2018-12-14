@@ -1,7 +1,7 @@
 make_and_install:   all	install_C
 
 install:    all install_C 
-all:	jni/luaServer/lua_server.cpp ragnarok ragnarokMono 
+all:	jni/luaServer/lua_server.cpp ragnarok ragnarokMono elf
 #	ndk-build.cmd V=1
 	ndk-build.cmd
 	adb push libs/x86/scrcapx86 /data/local/tmp/scrcapx86
@@ -12,15 +12,15 @@ all:	jni/luaServer/lua_server.cpp ragnarok ragnarokMono
 
 	adb push libs/x86/libloader.so /data/local/tmp/libloader.so
 	adb push libs/x86/libtestso.so /data/local/tmp/libtestso.so
-	adb push libs/x86/elf /data/local/tmp/elf
-	adb shell chmod 777 /data/local/tmp/elf
+#	adb push libs/x86/elf /data/local/tmp/elf
+#	adb shell chmod 777 /data/local/tmp/elf
 
 
 clean:
 	@rm -rf obj libs
 
 elf:
-	ndk-build.cmd elf
+	ndk-build.cmd -C jni/tracer
 	adb push libs/x86/elf /data/local/tmp/elf
 	adb shell chmod 777 /data/local/tmp/elf
 

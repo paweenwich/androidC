@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
     if(argc==5){
 	elf(argv[1],argv[2],argv[3],argv[4]);return 0;
     }
-    printf("Usage %s command [param...]\n",argv[0]);
+    printf("Usage: %s command [param...]\n",argv[0]);
     printf("\tcommand as\n");
     printf("\t%s filename\t;just dump so\n",CMD_DUMP);
     printf("\t%s filename from to\t;replace dll dependency\n",CMD_REPLACE);

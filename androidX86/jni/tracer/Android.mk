@@ -1,3 +1,4 @@
+#$(info $(shell dir))
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
@@ -21,3 +22,4 @@ LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog   # whatever ld flags you like
 LOCAL_CFLAGS += -I../tolua -Wno-write-strings -Wformat -save-temps -g -fexceptions# -O0
 
 include $(BUILD_EXECUTABLE)    # <-- Use this to build an executable.
+
