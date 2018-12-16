@@ -14,6 +14,9 @@
 #ifndef ELFHELP_H
 #define ELFHELP_H
 
+#define PT_GNU_EH_FRAME 0x6474e550      /* GCC .eh_frame_hdr segment */  
+#define PT_GNU_STACK    0x6474e551      /* Indicates stack executability */  
+#define PT_GNU_RELRO    0x6474e552      /* Read-only after relocation */
 
 class ELFHelp {
 public:
@@ -42,9 +45,10 @@ public:
     char *GetHeaderString(int index);
     char *GetDynamicString(int index);
     char *GetString(int addr);
+    std::string GetProgramHeaderType(int type);
     void Save(char *fileName = NULL);
     std::string SectionFlagToString(int flag);
-    
+    std::string ProgramFlagToString(int flg);
     std::vector<Elf32_Dyn *> GetDynamics(Elf32_Shdr *shdr);
     void ShowDependency(Elf32_Shdr *shdr);
     bool ReplaceDependency(Elf32_Shdr *shdr,char *from,char *to);

@@ -77,6 +77,15 @@ void elf_dump(char *fileName)
     for(int i=0;i<elfHelp.programHeader.size();i++){
 	Elf32_Phdr *phdr = elfHelp.programHeader[i];
 	//elfHelp.Show(phdr);
+        printf("%02d o:%08X v:%08X p:%08X fz:%08X mz:%08X e:%08X %s a:%d [%s]\n",i,
+                phdr->p_offset,phdr->p_vaddr,phdr->p_paddr,
+                phdr->p_filesz,phdr->p_memsz,
+                phdr->p_offset + phdr->p_filesz,
+                elfHelp.ProgramFlagToString(phdr->p_flags).c_str(),
+                phdr->p_align,
+                elfHelp.GetProgramHeaderType(phdr->p_type).c_str()
+	);
+
     }
     //elfHelp.ShowDependency(elfHelp.shdrDynamic);
     //elfHelp.ReplaceDependency(elfHelp.shdrDynamic,"liblog.so","libmog.so");

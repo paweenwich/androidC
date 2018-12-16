@@ -148,6 +148,42 @@ std::string ELFHelp::SectionFlagToString(int flg)
     return ret;
 }
 
+std::string ELFHelp::ProgramFlagToString(int flg)
+{
+    std::string ret;
+    if(flg & PF_X) ret+="X";
+    if(flg & PF_W) ret+="W";
+    if(flg & PF_R) ret+="R";
+    return ret;
+}
+
+std::string ELFHelp::GetProgramHeaderType(int type)
+{
+    switch(type){
+        case PT_NULL: return STRINGIFY(PT_NULL);
+        case PT_LOAD: return STRINGIFY(PT_LOAD);
+        case PT_DYNAMIC: return STRINGIFY(PT_DYNAMIC);
+        case PT_INTERP: return STRINGIFY(PT_INTERP);
+        case PT_NOTE: return STRINGIFY(PT_NOTE);
+        case PT_SHLIB: return STRINGIFY(PT_SHLIB);
+        case PT_PHDR: return STRINGIFY(PT_PHDR);
+        case PT_NUM: return STRINGIFY(PT_NUM);
+//        case PT_TLS: return STRINGIFY(PT_TLS);        
+        case PT_GNU_EH_FRAME: return STRINGIFY(PT_GNU_EH_FRAME);
+        case PT_GNU_STACK: return STRINGIFY(PT_GNU_STACK);
+        case PT_GNU_RELRO: return STRINGIFY(PT_GNU_RELRO);
+//        case PT_HIOS: return STRINGIFY(PT_HIOS);        
+        default:
+            if(type && PT_LOOS){
+                return StringPrintf("%08X (os)",type);
+            }
+            if(type && PT_LOPROC){
+                return StringPrintf("%08X (proc)",type);
+            }
+            return StringPrintf("%d",type);
+    }
+}
+
 #define PRINTF(f,n) printf(#n " " f "\n",hdr->n)
 void ELFHelp::Show(Elf32_Ehdr *hdr)
 {

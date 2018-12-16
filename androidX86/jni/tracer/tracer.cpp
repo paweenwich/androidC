@@ -996,61 +996,6 @@ void testLoader()
 }
 
 
-
-
-char *getshdrString(char *buffer,Elf32_Shdr &shdr_stringtable,int index)
-{
-    int offset = shdr_stringtable.sh_offset + index;
-    return &buffer[offset];
-}
-
-void elf(char *fileName)
-{
-    printf("%s\n",fileName);
-    ELFHelp elfHelp;
-    if(elfHelp.Load((char *)fileName)<0){
-        printf("Fail: Load File\n");exit(0);
-    }
-    if(!elfHelp.IsELF()){
-	printf("Fail: Not an elf file\n");
-	exit(0);
-    }
-    if(elfHelp.header->e_ident[EI_CLASS]!=1){
-	printf("Fail: Not a 32bit elf file\n");
-	exit(0);
-    }
-    elfHelp.Show(elfHelp.header);
-    //elfHelp.Show(elfHelp.shdrStringtable);
-
-    //logger.logHex((unsigned char *)elfHelp.At(elfHelp.shdrStringtable->sh_offset),64);
-
-    for(int i=0;i<elfHelp.sectionHeader.size();i++){
-	Elf32_Shdr *shdr = elfHelp.sectionHeader[i];
-        printf("%d %08X %08X %08X %d [%s] %s\n",i,shdr->sh_addr,shdr->sh_offset,shdr->sh_size,shdr->sh_type,
-		elfHelp.GetHeaderString(shdr->sh_name),
-		elfHelp.SectionFlagToString(shdr->sh_flags).c_str()
-		
-	);
-    }
-    //printf("%08X\n",elfHelp.shdrDynsym->sh_offset);
-    //printf("%08X\n",elfHelp.dynStrTab->d_un.d_val);
-    printf("FileSize = %08X\n",elfHelp.buffer.size());
-    printf("End = %08X\n",elfHelp.header->e_shoff + (elfHelp.header->e_shentsize * elfHelp.header->e_shnum));
-    //elfHelp.Show(elfHelp.shdrDynsym);
-    //elfHelp.Show(elfHelp.shdrDynamic);
-    //logger.logHex((unsigned char *)elfHelp.At(elfHelp.shdrDynamic->sh_offset),320);
-    //elfHelp.ShowDynamic(elfHelp.shdrDynamic);
-    //DumpHex(stdout,elfHelp.At(elfHelp.shdrDynsym->sh_offset),elfHelp.shdrDynsym->sh_size);
-    for(int i=0;i<elfHelp.programHeader.size();i++){
-	Elf32_Phdr *phdr = elfHelp.programHeader[i];
-	//elfHelp.Show(phdr);
-    }
-    //elfHelp.ShowDependency(elfHelp.shdrDynamic);
-    elfHelp.ReplaceDependency(elfHelp.shdrDynamic,"liblog.so","libmog.so");
-    elfHelp.Save();
-}
-
-
 int main(int argc, char** argv) {
     bool flgDump = false;
     char funcName[128] = {0};
@@ -1106,16 +1051,13 @@ int main(int argc, char** argv) {
 		    printf("load success\n");
 		    MONO_API(handle,void *,Test1,(void));
 		    Test1();
+                    std::vector<std::string> out;
+                    ReadMaps(getpid(),out);
+                    for(int j=0;j<out.size();j++){
+                        printf("%s\n",out[j].c_str());
+                    }
 		}else{
 		    printf("load fail %s\n",dlerror());
-		}
-		exit(0);
-	    }
-	    if(strcmp(argv[i],"-telf")==0){
-		if(argv[i+1]==NULL){
-		    printf("USAGE: %s -telf fileName\n",argv[0]);
-		}else{
-		    elf(argv[i+1]);
 		}
 		exit(0);
 	    }
