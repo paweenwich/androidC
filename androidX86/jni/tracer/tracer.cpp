@@ -1054,7 +1054,23 @@ int main(int argc, char** argv) {
                     std::vector<std::string> out;
                     ReadMaps(getpid(),out);
                     for(int j=0;j<out.size();j++){
-                        printf("%s\n",out[j].c_str());
+			if(strstr(out[j].c_str(),(char *)argv[i+1])!=NULL){
+			    printf("%s\n",out[j].c_str());
+/*			    char addr[64];
+			    char perms[64];
+			    char unk[64];
+			    char unk2[64] = {0};
+			    char unk3[64] = {0};
+			    char unk4[512] = {0};
+			    sscanf(out[j].c_str(),"%s %s %s %s %s %s",addr, perms, unk,unk2,unk3,unk4);
+			    std::string strAddr = addr;
+			    std::replace( strAddr.begin(), strAddr.end(), '-', ' ');
+			    unsigned int from;
+			    unsigned int to;
+			    sscanf(strAddr.c_str(),"%x %x",&from,&to);
+			    
+			    DumpHex(stdout,(unsigned char *)from,to - from);*/
+			}
                     }
 		}else{
 		    printf("load fail %s\n",dlerror());

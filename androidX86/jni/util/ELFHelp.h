@@ -25,10 +25,8 @@ public:
     Elf32_Ehdr *header;
     Elf32_Shdr *shdrStringtable;
     Elf32_Shdr *shdrDynsym;
-//    Elf32_Shdr *shdrDynstr;
     Elf32_Shdr *shdrDynamic;
     Elf32_Dyn *dynStrTab;
-    //unsigned int dynamic_strtab;
     std::vector<Elf32_Shdr *> sectionHeader;
     std::vector<Elf32_Phdr *> programHeader;
     ELFHelp();
@@ -52,7 +50,14 @@ public:
     std::vector<Elf32_Dyn *> GetDynamics(Elf32_Shdr *shdr);
     void ShowDependency(Elf32_Shdr *shdr);
     bool ReplaceDependency(Elf32_Shdr *shdr,char *from,char *to);
-    
+    int GetMemorySize();
+    bool Strip();
+    Elf32_Phdr * GetProgramHeaderData();
+    Elf32_Phdr * GetProgramHeaderCode();
+    Elf32_Dyn * GetDynamic(int type);
+    Elf32_Shdr * GetSectionHeaderByName(char *name);
+    int CountDynamicEmptyEntries();
+    int GetDynamicIndex(int type);    
 private:
 
 };

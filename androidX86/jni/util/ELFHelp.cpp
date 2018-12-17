@@ -41,7 +41,10 @@
 https://blogs.oracle.com/solaris/inside-elf-symbol-tables-v2
 https://grugq.github.io/docs/subversiveld.pdf
 http://sco.com/developers/gabi/latest/ch4.symtab.html
-*/ 
+http://michalmalik.github.io/elf-dynamic-segment-struggles
+
+The linux kernel does not really care about the dynamic segment, but looking for PT_DYNAMIC 
+ */ 
 
 ELFHelp::ELFHelp() {
 }
@@ -59,10 +62,14 @@ int ELFHelp::Load(char *fileName)
 	    printf("Fail: Only elf file supported\n");
 	    return -1;
 	}
-	if(header->e_entry !=0){
-	    printf("Fail: e_entry !=0 possible executable file, only so supported\n");
+	if(header->e_type != ET_DYN ){
+	    printf("Fail: e_type != ET_DYN possible executable file, only so supported\n");
 	    return -1;
 	}
+/*	if(header->e_entry !=0){
+	    printf("Fail: e_entry !=0 possible executable file, only so supported\n");
+	    return -1;
+	}*/
 	if(header->e_ident[EI_CLASS]!=1){
 	    printf("Fail: Not a 32bit elf file\n");
 	    return -1;
@@ -237,29 +244,63 @@ void ELFHelp::Show(Elf32_Dyn *dyn)
 
     switch(dyn->d_tag){
 	case DT_NEEDED:
-	    printf("%d %d DT_NEEDED [%s]\n",dyn->d_tag,dyn->d_un.d_val,GetDynamicString(dyn->d_un.d_val));
+	    printf("%d %08X DT_NEEDED [%s]\n",dyn->d_tag,dyn->d_un.d_val,GetDynamicString(dyn->d_un.d_val));
 	    break;
 	case DT_STRTAB:	    
-	    printf("%d %d DT_STRTAB\n",dyn->d_tag,dyn->d_un.d_val);
+	    printf("%d %08X DT_STRTAB\n",dyn->d_tag,dyn->d_un.d_val);
 	    //DumpHex(stdout,At(dyn->d_un.d_val),64);
 	    break;
 	case DT_SYMTAB:	    
-	    printf("%d %d DT_SYMTAB\n",dyn->d_tag,dyn->d_un.d_val);
+	    printf("%d %08X DT_SYMTAB\n",dyn->d_tag,dyn->d_un.d_val);
 	    //DumpHex(stdout,At(dyn->d_un.d_val),64);
 	    break;
 	case DT_HASH:	    
-	    printf("%d %d DT_HASH\n",dyn->d_tag,dyn->d_un.d_val);
+	    printf("%d %08X DT_HASH\n",dyn->d_tag,dyn->d_un.d_val);
 	    break;
 	case DT_PLTGOT:
-	    printf("%d %d DT_PLTGOT\n",dyn->d_tag,dyn->d_un.d_val);
+	    printf("%d %08X DT_PLTGOT\n",dyn->d_tag,dyn->d_un.d_val);
 	    break;
 	case DT_NULL:	    
-	    printf("%d %d DT_NULL\n",dyn->d_tag,dyn->d_un.d_val);
+	    printf("%d %08X DT_NULL\n",dyn->d_tag,dyn->d_un.d_val);
 	    break;
 	default:
-	    printf("%d %d\n",dyn->d_tag,dyn->d_un.d_val);
+	    printf("%d %08X\n",dyn->d_tag,dyn->d_un.d_val);
 	    break;
     }
+}
+
+int ELFHelp::GetDynamicIndex(int type)
+{
+    std::vector<Elf32_Dyn *> dyns = GetDynamics(shdrDynamic);
+    for(int i=0;i<dyns.size();i++){
+	Elf32_Dyn *dyn = dyns[i];
+	if(dyn->d_tag == type){
+	    return i;
+	}
+    }
+    return -1;
+}
+
+int ELFHelp::CountDynamicEmptyEntries()
+{
+    int index = GetDynamicIndex(DT_NULL);
+    if(index >=0){
+	return GetDynamics(shdrDynamic).size() - index;
+    }else{
+	return 0;
+    }
+    /*int ret = 0;
+    std::vector<Elf32_Dyn *> dyns = GetDynamics(shdrDynamic);
+    for(int i=0;i<dyns.size();i++){
+	Elf32_Dyn *dyn = dyns[i];
+	if(dyn->d_tag == DT_NULL){
+	    ret++;
+	}
+	if(ret>0){
+	    Show(dyn);
+	}
+    }
+    return ret;*/
 }
 
 void ELFHelp::ShowDynamic(Elf32_Shdr *hdr,int filter)
@@ -357,6 +398,91 @@ bool ELFHelp::ReplaceDependency(Elf32_Shdr *hdr,char *from,char *to)
     return false;
 }
 
+/* getmemorysize() determines the offset of the last byte of the file
+ * that is referenced by an entry in the program segment header table.
+ * (Anything in the file after that point is not used when the program
+ * is executing, and thus can be safely discarded.)
+ */
+int ELFHelp::GetMemorySize()
+{
+    unsigned long size, n;
+    int i;
+
+    /* Start by setting the size to include the ELF header and the
+     * complete program segment header table.
+     */
+    size = header->e_phoff + header->e_phnum * header->e_phentsize;
+    if (size < header->e_ehsize)
+	size = header->e_ehsize;
+
+    /* Then keep extending the size to include whatever data the
+     * program segment header table references.
+     */
+    for (i = 0 ; i < programHeader.size() ; ++i) {
+	if (programHeader[i]->p_type != PT_NULL) {
+	    n = programHeader[i]->p_offset + programHeader[i]->p_filesz;
+	    if (n > size)
+		size = n;
+	}
+    }
+    return size;
+
+}
+
+bool ELFHelp::Strip()
+{
+    int lastOffset = GetMemorySize();
+    // remove buffer 
+    buffer.erase(buffer.begin() + lastOffset,buffer.end());
+    return true;
+}
+
+Elf32_Phdr * ELFHelp::GetProgramHeaderData()
+{
+    for (int i = 0 ; i < programHeader.size() ; ++i) {
+	if (programHeader[i]->p_type == PT_LOAD) {
+	    if (ProgramFlagToString(programHeader[i]->p_flags) == "WR") {
+		return programHeader[i];
+	    }
+	}
+    }
+    return NULL;
+}
+
+Elf32_Phdr * ELFHelp::GetProgramHeaderCode()
+{
+    for (int i = 0 ; i < programHeader.size() ; ++i) {
+	if (programHeader[i]->p_type == PT_LOAD) {
+	    if (ProgramFlagToString(programHeader[i]->p_flags) == "XR") {
+		return programHeader[i];
+	    }
+	}
+    }
+    return NULL;    
+}
+
+Elf32_Dyn * ELFHelp::GetDynamic(int type)
+{
+    std::vector<Elf32_Dyn *> dyns = GetDynamics(shdrDynamic);
+    for(int i=0;i<dyns.size();i++){
+	Elf32_Dyn *dyn = dyns[i];
+	//Show(dyn);
+	if(dyn->d_tag == type){
+	    return dyn;
+	}
+    }
+    return NULL;
+}
+
+Elf32_Shdr * ELFHelp::GetSectionHeaderByName(char *name)
+{
+    for(int i=0;i<sectionHeader.size();i++){
+	if(strcmp(GetHeaderString(sectionHeader[i]->sh_name),name)==0){
+	    return sectionHeader[i];
+	}
+    }
+    return NULL;
+}
 
 
 ELFHelp::~ELFHelp() {
