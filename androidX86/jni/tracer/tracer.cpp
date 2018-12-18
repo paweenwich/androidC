@@ -1040,38 +1040,44 @@ int main(int argc, char** argv) {
 		i++;
 		strcpy(libraryName,argv[i]);
 	    }
-	    if(strcmp(argv[i],"-ttestso")==0){
+	    if(strcmp(argv[i],"-tloadso")==0){
 		if(argv[i+1]==NULL){
-		    printf("USAGE: %s -ttestso fileName\n",argv[0]);
+		    printf("USAGE: %s -tloadso fileName\n",argv[0]);
 		    exit(0);
+		}
+		bool flgDump = false;
+		if(argv[i+2]!=NULL){
+		    flgDump = true;
 		}
 		std::string filename = std::string("/data/local/tmp/") + ((char *)argv[i+1]);
 		void *handle = dlopen(filename.c_str(),RTLD_NOW);
 		if(handle!=NULL){
 		    printf("load success\n");
-		    MONO_API(handle,void *,Test1,(void));
-		    Test1();
                     std::vector<std::string> out;
                     ReadMaps(getpid(),out);
                     for(int j=0;j<out.size();j++){
-			if(strstr(out[j].c_str(),(char *)argv[i+1])!=NULL){
-			    printf("%s\n",out[j].c_str());
-/*			    char addr[64];
-			    char perms[64];
-			    char unk[64];
-			    char unk2[64] = {0};
-			    char unk3[64] = {0};
-			    char unk4[512] = {0};
-			    sscanf(out[j].c_str(),"%s %s %s %s %s %s",addr, perms, unk,unk2,unk3,unk4);
-			    std::string strAddr = addr;
-			    std::replace( strAddr.begin(), strAddr.end(), '-', ' ');
-			    unsigned int from;
-			    unsigned int to;
-			    sscanf(strAddr.c_str(),"%x %x",&from,&to);
-			    
-			    DumpHex(stdout,(unsigned char *)from,to - from);*/
+			printf("%s\n",out[j].c_str());
+			if(flgDump){
+			    if(strstr(out[j].c_str(),(char *)argv[i+1])!=NULL){
+				char addr[64];
+				char perms[64];
+				char unk[64];
+				char unk2[64] = {0};
+				char unk3[64] = {0};
+				char unk4[512] = {0};
+				sscanf(out[j].c_str(),"%s %s %s %s %s %s",addr, perms, unk,unk2,unk3,unk4);
+				std::string strAddr = addr;
+				std::replace( strAddr.begin(), strAddr.end(), '-', ' ');
+				unsigned int from;
+				unsigned int to;
+				sscanf(strAddr.c_str(),"%x %x",&from,&to);
+
+				DumpHex(stdout,(unsigned char *)from,to - from);
+			    }
 			}
                     }
+		    MONO_API(handle,void *,Test1,(void));
+		    Test1();
 		}else{
 		    printf("load fail %s\n",dlerror());
 		}

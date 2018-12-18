@@ -328,6 +328,35 @@ std::vector<Elf32_Dyn *> ELFHelp::GetDynamics(Elf32_Shdr *hdr)
     return ret;
 }
 
+std::vector<Elf32_Shdr *> ELFHelp::GetStripableSection()
+{
+    std::vector<Elf32_Shdr *> ret;
+    for(int i=0;i<sectionHeader.size();i++){
+	Elf32_Shdr *shdr = sectionHeader[i];
+	if((shdr->sh_addr == 0) && (shdr->sh_size > 0)){
+	    ret.push_back(shdr);
+	}
+    }
+    return ret;
+}
+
+Elf32_Shdr * ELFHelp::FindBestStripableSection(int size)
+{
+    std::vector<Elf32_Shdr *> lst = GetStripableSection();
+    for(int i=0;i<lst.size();i++){
+	Elf32_Shdr *shdr = lst[i];
+	if(shdr->sh_size < size) continue;
+	// ignore shstrtab symtab strtab because we might need this info
+	// even kernel does not need it
+	char *name = GetHeaderString(shdr->sh_name);
+	if(strstr(name,"tab")==NULL){
+	    //simply return first on found
+	    return shdr;
+	}
+    }
+    return NULL;
+}
+
 void *ELFHelp::At(int index)
 {
     return (void *)&buffer[index];
@@ -484,6 +513,112 @@ Elf32_Shdr * ELFHelp::GetSectionHeaderByName(char *name)
     return NULL;
 }
 
+/*
+ * Find empty section (stripable)
+ * write our string to it
+ * adjust data section to cover whole file
+ * add DT_NEEDED point to our string by relative strtab
+*/
+bool ELFHelp::AddDependency(char *dependencyName)
+{
+    Elf32_Phdr *data = GetProgramHeaderData();
+    Elf32_Phdr *code = GetProgramHeaderCode();
+
+    // dyn does not has size info need to get size fomr ".dynstr" section
+    Elf32_Shdr *shdrDynStr = GetSectionHeaderByName(".dynstr");
+    Elf32_Shdr *shdrData = GetSectionHeaderByName(".data");
+    
+    if(CountDynamicEmptyEntries()==0){
+	printf("Fail: no empty dyn entry found\n");
+	return false;
+    }
+    Elf32_Dyn *dynNull = GetDynamic(DT_NULL);    
+    
+    // check empty section
+    int dataSize = strlen(dependencyName) + 1;
+    Elf32_Shdr *emptySection = FindBestStripableSection(dataSize);
+    if(emptySection == NULL){
+	printf("Fail: empty section not found\n");
+	return false;
+    }
+    //elfHelp.Show(emptySection);
+    printf("Found target section %s\n",GetString(emptySection->sh_name));
+    DumpHex(stdout,At(emptySection->sh_offset),32);
+    memcpy(At(emptySection->sh_offset),dependencyName,dataSize);
+    DumpHex(stdout,At(emptySection->sh_offset),32);
+    //adjust data section to cover whole file
+    data->p_memsz = buffer.size() - data->p_offset;
+    data->p_filesz = buffer.size() - data->p_offset;
+
+    // use retive distance between va(shrtab - data)  + fileoffset(emptysection - data)
+    dynNull->d_tag = DT_NEEDED;
+    dynNull->d_un.d_val = shdrData->sh_addr - shdrDynStr->sh_addr + emptySection->sh_offset - shdrData->sh_offset ; // + offset ;
+    //printf("%08X %08X %08X\n",shdrDynStr->sh_addr,shdrData->sh_addr,emptySection->sh_offset - shdrData->sh_offset);
+    //printf("%08X\n",dynNull->d_un.d_val);
+    return true;
+}
+
+/*
+ * Append Strtab + out data at the end of file
+ * adjust size of data section to cover all of it
+ * chnage strtab to new location 
+ * add DT_NEEDED point to our string
+*/
+bool ELFHelp::AddDependencyByAppend(char *dependencyName)
+{
+    Elf32_Dyn *dynNull = GetDynamic(DT_NULL);    
+    if(dynNull == NULL){
+	printf("Fail: no empty dynamic entry found\n");
+	return false;
+    }
+    Elf32_Phdr *data = GetProgramHeaderData();
+    Elf32_Phdr *code = GetProgramHeaderCode();
+
+    unsigned int oldEndFileOffset = buffer.size();
+    Elf32_Dyn *dynStrTab = GetDynamic(DT_STRTAB);
+    
+    // dyn does not has size info need to get size fomr ".dynstr" section
+    Elf32_Shdr *shdrDynStr = GetSectionHeaderByName(".dynstr");
+    int dynStrOffset = shdrDynStr->sh_offset;
+    int dynStrSize = shdrDynStr->sh_size;
+    
+    Elf32_Shdr *shdrData = GetSectionHeaderByName(".data");
+    int offset = shdrData->sh_addr - shdrData->sh_offset;
+    printf("offset=%08X\n",offset);
+    
+    //copy oldstrtable to appendBuffer first, then remember relative offset that we append 
+    // out string, then add our string to appendBuffer
+    std::vector<unsigned char> appendBuffer;
+    std::copy(buffer.begin() + dynStrOffset,buffer.begin() + dynStrOffset + dynStrSize,
+	    std::back_inserter(appendBuffer));
+    //logger.logHex((unsigned char *)appendBuffer.begin(),appendBuffer.size());
+    int myStringOffset = appendBuffer.size();
+    char *myString = dependencyName; //"libmog.so";
+    std::copy(&myString[0],&myString[strlen(myString) + 1],std::back_inserter(appendBuffer));
+    //logger.logHex((unsigned char *)appendBuffer.begin(),appendBuffer.size());
+
+    
+    // point dynStrTab to new location 
+    // need to add offset because we add to .data which load to different offset then 
+    // old str table (text)
+    dynStrTab->d_un.d_val = oldEndFileOffset + offset;
+
+    // fix data section program header size to have more appendBuffer data
+    data->p_memsz = buffer.size() - data->p_offset + appendBuffer.size();
+    data->p_filesz = buffer.size() - data->p_offset + appendBuffer.size();
+    
+    //add DT needed at lastest DT_NULL
+    //this might has a bug if no DT_NULL in so
+    dynNull->d_tag = DT_NEEDED;
+    dynNull->d_un.d_val = myStringOffset;
+    
+    // append to buffer
+    //!IMPORTANT need to do this after modify all data
+    //because vector might allocate new buffer when append and all pointers that we have 
+    //before will mot make sense
+    std::copy(appendBuffer.begin(),appendBuffer.end(),std::back_inserter(buffer));
+    return true;
+}
 
 ELFHelp::~ELFHelp() {
 }

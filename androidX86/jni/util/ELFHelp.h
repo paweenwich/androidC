@@ -57,7 +57,11 @@ public:
     Elf32_Dyn * GetDynamic(int type);
     Elf32_Shdr * GetSectionHeaderByName(char *name);
     int CountDynamicEmptyEntries();
-    int GetDynamicIndex(int type);    
+    int GetDynamicIndex(int type); 
+    std::vector<Elf32_Shdr *> GetStripableSection();
+    Elf32_Shdr * FindBestStripableSection(int size);
+    bool AddDependency(char *name);
+    bool AddDependencyByAppend(char *name);
 private:
 
 };

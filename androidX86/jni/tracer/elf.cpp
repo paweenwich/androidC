@@ -145,6 +145,86 @@ void elf_addDependency(char *fileIn,char *fileOut,char *dependencyName)
         printf("Fail: Load File\n");
 	return;
     }
+    if(!elfHelp.AddDependency(dependencyName)){
+        printf("Fail: AddDependency()\n");
+        /*if(!elfHelp.AddDependencyByAppend(dependencyName)){
+	    printf("Fail: AddDependencyByAppend()\n");
+	    return;
+	}*/
+	return;
+    }
+
+
+    // Save to output file
+    elfHelp.Save(fileOut);
+    printf("%s done\n",fileOut);
+
+}
+
+void elf_test(char *fileIn,char *fileOut)
+{
+
+}
+
+void elf(char *cmd,char *param1,char *param2,char *param3)
+{
+    if(strcmp(cmd,CMD_DUMP)==0){
+	elf_dump(param1);return;
+    }
+    if(strcmp(cmd,CMD_REPLACE)==0){
+	elf_replace(param1,param2,param3);return;
+    }
+    if(strcmp(cmd,CMD_STRIP)==0){
+	elf_strip(param1,param2);return;
+    }
+    if(strcmp(cmd,CMD_ADDSO)==0){
+	elf_addDependency(param1,param2,param3);return;
+    }
+    
+    if(strcmp(cmd,CMD_TEST)==0){
+	elf_test(param1,param2);return;
+    }
+    
+}
+
+
+int main(int argc, char** argv) {
+    _argv = argv;
+    //printf("%d\n",argc);
+    if(argc==2){
+	elf(argv[1],NULL,NULL,NULL);return 0;
+    }
+    if(argc==3){
+	elf(argv[1],argv[2],NULL,NULL);return 0;
+    }
+    if(argc==4){
+	elf(argv[1],argv[2],argv[3],NULL);return 0;
+    }
+    if(argc==5){
+	elf(argv[1],argv[2],argv[3],argv[4]);return 0;
+    }
+    printf("Usage: %s command [param...]\n",argv[0]);
+    printf("\tcommand as\n");
+    printf("\t%s filename\t;just dump so\n",CMD_DUMP);
+    printf("\t%s filename from to\t;replace dll dependency\n",CMD_REPLACE);
+    printf("\t%s filename fileout\t;strip unused info\n",CMD_STRIP);
+    printf("\t%s filein fileout soName\t;add soName in dependency list\n",CMD_ADDSO);    
+    
+}
+
+
+void elf_addDependencyAppendAtTheEnd(char *fileIn,char *fileOut,char *dependencyName)
+{
+    if((fileIn == NULL)||(fileOut == NULL)||(dependencyName == NULL)){
+	printf("Usage: %s %s fileIn fileOut soName\n",_argv[0],CMD_ADDSO);
+	return;
+    }
+    printf("%s %s %s %s\n",CMD_ADDSO,fileIn,fileOut,dependencyName);
+    ELFHelp elfHelp;
+    if(elfHelp.Load((char *)fileIn)<0){
+        printf("Fail: Load File\n");
+	return;
+    }
     Elf32_Phdr *data = elfHelp.GetProgramHeaderData();
     Elf32_Phdr *code = elfHelp.GetProgramHeaderCode();
     //elfHelp.Show(data);
@@ -220,56 +300,4 @@ void elf_addDependency(char *fileIn,char *fileOut,char *dependencyName)
     printf("%s done\n",fileOut);
 
 }
-
-void elf_test(char *fileIn,char *fileOut)
-{
-
-}
-
-void elf(char *cmd,char *param1,char *param2,char *param3)
-{
-    if(strcmp(cmd,CMD_DUMP)==0){
-	elf_dump(param1);return;
-    }
-    if(strcmp(cmd,CMD_REPLACE)==0){
-	elf_replace(param1,param2,param3);return;
-    }
-    if(strcmp(cmd,CMD_STRIP)==0){
-	elf_strip(param1,param2);return;
-    }
-    if(strcmp(cmd,CMD_ADDSO)==0){
-	elf_addDependency(param1,param2,param3);return;
-    }
-    
-    if(strcmp(cmd,CMD_TEST)==0){
-	elf_test(param1,param2);return;
-    }
-    
-}
-
-
-int main(int argc, char** argv) {
-    _argv = argv;
-    //printf("%d\n",argc);
-    if(argc==2){
-	elf(argv[1],NULL,NULL,NULL);return 0;
-    }
-    if(argc==3){
-	elf(argv[1],argv[2],NULL,NULL);return 0;
-    }
-    if(argc==4){
-	elf(argv[1],argv[2],argv[3],NULL);return 0;
-    }
-    if(argc==5){
-	elf(argv[1],argv[2],argv[3],argv[4]);return 0;
-    }
-    printf("Usage: %s command [param...]\n",argv[0]);
-    printf("\tcommand as\n");
-    printf("\t%s filename\t;just dump so\n",CMD_DUMP);
-    printf("\t%s filename from to\t;replace dll dependency\n",CMD_REPLACE);
-    printf("\t%s filename fileout\t;strip unused info\n",CMD_STRIP);
-    printf("\t%s filein fileout soName\t;add soName in dependency list\n",CMD_ADDSO);    
-    
-}
-
 
