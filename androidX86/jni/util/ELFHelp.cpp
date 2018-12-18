@@ -43,6 +43,8 @@ https://grugq.github.io/docs/subversiveld.pdf
 http://sco.com/developers/gabi/latest/ch4.symtab.html
 http://michalmalik.github.io/elf-dynamic-segment-struggles
 https://en.wikipedia.org/wiki/Executable_and_Linkable_Format
+ * PLT GOT
+https://www.codeproject.com/Articles/70302/Redirecting-functions-in-shared-ELF-libraries
 
 The linux kernel does not really care about the dynamic segment, but looking for PT_DYNAMIC 
  */ 
