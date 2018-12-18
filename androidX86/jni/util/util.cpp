@@ -793,7 +793,8 @@ void DumpHex(FILE *f,void *addr,int len)
         if(((i+1)%16)==0){
             for(j=16;j>0;j--){
                 unsigned char ch = p[i+1-j];
-                if(isalnum(ch)){
+                //if(isalnum(ch)){
+		if(isprint(ch)){
                     sprintf(tmp,"%c",ch);strcat(line,tmp);
                 }else{
                     strcat(line,".");

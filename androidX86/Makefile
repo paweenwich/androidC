@@ -14,7 +14,8 @@ all:	jni/luaServer/lua_server.cpp ragnarok ragnarokMono elf
 	adb push libs/x86/libtestso.so /data/local/tmp/libtestso.so
 #	adb push libs/x86/elf /data/local/tmp/elf
 #	adb shell chmod 777 /data/local/tmp/elf
-
+	adb push jni/tracer/install.sh /data/local/tmp/install.sh
+	adb shell chmod 777 /data/local/tmp/install.sh
 
 clean:
 	@rm -rf obj libs

@@ -62,6 +62,7 @@ public:
     Elf32_Shdr * FindBestStripableSection(int size);
     bool AddDependency(char *name);
     bool AddDependencyByAppend(char *name);
+    bool AddDependencyByGNU(char *name);
 private:
 
 };

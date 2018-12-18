@@ -3,8 +3,11 @@ Nox
 #2 adb connect 127.0.0.1:62025
 #3 adb connect 127.0.0.1:62026
 
+
+
 pull whilecard file, need cygwin (tr and xargs
 adb shell 'ls sdcard/gps*.trace' | tr -d '\r' | xargs -n1 adb pull
+adb logcat testso:* *:s
 
 To Dump Assembly-CSharp
 - use X86 gdbserver, and forward port
@@ -50,44 +53,6 @@ there is a active tyhread that monitor read /proc/xxxx/maps if found, program en
 7e554000-7e555000 r--p 00021000 08:13 1851410    /data/app-lib/com.gravity.romg-2/libfp.so
 7e555000-7e556000 rw-p 00022000 08:13 1851410    /data/app-lib/com.gravity.romg-2/libfp.so
 84e44000-84ebb000 rwxp 00000000 08:13 1851410    /data/app-lib/com.gravity.romg-2/libfp.so
-
-0 00000000 00000000 00000000 []
-1 00000114 00000114 00000D50 [.dynsym] A
-2 00000E64 00000E64 000016C6 [.dynstr] A
-3 0000252C 0000252C 00000670 [.hash] A
-4 00002B9C 00002B9C 000001AA [.gnu.version] A
-5 00002D48 00002D48 0000001C [.gnu.version_d] A
-6 00002D64 00002D64 00000040 [.gnu.version_r] A
-7 00002DA4 00002DA4 000009B8 [.rel.dyn] A
-8 0000375C 0000375C 00000420 [.rel.plt] A
-9 00003B80 00003B80 00000850 [.plt] AE
-10 000043E0 000043E0 0001791E [.text] AE
-11 0001BD00 0001BD00 00001514 [.rodata] A
-12 0001D214 0001D214 00000160 [.gcc_except_table] A
-13 0001D374 0001D374 00002F28 [.eh_frame] A
-14 0002029C 0002029C 000008A4 [.eh_frame_hdr] A
-15 000222C0 000212C0 00000794 [.data.rel.ro.local] WA
-16 00022A54 00021A54 00000008 [.fini_array] WA
-17 00022A5C 00021A5C 0000000C [.init_array] WA
-18 00022A80 00021A80 0000018C [.data.rel.ro] WA
-19 00022C0C 00021C0C 00000120 [.dynamic] WA
-20 00022D2C 00021D2C 0000008C [.got] WA
-21 00022DB8 00021DB8 0000021C [.got.plt] WA
-22 00023000 00022000 00000A08 [.data] WA
-23 00023A40 00022A40 00004BCC [.bss] WA
-24 00000000 00022A08 00000071 [.comment]
-25 00000000 00022A79 0001E49D [.debug_info]
-26 00000000 00040F16 000040E0 [.debug_abbrev]
-27 00000000 00044FF6 0001674E [.debug_loc]
-28 00000000 0005B744 00000578 [.debug_aranges]
-29 00000000 0005BCBC 00004848 [.debug_ranges]
-30 00000000 00060504 00008278 [.debug_line]
-31 00000000 0006877C 00008347 [.debug_str]
-32 00000000 00070AC4 0000001C [.note.gnu.gold-version]
-33 00000000 00070AE0 000028E0 [.symtab]
-34 00000000 000733C0 00002DD8 [.strtab]
-35 00000000 00076198 00000179 [.shstrtab]
-
 
 [ header]
 ...
@@ -144,3 +109,15 @@ b762b000-b762c000 r--p 00000000 00:00 0
 b762c000-b764c000 r--s 00000000 00:0a 52         /dev/__properties__
 
 The linux kernel does not really care about the dynamic segment, but looking for PT_DYNAMIC 
+
+- libfp.so 
+    fail at libvdog.so, even adddependencyByGNU
+    seem to have check sum, only original file work
+- libmain.so 
+    fail hardware not support 
+    can write at stripable section 
+    can not extend data, might because mz != fz and we have not initialize zero when entend.
+    dll seem to load fine
+
+    success with adddependencyByGNU
+    success with adddependency  

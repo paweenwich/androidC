@@ -1050,6 +1050,9 @@ int main(int argc, char** argv) {
 		    flgDump = true;
 		}
 		std::string filename = std::string("/data/local/tmp/") + ((char *)argv[i+1]);
+		if(argv[i+1][0]=='/'){
+		    filename = std::string("") + ((char *)argv[i+1]);
+		}
 		void *handle = dlopen(filename.c_str(),RTLD_NOW);
 		if(handle!=NULL){
 		    printf("load success\n");

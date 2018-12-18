@@ -42,6 +42,7 @@ https://blogs.oracle.com/solaris/inside-elf-symbol-tables-v2
 https://grugq.github.io/docs/subversiveld.pdf
 http://sco.com/developers/gabi/latest/ch4.symtab.html
 http://michalmalik.github.io/elf-dynamic-segment-struggles
+https://en.wikipedia.org/wiki/Executable_and_Linkable_Format
 
 The linux kernel does not really care about the dynamic segment, but looking for PT_DYNAMIC 
  */ 
@@ -386,6 +387,7 @@ void ELFHelp::Save(char *fileName)
     }else{
 	outFileName = fileName;
     }
+    unlink((char *)outFileName.c_str());
     DumpMemory((unsigned int)&buffer[0],buffer.size(),(char *)outFileName.c_str());
     //DumpHex(stdout,At(0),64);
 }
@@ -513,11 +515,45 @@ Elf32_Shdr * ELFHelp::GetSectionHeaderByName(char *name)
     return NULL;
 }
 
+/* 
+ *  using gnu.version section as space to put our string
+ */
+bool ELFHelp::AddDependencyByGNU(char *dependencyName)
+{
+    int dataSize = strlen(dependencyName) + 1;
+    //Elf32_Phdr *data = GetProgramHeaderData();
+
+    // dyn does not has size info need to get size fomr ".dynstr" section
+    Elf32_Shdr *shdrDynStr = GetSectionHeaderByName(".dynstr");
+    //Elf32_Shdr *shdrData = GetSectionHeaderByName(".data");
+    
+    Elf32_Shdr *shdrGnu = GetSectionHeaderByName(".gnu.version");
+    if(shdrGnu == NULL){
+	printf("Fail: .gnu.version section not found\n");
+	return false;
+    }
+    if(shdrGnu->sh_size < dataSize){
+	printf("Fail: .gnu.version section size < needed size\n");
+	return false;
+    }
+    Elf32_Dyn *dynNull = GetDynamic(DT_NULL);    
+    
+    DumpHex(stdout,At(shdrGnu->sh_offset),shdrGnu->sh_size);
+    //memset(At(shdrGnu->sh_offset),0x65,shdrGnu->sh_size);
+    memcpy(At(shdrGnu->sh_offset),dependencyName,dataSize);
+    DumpHex(stdout,At(shdrGnu->sh_offset),shdrGnu->sh_size);
+    dynNull->d_tag = DT_NEEDED;
+    dynNull->d_un.d_val = shdrGnu->sh_offset - shdrDynStr->sh_offset;
+    printf("offset from string table %08X\n",dynNull->d_un.d_val);
+    return true;
+}
+
 /*
  * Find empty section (stripable)
  * write our string to it
  * adjust data section to cover whole file
  * add DT_NEEDED point to our string by relative strtab
+ * 
 */
 bool ELFHelp::AddDependency(char *dependencyName)
 {
@@ -527,6 +563,9 @@ bool ELFHelp::AddDependency(char *dependencyName)
     // dyn does not has size info need to get size fomr ".dynstr" section
     Elf32_Shdr *shdrDynStr = GetSectionHeaderByName(".dynstr");
     Elf32_Shdr *shdrData = GetSectionHeaderByName(".data");
+    
+    Elf32_Shdr *shdrGnu = GetSectionHeaderByName(".gnu.version");
+    
     
     if(CountDynamicEmptyEntries()==0){
 	printf("Fail: no empty dyn entry found\n");
@@ -541,20 +580,36 @@ bool ELFHelp::AddDependency(char *dependencyName)
 	printf("Fail: empty section not found\n");
 	return false;
     }
+    
+    //int delta = 0;
+    int delta = data->p_memsz - data->p_filesz;    
+    if(delta > 0){
+	printf("Warning!data section memsz != filesz mz=%08X fz=%08X\n",data->p_memsz,data->p_filesz);
+    }
+    DumpHex(stdout,At(shdrDynStr->sh_offset),shdrDynStr->sh_size);
+
+    int endData = data->p_offset + data->p_filesz;
+    DumpHex(stdout,At(endData),delta);
+    memset(At(endData),0,delta);
+    DumpHex(stdout,At(endData),delta);
+    
+    
     //elfHelp.Show(emptySection);
-    printf("Found target section %s\n",GetString(emptySection->sh_name));
-    DumpHex(stdout,At(emptySection->sh_offset),32);
-    memcpy(At(emptySection->sh_offset),dependencyName,dataSize);
-    DumpHex(stdout,At(emptySection->sh_offset),32);
+    //DumpHex(stdout,At(shdrDynStr->sh_offset),shdrDynStr->sh_size);
+    
+    //printf("Found target section %s\n",GetString(emptySection->sh_name));
+    DumpHex(stdout,At(emptySection->sh_offset + delta),32);
+    memcpy(At(emptySection->sh_offset + delta),dependencyName,dataSize);
+    DumpHex(stdout,At(emptySection->sh_offset + delta),32);
     //adjust data section to cover whole file
     data->p_memsz = buffer.size() - data->p_offset;
     data->p_filesz = buffer.size() - data->p_offset;
 
     // use retive distance between va(shrtab - data)  + fileoffset(emptysection - data)
     dynNull->d_tag = DT_NEEDED;
-    dynNull->d_un.d_val = shdrData->sh_addr - shdrDynStr->sh_addr + emptySection->sh_offset - shdrData->sh_offset ; // + offset ;
-    //printf("%08X %08X %08X\n",shdrDynStr->sh_addr,shdrData->sh_addr,emptySection->sh_offset - shdrData->sh_offset);
-    //printf("%08X\n",dynNull->d_un.d_val);
+    dynNull->d_un.d_val = shdrData->sh_addr - shdrDynStr->sh_addr + emptySection->sh_offset - shdrData->sh_offset + delta; // + offset ;
+    printf("%08X %08X %08X\n",shdrDynStr->sh_addr,shdrData->sh_addr,emptySection->sh_offset - shdrData->sh_offset);
+    printf("%08X\n",dynNull->d_un.d_val);
     return true;
 }
 

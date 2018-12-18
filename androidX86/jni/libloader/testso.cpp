@@ -26,6 +26,8 @@
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
+char buf[256];
+
 extern "C" {
     void Test1();
 };
@@ -40,7 +42,12 @@ void Test1()
 void __attribute__ ((constructor)) dll_load()
 {
     LOGD("LIBRARY LOADED FROM PID %d", getpid());
-    LOGD("THREAD CREATED");
+    //LOGD("THREAD CREATED");
+    int count =0;
+    for(int i=0;i<sizeof(buf);i++){
+	if(buf[i]==0) count++;
+    }
+    LOGD("ZERO COUNT %d",count);
 }
 
 void __attribute__ ((destructor)) dll_unload()
