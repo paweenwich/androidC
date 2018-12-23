@@ -30,6 +30,7 @@
 #include "../util/ProcessScanner.hpp"
 #include "../util/luascript.h"
 #include "../luaserver/lua_server.hpp"
+#include "../util/elf_hook.h"
 
 
 #define  LOG_TAG    "elf"
@@ -61,7 +62,7 @@ void elf_dump(char *fileName)
     elfHelp.Show(elfHelp.header);
     //elfHelp.Show(elfHelp.shdrStringtable);
     //logger.logHex((unsigned char *)elfHelp.At(elfHelp.shdrStringtable->sh_offset),64);
-
+    printf("Section Headers\n");
     for(int i=0;i<elfHelp.sectionHeader.size();i++){
 	Elf32_Shdr *shdr = elfHelp.sectionHeader[i];
         printf("%d %08X %08X %08X %d [%s] %s\n",i,shdr->sh_addr,shdr->sh_offset,shdr->sh_size,shdr->sh_type,
@@ -81,7 +82,8 @@ void elf_dump(char *fileName)
     //elfHelp.Show(elfHelp.shdrDynamic);
     //logger.logHex((unsigned char *)elfHelp.At(elfHelp.shdrDynamic->sh_offset),320);
     elfHelp.ShowDynamic(elfHelp.shdrDynamic);
-    //DumpHex(stdout,elfHelp.At(elfHelp.shdrDynsym->sh_offset),elfHelp.shdrDynsym->sh_size);
+
+    printf("Program Headers\n");
     for(int i=0;i<elfHelp.programHeader.size();i++){
 	Elf32_Phdr *phdr = elfHelp.programHeader[i];
 	//elfHelp.Show(phdr);
@@ -94,6 +96,34 @@ void elf_dump(char *fileName)
                 elfHelp.GetProgramHeaderType(phdr->p_type).c_str()
 	);
 
+    }
+    Elf32_Shdr * rel_dyn =  elfHelp.GetSectionHeaderByName(".rel.dyn");
+    Elf32_Shdr * rel_plt =  elfHelp.GetSectionHeaderByName(".rel.plt");
+    {
+        DumpHex(stdout,elfHelp.At(rel_dyn->sh_offset),rel_dyn->sh_size);
+        int num = rel_dyn->sh_size/sizeof(Elf32_Rel);
+        for(int i=0;i<num;i++){
+            Elf32_Rel *rel = (Elf32_Rel *)elfHelp.At(rel_dyn->sh_offset + (i*sizeof(Elf32_Rel)));
+            printf("%08X %08X %s\n",rel->r_offset,rel->r_info,elfHelp.GetDynamicString(ELF32_R_SYM(rel->r_info)));
+        }
+    }
+    
+    {
+        DumpHex(stdout,elfHelp.At(rel_plt->sh_offset),rel_plt->sh_size);
+        int num = rel_plt->sh_size/sizeof(Elf32_Rel);
+        for(int i=0;i<num;i++){
+            Elf32_Rel *rel = (Elf32_Rel *)elfHelp.At(rel_plt->sh_offset + (i*sizeof(Elf32_Rel)));
+            printf("%08X %08X %s\n",rel->r_offset,rel->r_info,elfHelp.GetDynamicString(ELF32_R_SYM(rel->r_info)));
+        }
+    }
+    {
+        DumpHex(stdout,elfHelp.At(elfHelp.shdrDynsym->sh_offset),elfHelp.shdrDynsym->sh_size);
+        int num = elfHelp.shdrDynsym->sh_size/sizeof(Elf32_Sym);
+        for(int i=0;i<num;i++){
+            Elf32_Sym *sym = (Elf32_Sym *)elfHelp.At(elfHelp.shdrDynsym->sh_offset + (i*sizeof(Elf32_Sym)));
+            printf("name=%08X value=%08X %s\n",sym->st_name,sym->st_value,elfHelp.GetDynamicString(sym->st_name));
+        }
+        
     }
     //elfHelp.ShowDependency(elfHelp.shdrDynamic);
     //elfHelp.ReplaceDependency(elfHelp.shdrDynamic,"liblog.so","libmog.so");
@@ -185,10 +215,29 @@ void elf_addDependency(char *fileIn,char *fileOut,char *dependencyName)
 
 }
 
+void (*org_puts)(char *str);
+void hooked_puts(char *str)
+{
+    printf("puts(%s)\n",str);
+    org_puts(str);
+}
 
 void elf_test(char *fileIn,char *fileOut)
 {
+    printf("TEST\n");
+    void *handle = dlopen("/data/local/tmp/libtestso.so", RTLD_LAZY);
+    DLSYM_ENSURE_API(handle,void *,Test1,(void));
+    Test1();
+    //void * base1 = LIBRARY_ADDRESS_BY_HANDLE(handle1);
+    void *base1 = (void *)FindBaseLibrary("/data/local/tmp/libtestso.so",getpid());    
+    printf("base1=%08X\n",UINT(base1));
+    //printf("base2=%08X handle1=%08X\n",UINT(base2),UINT(handle1));    
+    printf("puts=%08X\n",UINT(puts));    
+    org_puts = (void (*)(char*))elf_hook("/data/local/tmp/libtestso.so", base1, "puts", (void const *)hooked_puts);
+    printf("original1=%08X\n",UINT(org_puts));    
 
+    Test1();
+    //void *elf_hook("libtestso.so", void const *library_address, char const *function_name, void const *substitution_address);
 }
 
 void elf(char *cmd,char *param1,char *param2,char *param3)

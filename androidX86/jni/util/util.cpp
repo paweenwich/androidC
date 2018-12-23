@@ -235,13 +235,33 @@ unsigned int FindBaseLibrary( const char *library, int pid)
     std::vector<std::string> lines;
     ReadMaps(pid,lines);
     for(int i=0;i<lines.size();i++){
-        //LOGD("FindBaseLibrary: %s",lines[i].c_str());
         if (strstr(lines[i].c_str(), library)) {
+            LOGD("FindBaseLibrary: %s",lines[i].c_str());            
             address = (unsigned int) strtoul(lines[i].c_str(), NULL, 16);
             break;
         }
     }
     return address;
+}
+
+bool FindMemorySectionFromAddr(unsigned int address,int pid,unsigned int *baseMemory,unsigned int *size)
+{
+    unsigned int ret = 0;
+    std::vector<std::string> lines;
+    ReadMaps(pid,lines);
+    for(int i=0;i<lines.size();i++){
+        std::string line = lines[i];
+        std::replace( line.begin(), line.end(), '-', ' ');
+        //printf("%s",line.c_str());
+        unsigned int from,to;
+        sscanf(line.c_str(),"%X%X",&from,&to);
+        //printf("%08X %08X\n",from,to);
+        if((address >= from)&&(address<to)){
+            
+            return true;
+        }
+    }
+    return false;
 }
 
 unsigned int FindBaseLibraryFromAddress(unsigned int address, int pid)
@@ -825,4 +845,40 @@ void DumpHex(FILE *f,void *addr,int len)
     fprintf(f,"%s",line);
     //_logStr(line);
 
+}
+
+void ShowMaps(int pid)
+{
+    std::vector<std::string> out;
+    ReadMaps(getpid(),out);
+    for(int j=0;j<out.size();j++){
+        printf("%s\n",out[j].c_str());
+    }
+}
+
+bool WriteMemory(unsigned int addr,void *data,int size)
+{
+    int pageSize = sysconf(_SC_PAGESIZE);
+    //printf("pageSize=%08X addr=%08X\n",pageSize,addr);
+    unsigned int alignAddr = AlignLower(addr,pageSize);
+    unsigned int alignUpperAddr = AlignUpper(addr + size,pageSize);    
+    int alignSize = alignUpperAddr - alignAddr; 
+    //printf("alignAddr=%08X %08X %08X\n",alignAddr,alignUpperAddr,alignSize);
+    int ret = mprotect((void *)alignAddr, alignSize,PROT_WRITE|PROT_READ);
+    //printf("mprotect return=%08X\n",ret);
+    if(ret==0){
+        memcpy((void *)addr,data,size);
+        //mprotect((void *)alignAddr, alignSize,oldProtect);
+        return true;
+    }
+    return false;
+}
+
+unsigned int AlignLower(unsigned int unalign, int size)
+{
+    return(((unalign + size -1) & ~(size-1)) - size);
+}
+unsigned int AlignUpper(unsigned int unalign, int size)
+{
+    return(((unalign + size -1) & ~(size-1)));
 }

@@ -1086,40 +1086,6 @@ int main(int argc, char** argv) {
 		}
 		exit(0);
 	    }
-	    if(strcmp(argv[i],"-tuninstall")==0){
-		char libPath[1024];
-		libPath[0] = 0;
-		if(argv[i+1]!=NULL){
-		    strcpy(libPath,argv[i+1]);
-		}else{
-		    FindLibraryPath("libzipw.so",libPath,pid);
-		    printf("%d %s\n",pid,libPath);
-		}
-		printf("[%s]\n",libPath);		
-		if(libPath[0]!=0){
-		    bool ret = ReplaceLibrary(libPath,"libmog.so","liblog.so");
-		}else{
-		    printf("not found\n");
-		}
-		exit(0);
-	    }
-	    if(strcmp(argv[i],"-tinstall")==0){
-		char libPath[1024];
-		libPath[0] = 0;
-		if(argv[i+1]!=NULL){
-		    strcpy(libPath,argv[i+1]);
-		}else{
-		    FindLibraryPath("libzipw.so",libPath,pid);
-		    printf("%d %s\n",pid,libPath);
-		}
-		printf("[%s]\n",libPath);		
-		if(libPath[0]!=0){
-		    bool ret = ReplaceLibrary(libPath,"liblog.so","libmog.so");
-		}else{
-		    printf("not found\n");
-		}
-		exit(0);
-	    }
 	    if(strcmp(argv[i],"-tclient")==0){
 		int port = 1414;
 		if(argv[i+1]!=NULL){

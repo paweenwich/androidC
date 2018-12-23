@@ -37,6 +37,16 @@
 #define UTIL_HPP
 
 #define STRINGIFY(x) #x
+#define DLSYM_API(h, r, n, p) \
+    r (* n) p;\
+    n = ( r (*) p )dlsym(h, #n);
+
+#define DLSYM_ENSURE_API(h, r, n, p) \
+    r (* n) p;\
+    n = ( r (*) p )dlsym(h, #n);\
+    if(n==NULL){ printf("ERROR %s not found\n",#n); exit(-1); }
+
+#define UINT(x)     (unsigned int)x
 
 
 std::vector<unsigned char> ReadFile(const char *fileName);
@@ -82,6 +92,11 @@ extern "C" {
     bool MightContainPE(unsigned int startAddr,unsigned int endAddr);
     bool ReplaceLibrary(char *fileName,char *libname,char *replacelibName);
     void DumpHex(FILE *f,void *add,int size);
+    void ShowMaps(int pid);
+    bool WriteMemory(unsigned int addr,void *data,int size);
+    bool FindMemorySectionFromAddr(unsigned int address,int pid,unsigned int *baseMemory,unsigned int *size);
+    unsigned int AlignLower(unsigned int unalign, int size);
+    unsigned int AlignUpper(unsigned int unalign, int size);
 };
 
 class FileMap

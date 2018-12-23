@@ -34,7 +34,7 @@ extern "C" {
 
 void Test1()
 {
-    LOGD("Test1()");
+    LOGD("TEST1()");
     printf("Test1()\n");
 }
 

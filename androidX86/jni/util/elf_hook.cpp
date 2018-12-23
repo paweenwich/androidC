@@ -7,9 +7,15 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <errno.h>
+#include <android/log.h>
+#include "../util/util.hpp"
 //rename standart types for convenience
 // make sure we use 32 bit
 #undef __x86_64
+#define  LOG_TAG    "elfhook"
+//#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define  LOGD(...)  printf(__VA_ARGS__);printf("\n")
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 
 #ifdef __x86_64
@@ -287,7 +293,8 @@ int symbol_by_name(int d, Elf_Shdr *section, char const *name, Elf_Sym **symbol,
 
     amount = section->sh_size / sizeof(Elf_Sym);
 
-    for (i = 0; i < amount; ++i)
+    for (i = 0; i < amount; ++i){
+        LOGD("%s %s",name,&strings[symbols[i].st_name]);
         if (!strcmp(name, &strings[symbols[i].st_name]))
         {
             *symbol = (Elf_Sym *)malloc(sizeof(Elf_Sym));
@@ -306,7 +313,7 @@ int symbol_by_name(int d, Elf_Shdr *section, char const *name, Elf_Sym **symbol,
 
             break;
         }
-
+    }
     free(strings_section);
     free((void *)strings);
     free(symbols);
@@ -345,17 +352,24 @@ void *elf_hook(char const *module_filename, void const *module_address, char con
 
     void *original = NULL;  //address of the symbol being substituted
 
-    if (NULL == module_address || NULL == name || NULL == substitution)
+    if (NULL == module_address || NULL == name || NULL == substitution){
         return original;
+    }
+    if(!IsReadable(UINT(module_address),32)){
+        LOGD("FAIL: module_address %08X not readable",UINT(module_address));
+        return NULL;
+    }
+    
 
     if (!pagesize)
         pagesize = sysconf(_SC_PAGESIZE);
 
     descriptor = open(module_filename, O_RDONLY);
-
+    LOGD("open return %d",descriptor);
     if (descriptor < 0)
         return original;
 
+        
     if (
         section_by_type(descriptor, SHT_DYNSYM, &dynsym) ||  //get ".dynsym" section
         symbol_by_name(descriptor, dynsym, name, &symbol, &name_index) ||  //actually, we need only the index of symbol named "name" in the ".dynsym" table
@@ -371,7 +385,9 @@ void *elf_hook(char const *module_filename, void const *module_address, char con
 
         return original;
     }
-//release the data used
+    LOGD("get all sections");    
+    ShowMaps(getpid());
+    //release the data used
     free(dynsym);
     free(symbol);
 
@@ -385,19 +401,45 @@ void *elf_hook(char const *module_filename, void const *module_address, char con
     free(rel_dyn);
 //and descriptor
     close(descriptor);
+    LOGD("startloop1 %d name_index=%d",rel_plt_amount,name_index);        
+    LOGD("rel_plt_table %08X size=%d",(unsigned int)rel_plt_table,rel_plt_amount);       
+    LOGD("rel_dyn_table %08X size=%d",(unsigned int)rel_dyn_table,rel_dyn_amount);       
+    
+    if(!IsReadable(UINT(rel_plt_table),32)){
+        LOGD("FAIL: rel_plt_table %08X not readable",UINT(rel_plt_table));
+        return NULL;
+    }
+    
+    DumpHex(stdout,rel_plt_table,rel_plt_amount * sizeof(Elf_Rel));
+    DumpHex(stdout,rel_dyn_table,rel_dyn_amount * sizeof(Elf_Rel));
+    
+    if(name_index ==0){
+        LOGD("FAIL: name %s not found in %s",name,module_filename);
+        return NULL;
+    }
+    
 //now we've got ".rel.plt" (needed for PIC) table and ".rel.dyn" (for non-PIC) table and the symbol's index
-    for (i = 0; i < rel_plt_amount; ++i)  //lookup the ".rel.plt" table
+    for (i = 0; i < rel_plt_amount; ++i){  //lookup the ".rel.plt" table
+        LOGD("i=%d",i);
         if (ELF_R_SYM(rel_plt_table[i].r_info) == name_index)  //if we found the symbol to substitute in ".rel.plt"
         {
+            LOGD("found at %d addr=%08X",i,UINT(module_address) + rel_plt_table[i].r_offset);
             original = (void *)*(size_t *)(((size_t)module_address) + rel_plt_table[i].r_offset);  //save the original function address
-            *(size_t *)(((size_t)module_address) + rel_plt_table[i].r_offset) = (size_t)substitution;  //and replace it with the substitutional
+            LOGD("original %08X",UINT(original));
+            //*(size_t *)(((size_t)module_address) + rel_plt_table[i].r_offset) = (size_t)substitution;  //and replace it with the substitutional
+            unsigned int memAddr = UINT(module_address) + rel_plt_table[i].r_offset;
+            if(!WriteMemory(memAddr,&substitution,sizeof(substitution))){
+                LOGD("FAIL: can not write memory at %08X",memAddr);
+                return NULL;
+            }
 
             break;  //the target symbol appears in ".rel.plt" only once
         }
-
+    }
     if (original)
         return original;
 //we will get here only with 32-bit non-PIC module
+    LOGD("startloop2");            
     for (i = 0; i < rel_dyn_amount; ++i)  //lookup the ".rel.dyn" table
         if (ELF_R_SYM(rel_dyn_table[i].r_info) == name_index)  //if we found the symbol to substitute in ".rel.dyn"
         {

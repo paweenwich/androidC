@@ -18,8 +18,8 @@
 extern "C" {
 #endif
 
-
-#define LIBRARY_ADDRESS_BY_HANDLE(x) ((NULL == x) ? NULL : (void *)*(size_t const *)(x))  //undocumented hack to get shared library's address in memory by its handle
+//Not work
+//#define LIBRARY_ADDRESS_BY_HANDLE(x) ((NULL == x) ? NULL : (void *)*(size_t const *)(x))  //undocumented hack to get shared library's address in memory by its handle
 void *elf_hook(char const *library_filename, void const *library_address, char const *function_name, void const *substitution_address);
 
 
