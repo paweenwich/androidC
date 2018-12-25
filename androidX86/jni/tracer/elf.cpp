@@ -31,7 +31,7 @@
 #include "../util/luascript.h"
 #include "../luaserver/lua_server.hpp"
 #include "../util/elf_hook.h"
-
+#include "../util/DLHook.h"
 
 #define  LOG_TAG    "elf"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
@@ -218,26 +218,48 @@ void elf_addDependency(char *fileIn,char *fileOut,char *dependencyName)
 void (*org_puts)(char *str);
 void hooked_puts(char *str)
 {
-    printf("puts(%s)\n",str);
+    LOGD("hooked_puts(%s)",str);
     org_puts(str);
 }
 
 void elf_test(char *fileIn,char *fileOut)
 {
-    printf("TEST\n");
-    void *handle = dlopen("/data/local/tmp/libtestso.so", RTLD_LAZY);
-    DLSYM_ENSURE_API(handle,void *,Test1,(void));
-    Test1();
-    //void * base1 = LIBRARY_ADDRESS_BY_HANDLE(handle1);
-    void *base1 = (void *)FindBaseLibrary("/data/local/tmp/libtestso.so",getpid());    
-    printf("base1=%08X\n",UINT(base1));
-    //printf("base2=%08X handle1=%08X\n",UINT(base2),UINT(handle1));    
-    printf("puts=%08X\n",UINT(puts));    
-    org_puts = (void (*)(char*))elf_hook("/data/local/tmp/libtestso.so", base1, "puts", (void const *)hooked_puts);
-    printf("original1=%08X\n",UINT(org_puts));    
+    void *handle0 = dlopen("/data/local/tmp/libmain.so", RTLD_LAZY); 
+    if(handle0==NULL){
+	printf("%s",dlerror());
+    }    
+    void *handle1 = dlopen("/data/local/tmp/libunity.so", RTLD_LAZY); 
+    if(handle1==NULL){
+	printf("%s",dlerror());
+    }
+    void *handle2 = dlopen("/data/local/tmp/libmono.so", RTLD_LAZY);    
+    
+    std::vector<HookData> vHook = DLHook::GetDLHookData();
+    DLHook::vHookData.insert(DLHook::vHookData.end(), vHook.begin(), vHook.end());    
+    
+    char *libNames[] = {
+	"/libmono.so",
+	"/libunity.so",
+//	"/libtestso.so",
+	0
+    };
+    for(int i=0;libNames[i]!=NULL;i++){
+        ELFHook elfHook;
+        if(elfHook.Open(libNames[i])){
+	    printf("Open %s success\n",libNames[i]);	    
+	    for(int j=0;j<vHook.size();j++){
+		unsigned int originalAddr=0;
+		if(elfHook.Hook(vHook[j].name, vHook[j].hookAddr,&originalAddr)){
+		    printf("Hook [%s] [%s] original1=%08X\n",libNames[i],vHook[j].name,originalAddr); 		
+		    *(vHook[j].originalAddr) = originalAddr;
+		}
+	    }
+	}
+	
+    }
 
-    Test1();
-    //void *elf_hook("libtestso.so", void const *library_address, char const *function_name, void const *substitution_address);
+
+    
 }
 
 void elf(char *cmd,char *param1,char *param2,char *param3)

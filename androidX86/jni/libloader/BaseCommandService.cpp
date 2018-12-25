@@ -96,7 +96,7 @@ void BaseCommandService::dump(SimpleSocket &sock,std::string mode)
 {
     ProcessScanner pscan;
     int pid = getpid();
-    pscan.open(pid);
+    pscan.open(pid,false);
     std::vector<ProcMapData> ret;
     if((mode=="")||(mode=="A"))ret = pscan.getAll();
     if(mode=="H")ret = pscan.getHeap();

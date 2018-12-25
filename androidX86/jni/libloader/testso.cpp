@@ -36,6 +36,8 @@ void Test1()
 {
     LOGD("TEST1()");
     printf("Test1()\n");
+    void *handle = dlopen("liblog.so", RTLD_LAZY);
+    
 }
 
 

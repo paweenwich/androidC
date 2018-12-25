@@ -125,7 +125,7 @@ public:
     std::vector<ProcMapData> vProcMap;
     ProcessScanner();
     virtual ~ProcessScanner();
-    bool open(int _pid);
+    bool open(int _pid,bool flgOpenFile = true);
     void openFile();
     void close();
     void readMap();
@@ -140,6 +140,7 @@ public:
     std::vector<ProcMapData> getWriteable();
     std::vector<ProcMapData> getNotExecute();
     std::vector<ProcMapData> getAll();
+    std::vector<ProcMapData> getBase(std::vector<std::string> filter);
     bool buffToFile(unsigned int bufferAddr,int size,char *fileName);
     static void memScan(unsigned int dataAddr,int dataSize,unsigned int memAddr,int memSize,std::vector<ScanResult> &result,int step);
 private:

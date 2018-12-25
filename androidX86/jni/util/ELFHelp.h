@@ -26,9 +26,11 @@ public:
     Elf32_Shdr *shdrStringtable;
     Elf32_Shdr *shdrDynsym;
     Elf32_Shdr *shdrDynamic;
+    Elf32_Shdr *shdrDynstr;
     Elf32_Dyn *dynStrTab;
     std::vector<Elf32_Shdr *> sectionHeader;
     std::vector<Elf32_Phdr *> programHeader;
+    bool flgExe;
     ELFHelp();
     ELFHelp(const ELFHelp& orig);
     virtual ~ELFHelp();
@@ -63,6 +65,7 @@ public:
     bool AddDependency(char *name);
     bool AddDependencyByAppend(char *name);
     bool AddDependencyByGNU(char *name);
+    int FindSymbolByName(char *name);
 private:
 
 };

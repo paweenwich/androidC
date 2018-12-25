@@ -11,7 +11,7 @@
  * Created on December 23, 2018, 12:55 PM
  */
 
-#include "DLHook.h"
+
 
 #include <stdio.h>
 #include <sys/ptrace.h>
@@ -37,8 +37,51 @@
 #include <../util/util.hpp>
 #include <../util/AndroidLogger.h>
 
+#include "DLHook.h"
+
 #define  LOG_TAG    "DLHook"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
+std::vector<HookData> DLHook::vHookData;
 
+
+void* (*original_dlsym)(void *handle, const char *symbol);
+void* hooked_dlsym(void *handle, const char *symbol)
+{
+    LOGD("hooked_dlsym(%08X,%s)",UINT(handle),symbol);
+    if(original_dlsym!=NULL){
+	return original_dlsym(handle,symbol);
+    }else{
+	LOGD("WARNING: original_dlsym not set");
+	return NULL;
+    }
+    
+}
+
+void* (*original_dlopen)(const char *filename, int flag);
+void* hooked_dlopen(const char *filename, int flag)
+{
+    LOGD("hooked_dlopen(%s,%08X)",filename,flag);  
+    if(original_dlopen!=NULL){
+	return original_dlopen(filename,flag);
+    }else{
+	LOGD("WARNING: original_dlopen not set");
+	return NULL;
+    }
+}
+
+std::vector<HookData> DLHook::GetDLHookData()
+{
+    std::vector<HookData> ret;
+    {
+	HookData h = { "dlsym", (void *)hooked_dlsym, (unsigned int *)&original_dlsym}; 
+        ret.push_back(h);
+    }
+    {
+	HookData h = { "dlopen", (void *)hooked_dlopen, (unsigned int *)&original_dlopen}; 
+        ret.push_back(h);
+    }
+    
+    return ret;
+}

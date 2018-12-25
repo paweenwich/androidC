@@ -8,13 +8,15 @@
 #include <unistd.h>
 #include <errno.h>
 #include <android/log.h>
-#include "../util/util.hpp"
+#include "util.hpp"
+#include "ProcessScanner.hpp"
+#include "elf_hook.h"
 //rename standart types for convenience
 // make sure we use 32 bit
 #undef __x86_64
 #define  LOG_TAG    "elfhook"
-//#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#define  LOGD(...)  printf(__VA_ARGS__);printf("\n")
+#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+//#define  LOGD(...)  printf(__VA_ARGS__);printf("\n")
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 
@@ -292,9 +294,9 @@ int symbol_by_name(int d, Elf_Shdr *section, char const *name, Elf_Sym **symbol,
         return errno;
 
     amount = section->sh_size / sizeof(Elf_Sym);
-
+    LOGD("symbol_by_name: amount=%d",amount);
     for (i = 0; i < amount; ++i){
-        LOGD("%s %s",name,&strings[symbols[i].st_name]);
+        //LOGD("%s %s",name,&strings[symbols[i].st_name]);
         if (!strcmp(name, &strings[symbols[i].st_name]))
         {
             *symbol = (Elf_Sym *)malloc(sizeof(Elf_Sym));
@@ -359,8 +361,13 @@ void *elf_hook(char const *module_filename, void const *module_address, char con
         LOGD("FAIL: module_address %08X not readable",UINT(module_address));
         return NULL;
     }
-    
-
+    Elf32_Ehdr *header = (Elf32_Ehdr *)module_address;
+    bool flgExe = false;
+    if(header->e_type==ET_EXEC){
+	flgExe = true;
+    }
+    //LOGD("e_ident=%d",header->e_ident[EI_CLASS]);
+    //LOGD("e_ident=%d %d",header->e_type,ET_DYN);
     if (!pagesize)
         pagesize = sysconf(_SC_PAGESIZE);
 
@@ -385,16 +392,37 @@ void *elf_hook(char const *module_filename, void const *module_address, char con
 
         return original;
     }
-    LOGD("get all sections");    
-    ShowMaps(getpid());
+    LOGD("get all sections dynsym=%08X symbol=%08X",UINT(dynsym),UINT(symbol));    
+    //ShowMaps(getpid());
     //release the data used
-    free(dynsym);
-    free(symbol);
+    if(dynsym!=NULL){
+	free(dynsym);
+    }else{
+	LOGD("FAIL: dynsym not found");	
+	return original;
+    }
+    
+    if(symbol!=NULL){
+	free(symbol);
+    }else{
+	LOGD("WARNING: symbol %s not found",name);	
+	return original;
+    }
 
-    rel_plt_table = (Elf_Rel *)(((size_t)module_address) + rel_plt->sh_addr);  //init the ".rel.plt" array
-    rel_plt_amount = rel_plt->sh_size / sizeof(Elf_Rel);  //and get its size
+    LOGD("rel_plt->sh_addr=%08X",rel_plt->sh_addr);
+    if(flgExe){
+	rel_plt_table = (Elf_Rel *)rel_plt->sh_addr;
+    }else{
+	rel_plt_table = (Elf_Rel *)(((size_t)module_address) + rel_plt->sh_addr);  //init the ".rel.plt" array
+    }
+    rel_plt_amount = rel_plt->sh_size / sizeof(Elf_Rel);  //and get its size    
 
-    rel_dyn_table = (Elf_Rel *)(((size_t)module_address) + rel_dyn->sh_addr);  //init the ".rel.dyn" array
+    LOGD("rel_dyn->sh_addr=%08X",rel_dyn->sh_addr);
+    if(flgExe){
+	rel_dyn_table = (Elf_Rel *)rel_dyn->sh_addr;  //init the ".rel.dyn" array
+    }else{
+	rel_dyn_table = (Elf_Rel *)(((size_t)module_address) + rel_dyn->sh_addr);  //init the ".rel.dyn" array	
+    }
     rel_dyn_amount = rel_dyn->sh_size / sizeof(Elf_Rel);  //and get its size
 //release the data used
     free(rel_plt);
@@ -410,8 +438,8 @@ void *elf_hook(char const *module_filename, void const *module_address, char con
         return NULL;
     }
     
-    DumpHex(stdout,rel_plt_table,rel_plt_amount * sizeof(Elf_Rel));
-    DumpHex(stdout,rel_dyn_table,rel_dyn_amount * sizeof(Elf_Rel));
+    //DumpHex(stdout,rel_plt_table,rel_plt_amount * sizeof(Elf_Rel));
+    //DumpHex(stdout,rel_dyn_table,rel_dyn_amount * sizeof(Elf_Rel));
     
     if(name_index ==0){
         LOGD("FAIL: name %s not found in %s",name,module_filename);
@@ -420,16 +448,20 @@ void *elf_hook(char const *module_filename, void const *module_address, char con
     
 //now we've got ".rel.plt" (needed for PIC) table and ".rel.dyn" (for non-PIC) table and the symbol's index
     for (i = 0; i < rel_plt_amount; ++i){  //lookup the ".rel.plt" table
-        LOGD("i=%d",i);
+        //LOGD("i=%d",i);
         if (ELF_R_SYM(rel_plt_table[i].r_info) == name_index)  //if we found the symbol to substitute in ".rel.plt"
         {
-            LOGD("found at %d addr=%08X",i,UINT(module_address) + rel_plt_table[i].r_offset);
-            original = (void *)*(size_t *)(((size_t)module_address) + rel_plt_table[i].r_offset);  //save the original function address
+	    unsigned int foundAddr = UINT(module_address) + rel_plt_table[i].r_offset;
+	    if(flgExe){
+		foundAddr = rel_plt_table[i].r_offset;
+	    }
+            LOGD("found at %d addr=%08X",i,foundAddr);
+            original = (void *)*(size_t *)(foundAddr);  //save the original function address
             LOGD("original %08X",UINT(original));
             //*(size_t *)(((size_t)module_address) + rel_plt_table[i].r_offset) = (size_t)substitution;  //and replace it with the substitutional
-            unsigned int memAddr = UINT(module_address) + rel_plt_table[i].r_offset;
-            if(!WriteMemory(memAddr,&substitution,sizeof(substitution))){
-                LOGD("FAIL: can not write memory at %08X",memAddr);
+            //unsigned int memAddr = UINT(module_address) + rel_plt_table[i].r_offset;
+            if(!WriteMemory(foundAddr,&substitution,sizeof(substitution))){
+                LOGD("FAIL: can not write memory at %08X",foundAddr);
                 return NULL;
             }
 
@@ -467,7 +499,80 @@ void *elf_hook(char const *module_filename, void const *module_address, char con
 
     return original;
 }
+
+
+
 #ifdef __cplusplus
 }
 #endif
+
+ELFHook::~ELFHook()
+{
+    
+}
+
+bool ELFHook::Open(char *fileName)
+{
+    ProcessScanner procscan;
+    procscan.open(getpid(),false);
+    procscan.readMap();
+    std::vector<std::string> vFilter;
+    vFilter.push_back(fileName);
+    std::vector<ProcMapData> vProcMap = procscan.getBase(vFilter);
+    if(vProcMap.size()<=0){
+	LOGD("FAIL: ELFHook Library not found [%s]",fileName);
+	return false;
+    }
+    libName = std::string(vProcMap[0].desc);
+    baseAddress = vProcMap[0].startAddr;
+    if(elfHelp.Load((char *)libName.c_str())<0){
+	LOGD("FAIL: ELFHook Open [%s]",libName.c_str());
+	return false;
+    }
+    LOGD("ELFHook [%s] addr=%08X",libName.c_str(),baseAddress);
+    return true;
+}
+bool ELFHook::Hook(char *function_name, void *substitution, unsigned int *originalAddr)
+{
+    LOGD("ELFHook Hook [%s] with addr=%08X",function_name,UINT(substitution));
+    // find name index 
+    //elfHelp.shdrDynsym
+    int nameIndex = elfHelp.FindSymbolByName(function_name);
+    if(nameIndex < 0){
+	LOGD("ELFHook Hook name [%s] not found",function_name);
+	return false;
+    }
+    LOGD("ELFHook Hook nameIndex=%d",nameIndex);
+    Elf32_Shdr *shdrRelPlt = elfHelp.GetSectionHeaderByName(".rel.plt");
+    if(shdrRelPlt==NULL){
+	LOGD("ELFHook Hook .rel.plt not found");
+	return false;
+    }
+    //elfHelp.Show(shdrRelPlt);
+    int num = shdrRelPlt->sh_size/sizeof(Elf_Rel);
+    Elf_Rel *rel_plt = (Elf_Rel *)elfHelp.At(shdrRelPlt->sh_offset);
+    //scan for name
+    for(int i=0;i<num;i++){
+	if(ELF_R_SYM(rel_plt[i].r_info) == nameIndex){
+	    //printf("Found at %d\n",i);
+	    unsigned int foundAddr = baseAddress + rel_plt[i].r_offset;
+	    if(elfHelp.flgExe){
+		foundAddr = rel_plt[i].r_offset;
+	    }
+            LOGD("ELFHook Hook found at %d addr=%08X",i,foundAddr);
+            *originalAddr = (unsigned int)*(size_t *)(foundAddr);  
+            LOGD("original %08X",*originalAddr);
+            if(!WriteMemory(foundAddr,&substitution,sizeof(substitution))){
+                LOGD("FAIL: ELFHook Hook can not write memory at %08X",foundAddr);
+                return false;
+            }else{
+		LOGD("ELFHook Hook %s success",function_name);
+	    }
+	    return true;
+	}
+    }
+    return false;
+}
+
+
 //==================================================================================================

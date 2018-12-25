@@ -58,6 +58,7 @@ ELFHelp::ELFHelp(const ELFHelp& orig) {
 int ELFHelp::Load(char *fileName)
 {
     this->fileName = fileName;
+    flgExe = false;
     buffer =  ReadFile(fileName);
     if(buffer.size()>0){
         header = (Elf32_Ehdr *)At(0);
@@ -66,8 +67,9 @@ int ELFHelp::Load(char *fileName)
 	    return -1;
 	}
 	if(header->e_type != ET_DYN ){
-	    printf("Fail: e_type != ET_DYN possible executable file, only so supported\n");
-	    return -1;
+	    //printf("Fail: e_type != ET_DYN possible executable file, only so supported\n");
+	    //return -1;
+	    flgExe = true;
 	}
 /*	if(header->e_entry !=0){
 	    printf("Fail: e_entry !=0 possible executable file, only so supported\n");
@@ -90,6 +92,9 @@ int ELFHelp::Load(char *fileName)
             }
 	    if(shdr->sh_type == SHT_DYNAMIC){
 		this->shdrDynamic = shdr;
+	    }
+	    if(strcmp(".dynstr",GetHeaderString(shdr->sh_name))==0){
+		this->shdrDynstr = shdr;
 	    }
         }
 	if(this->shdrDynsym == NULL){
@@ -248,6 +253,7 @@ void ELFHelp::Show(Elf32_Dyn *dyn)
     switch(dyn->d_tag){
 	case DT_NEEDED:
 	    printf("%d %08X DT_NEEDED [%s]\n",dyn->d_tag,dyn->d_un.d_val,GetDynamicString(dyn->d_un.d_val));
+	    //printf("%d %08X DT_NEEDED\n",dyn->d_tag,dyn->d_un.d_val);
 	    break;
 	case DT_STRTAB:	    
 	    printf("%d %08X DT_STRTAB\n",dyn->d_tag,dyn->d_un.d_val);
@@ -373,7 +379,11 @@ char *ELFHelp::GetHeaderString(int index)
 
 char *ELFHelp::GetDynamicString(int index)
 {
-    return GetString(dynStrTab->d_un.d_val + index);
+    //printf("%08X %08X\n",shdrDynstr->sh_addr,shdrDynstr->sh_offset);
+    //printf("GetDynamicString %08X %08X\n",dynStrTab->d_un.d_val,index);
+    //return GetString(dynStrTab->d_un.d_val + index);
+    /* use section offset is better than dynamic->d_un because in exe d_un is virtual address*/
+    return GetString(shdrDynstr->sh_offset + index);
 }
 
 char *ELFHelp::GetString(int addr)
@@ -515,6 +525,21 @@ Elf32_Shdr * ELFHelp::GetSectionHeaderByName(char *name)
 	}
     }
     return NULL;
+}
+
+int ELFHelp::FindSymbolByName(char *name)
+{
+    int num = shdrDynsym->sh_size / sizeof(Elf_Sym);
+    //printf("%d %s\n",num,name);
+    Elf_Sym *symbols = (Elf_Sym *)At(shdrDynsym->sh_offset);
+    for(int i=0;i<num;i++){
+	char *symName = GetDynamicString(symbols[i].st_name);
+	//printf("%d %s\n",symbols[i].st_name,symName);
+	if(strcmp(symName,name)==0){
+	    return i;
+	}
+    }
+    return -1;
 }
 
 /* 

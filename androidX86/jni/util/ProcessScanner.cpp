@@ -52,12 +52,17 @@ void ProcessScanner::openFile()
     f = fopen(fileName,"rw");
 }
 
-bool ProcessScanner::open(int _pid)
+bool ProcessScanner::open(int _pid,bool flgOpenFile)
 {
     pid = _pid;
     readMap();
-    openFile();
-    return (f != NULL);
+    if(flgOpenFile){
+        openFile();
+	return (f != NULL);
+    }else{
+	return true;
+    }
+
 }
 
 void ProcessScanner::close()
@@ -256,6 +261,21 @@ std::vector<ProcMapData> ProcessScanner::getAll()
     std::vector<ProcMapData> ret;
     for(int i=0;i<vProcMap.size();i++){
 	ret.push_back(vProcMap[i]);
+    }
+    return ret;
+}
+
+std::vector<ProcMapData> ProcessScanner::getBase(std::vector<std::string> filter)
+{
+    std::vector<ProcMapData> ret;
+    for(int j=0;j<filter.size();j++){    
+	for(int i=0;i<vProcMap.size();i++){
+	    if(strstr(vProcMap[i].desc,filter[j].c_str())!=NULL){
+		// assume first one is base
+		ret.push_back(vProcMap[i]);
+		break;
+	    }
+	}
     }
     return ret;
 }

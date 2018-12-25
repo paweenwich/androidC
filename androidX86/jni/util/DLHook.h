@@ -14,6 +14,17 @@
 #ifndef DLHOOK_H
 #define DLHOOK_H
 
+typedef struct _HookData {
+    char *name;
+    void *hookAddr;
+    unsigned int *originalAddr;
+} HookData;
+
+class DLHook {
+public:
+    static std::vector<HookData> vHookData;
+    static std::vector<HookData> GetDLHookData();
+};
 
 
 #endif /* DLHOOK_H */

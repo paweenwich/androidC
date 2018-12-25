@@ -8,6 +8,7 @@ Nox
 pull whilecard file, need cygwin (tr and xargs
 adb shell 'ls sdcard/gps*.trace' | tr -d '\r' | xargs -n1 adb pull
 adb logcat testso:* *:s
+adb logcat *:W
 
 To Dump Assembly-CSharp
 - use X86 gdbserver, and forward port
