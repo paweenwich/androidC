@@ -256,6 +256,17 @@ std::vector<ProcMapData> ProcessScanner::getNotExecute()
     return ret;
 }
 
+std::vector<ProcMapData> ProcessScanner::getExecute()
+{
+    std::vector<ProcMapData> ret;
+    for(int i=0;i<vProcMap.size();i++){
+	if(strcmp(vProcMap[i].protection,"r-xp")==0){
+	    ret.push_back(vProcMap[i]);
+	}
+    }
+    return ret;
+}
+
 std::vector<ProcMapData> ProcessScanner::getAll()
 {
     std::vector<ProcMapData> ret;

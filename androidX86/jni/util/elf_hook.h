@@ -40,6 +40,7 @@ public:
     unsigned int baseAddress;
     bool Open(char *library_filename);
     bool Hook(char *function_name, void *substitution_address, unsigned int *originalAddr);
+    static void ShowMap();
     ~ELFHook();
 };
 

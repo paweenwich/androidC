@@ -139,6 +139,7 @@ public:
     std::vector<ProcMapData> getHeap();
     std::vector<ProcMapData> getWriteable();
     std::vector<ProcMapData> getNotExecute();
+    std::vector<ProcMapData> getExecute();
     std::vector<ProcMapData> getAll();
     std::vector<ProcMapData> getBase(std::vector<std::string> filter);
     bool buffToFile(unsigned int bufferAddr,int size,char *fileName);

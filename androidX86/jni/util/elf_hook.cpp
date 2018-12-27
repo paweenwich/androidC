@@ -14,7 +14,7 @@
 //rename standart types for convenience
 // make sure we use 32 bit
 #undef __x86_64
-#define  LOG_TAG    "elfhook"
+#define  LOG_TAG    "Hook"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 //#define  LOGD(...)  printf(__VA_ARGS__);printf("\n")
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
@@ -574,5 +574,17 @@ bool ELFHook::Hook(char *function_name, void *substitution, unsigned int *origin
     return false;
 }
 
+void ELFHook::ShowMap()
+{
+    ProcessScanner procscan;
+    procscan.open(getpid(),false);
+    procscan.readMap();
+    std::vector<ProcMapData> vProcMap = procscan.getExecute();
+    for(int i=0;i<vProcMap.size();i++){
+	std::string line = vProcMap[i].ToString();
+	LOGD("%s",line.c_str());
+    }
+    
+}
 
 //==================================================================================================

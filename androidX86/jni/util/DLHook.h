@@ -11,6 +11,9 @@
  * Created on December 23, 2018, 12:55 PM
  */
 
+#include <string>
+#include <vector>
+
 #ifndef DLHOOK_H
 #define DLHOOK_H
 
@@ -22,8 +25,13 @@ typedef struct _HookData {
 
 class DLHook {
 public:
-    static std::vector<HookData> vHookData;
+    //static std::vector<HookData> vHookData;
+    //static std::vector<std::string> vWatchlibrary;
     static std::vector<HookData> GetDLHookData();
+    static std::vector<std::string> GetWatchlibrary();
+    static bool IsWatched(char *name);
+    //static void AddWatch(char *name);
+    static void ReHook(char *libname);
 };
 
 

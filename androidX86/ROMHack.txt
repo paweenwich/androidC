@@ -8,7 +8,7 @@ Nox
 pull whilecard file, need cygwin (tr and xargs
 adb shell 'ls sdcard/gps*.trace' | tr -d '\r' | xargs -n1 adb pull
 adb logcat testso:* *:s
-adb logcat *:W
+adb logcat -c
 
 To Dump Assembly-CSharp
 - use X86 gdbserver, and forward port
@@ -122,3 +122,5 @@ The linux kernel does not really care about the dynamic segment, but looking for
 
     success with adddependencyByGNU
     success with adddependency  
+
+can not use C++ static class variable between thread, some how it not shared

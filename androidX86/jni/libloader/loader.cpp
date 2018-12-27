@@ -18,16 +18,20 @@
 #include <cctype>
 #include <dirent.h>
 #include <pthread.h>
+#include <elf.h>
 
 #include "../util/util.hpp"
 #include "../util/PtraceUtil.hpp"
 #include "../util/logger.h"
 #include "../util/payload.hpp"
-#include "../util/elf_help.h"
+//#include "../util/elf_help.h"
+#include "../util/elf_hook.h"
+#include "../util/DLHook.h"
+
 
 #include "../util/SimpleTCPServer.hpp"
 
-#define  LOG_TAG    "loader"
+#define  LOG_TAG    "Hook"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
@@ -89,10 +93,41 @@ void * ServerService(SimpleTCPServerParam *arg)
     LOGD("%d End",gettid());
 }
 
+void Hook()
+{
+    ELFHook::ShowMap();
+    //DLHook::AddWatch("/libunity.so");
+    std::vector<HookData> vHook = DLHook::GetDLHookData();
+    //DLHook::vHookData.insert(DLHook::vHookData.end(), vHook.begin(), vHook.end());    
+    
+    char *libNames[] = {
+	"/libmono.so",
+//	"/libunity.so",
+	"/libmain.so",
+	0
+    };
+    for(int i=0;libNames[i]!=NULL;i++){
+        ELFHook elfHook;
+        if(elfHook.Open(libNames[i])){
+	    LOGD("Open %s success",libNames[i]);	    
+	    for(int j=0;j<vHook.size();j++){
+		unsigned int originalAddr=0;
+		if(elfHook.Hook(vHook[j].name, vHook[j].hookAddr,&originalAddr)){
+		    LOGD("Hook [%s] [%s] original1=%08X",libNames[i],vHook[j].name,originalAddr); 		
+		    *(vHook[j].originalAddr) = originalAddr;
+		}
+	    }
+	}
+	
+    }
+}
+
 
 void *ServerStart(void *param)
 {
-
+    //LOGD("S wsize=%d %d",DLHook::vWatchlibrary.size(),DLHook::vHookData.size());    
+    //LOGD("S %08X\n",UINT(&DLHook::vWatchlibrary));
+    //LOGD("S wsize=%d %d",DLHook::vWatchlibrary.size(),DLHook::vHookData.size());
     std::string exeName = GetCurrentExecutable();
     LOGD("EXENAME %s",exeName.c_str());
     SimpleTCPServer server;    
@@ -106,9 +141,15 @@ void *ServerStart(void *param)
 void __attribute__ ((constructor)) armhlp_load()
 {
     LOGD("LIBRARY LOADED FROM PID %d", getpid());
-
+    Hook();        
+    //LOGD("H1 wsize=%d %d",DLHook::vWatchlibrary.size(),DLHook::vHookData.size());
+    //LOGD("H1 %08X\n",UINT(&DLHook::vWatchlibrary));
+    
     pthread_t t;
     pthread_create(&t, NULL, ServerStart,new BaseCommandService());
+    sleep(2);
+    //LOGD("H2 wsize=%d %d",DLHook::vWatchlibrary.size(),DLHook::vHookData.size());
+    //LOGD("H2 %08X\n",UINT(&DLHook::vWatchlibrary));
     LOGD("THREAD CREATED");
 }
 

@@ -222,23 +222,44 @@ void hooked_puts(char *str)
     org_puts(str);
 }
 
+void *testThread(void *param)
+{
+    void *handle2 = dlopen("/data/local/tmp/libmono.so", RTLD_LAZY);  
+    //printf("testThread done %d\n",DLHook::vWatchlibrary.size());
+}
+
+
 void elf_test(char *fileIn,char *fileOut)
 {
     void *handle0 = dlopen("/data/local/tmp/libmain.so", RTLD_LAZY); 
     if(handle0==NULL){
 	printf("%s",dlerror());
     }    
+    void *handle1 = dlopen("/data/local/tmp/libloader.so", RTLD_LAZY); 
+    if(handle1==NULL){
+	printf("%s",dlerror());
+    }    
+    //DLHook::AddWatch("/libunity.so");
+/*    
     void *handle1 = dlopen("/data/local/tmp/libunity.so", RTLD_LAZY); 
     if(handle1==NULL){
 	printf("%s",dlerror());
     }
-    void *handle2 = dlopen("/data/local/tmp/libmono.so", RTLD_LAZY);    
     
+    
+    
+    //ELFHook::ShowMap();
+    DLHook::AddWatch("/libmono.so");
+    //DLHook::AddWatch("/libmono.so");
+    //if(DLHook::IsWatched("/data/local/tmp/libmono.so")){
+	//printf("Watched size=%d\n",DLHook::vWatchlibrary.size());
+	//exit(0);
+    //}
     std::vector<HookData> vHook = DLHook::GetDLHookData();
     DLHook::vHookData.insert(DLHook::vHookData.end(), vHook.begin(), vHook.end());    
     
     char *libNames[] = {
-	"/libmono.so",
+	"/elf",
 	"/libunity.so",
 //	"/libtestso.so",
 	0
@@ -257,8 +278,11 @@ void elf_test(char *fileIn,char *fileOut)
 	}
 	
     }
-
-
+*/
+    //printf("%d\n",DLHook::vWatchlibrary.size());
+    pthread_t t;
+    pthread_create(&t, NULL, testThread,0);
+    sleep(3);
     
 }
 
