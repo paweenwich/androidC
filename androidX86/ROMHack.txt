@@ -9,7 +9,7 @@ pull whilecard file, need cygwin (tr and xargs
 adb shell 'ls sdcard/gps*.trace' | tr -d '\r' | xargs -n1 adb pull
 adb logcat testso:* *:s
 adb logcat -c
-
+adb shell 'ls /data/local/tmp/loadbufferx/*' | tr -d '\r' | xargs -n1 adb pull
 To Dump Assembly-CSharp
 - use X86 gdbserver, and forward port
 - use Win version of gdb connect to port
@@ -124,3 +124,8 @@ The linux kernel does not really care about the dynamic segment, but looking for
     success with adddependency  
 
 can not use C++ static class variable between thread, some how it not shared
+
+TODO:
+- dump dir (storage/emulated/0/Android/obb/com.gravity.romg/main.495.com.gravity.romg.obb/...) while in proc
+- copy mono dll when loaded to check if it encrypt
+- handle 'temp buffer'
