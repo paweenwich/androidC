@@ -1,0 +1,1 @@
+if jit then require('jit.opt').start('sizemcode=256','maxmcode=256') for i=1,1000 do end end

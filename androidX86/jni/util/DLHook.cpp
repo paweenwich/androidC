@@ -76,9 +76,9 @@
 #define HOOKFUNC(n) \
 	if(strcmp(#n,symbol)==0){\
 	    LOGD("hooked it");\
-	    dlsym_ret = (void *) hooked_ ## n;\
 	    unsigned int *ptr = (unsigned int *)&original_ ## n;\
 	    *ptr = UINT(dlsym_ret);\
+	    dlsym_ret = (void *) hooked_ ## n;\
 	    return dlsym_ret;\
 	}
 
@@ -316,13 +316,56 @@ HOOKFUNCPROT(int, luaL_loadstring, (lua_State *L, char *s))
     }
     
 }
-
+/*
 HOOKFUNCPROT(int, luaL_loadbufferx, (lua_State *L, char *buff,size_t sz, char *name, char *mode))
 {
     if(ORG(luaL_loadbufferx)!=NULL){
 	LOGD("hooked luaL_loadbufferx %08X %08X %d %s %s",UINT(L),UINT(buff),sz,name,mode);
 	int ret = ORG(luaL_loadbufferx)(L,buff,sz,name,mode);
 	return ret;
+    }else{
+	LOGD("WARNING: original luaL_loadbufferx not set");
+	return 0;
+    }
+    
+}
+*/ 
+
+
+HOOKFUNCPROT(int, luaL_loadbufferx, (lua_State *L, char *buff,size_t sz, char *name, char *mode))
+{
+    if(ORG(luaL_loadbufferx)!=NULL){
+	LOGD("hooked luaL_loadbufferx %08X %08X %d %s %s",UINT(L),UINT(buff),sz,name,mode);
+        char cleanName[128];
+        if(strcmp(name,"temp buffer")==0){
+            sprintf(cleanName,"temp_buffer_%08X",sz);
+        }else{
+            strcpy(cleanName,name);
+            for(int i=0;i<strlen(cleanName);i++){
+                if(cleanName[i] == '@') {cleanName[i] = 'A';continue;}
+                if(cleanName[i] == '/') {cleanName[i] = '_';continue;}
+                if(cleanName[i] == ' ') {cleanName[i] = '_';continue;}
+            }
+        }
+        char outFileName[256];
+        sprintf(outFileName,"/data/local/tmp/loadbufferx/%s",cleanName);
+        if(DumpMemory(UINT(buff),sz,outFileName)){
+            LOGD("Save %s success",outFileName);
+        }else{
+            LOGD("Save %s fail",outFileName);
+        }
+        //check if we have custom script 
+        char customFileName[256];
+        sprintf(customFileName,"/data/local/tmp/script/%s",customFileName);        
+        if(isFileExist(customFileName)){
+            LOGD("Custom file found use it");
+            std::vector<unsigned char> buffer = ReadFile(customFileName);
+            int ret = ORG(luaL_loadbufferx)(L,(char *)&buffer[0],buffer.size(),name,mode);
+            return ret;
+        }else{
+            int ret = ORG(luaL_loadbufferx)(L,buff,sz,name,mode);
+            return ret;
+        }
     }else{
 	LOGD("WARNING: original luaL_loadbufferx not set");
 	return 0;
@@ -358,27 +401,27 @@ HOOKFUNCPROT(void*,dlsym,(void *handle, const char *symbol))
 	    return dlsym_ret;
 	}
 	LOGD("hooked_dlsym(%08X,%s) return %08X",UINT(handle),symbol,UINT(dlsym_ret));
-	HOOKFUNC(mono_assembly_load_from);
-	HOOKFUNC(mono_assembly_load_from_full);
-	HOOKFUNC(mono_assembly_open);
-	HOOKFUNC(mono_image_open_from_data_full);
-	HOOKFUNC(mono_image_open_from_data_with_name);
-	HOOKFUNC(mono_debug_init);
-	HOOKFUNC(mono_debug_open_image_from_memory);
-	HOOKFUNC(mono_is_debugger_attached);
-	HOOKFUNC(mono_domain_get);
-	HOOKFUNC(mono_get_root_domain);
-	HOOKFUNC(mono_runtime_object_init);
-	HOOKFUNC(mono_runtime_invoke);
-	HOOKFUNC(mono_runtime_invoke_array);
-	HOOKFUNC(mono_runtime_exec_main);
-	HOOKFUNC(luaL_newstate);
-	HOOKFUNC(luaL_openlibs);
-	HOOKFUNC(luaL_ref);
-	HOOKFUNC(luaL_unref);
+	//HOOKFUNC(mono_assembly_load_from);
+	//HOOKFUNC(mono_assembly_load_from_full);
+	//HOOKFUNC(mono_assembly_open);
+	//HOOKFUNC(mono_image_open_from_data_full);
+	//HOOKFUNC(mono_image_open_from_data_with_name);
+	//HOOKFUNC(mono_debug_init);
+	//HOOKFUNC(mono_debug_open_image_from_memory);
+	//HOOKFUNC(mono_is_debugger_attached);
+	//HOOKFUNC(mono_domain_get);
+	//HOOKFUNC(mono_get_root_domain);
+	//HOOKFUNC(mono_runtime_object_init);
+	//HOOKFUNC(mono_runtime_invoke);
+	//HOOKFUNC(mono_runtime_invoke_array);
+	//HOOKFUNC(mono_runtime_exec_main);
+	//HOOKFUNC(luaL_newstate);
+	//HOOKFUNC(luaL_openlibs);
+	//HOOKFUNC(luaL_ref);
+	//HOOKFUNC(luaL_unref);
 	HOOKFUNC(luaL_loadstring);
 	HOOKFUNC(luaL_loadbufferx);
-	HOOKFUNC(lua_atpanic);	
+	//HOOKFUNC(lua_atpanic);	
 	return dlsym_ret;
     }else{
 	LOGD("WARNING: original_dlsym not set");

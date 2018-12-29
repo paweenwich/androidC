@@ -1,4 +1,3 @@
-#!/system/bin/sh
 if [ $# -ne 2 ] ; then
     echo './install.sh I|U|S filename'
     exit 1

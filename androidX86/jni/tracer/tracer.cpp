@@ -995,6 +995,51 @@ void testLoader()
     //m.unMap();
 }
 
+void decryptDes()
+{
+    void *handle = dlopen("/data/local/tmp/libslua.so",RTLD_NOW);
+    if(handle!=NULL) printf("load success\n");
+    MONO_API(handle,void,InitDes,(void));
+    MONO_API(handle,unsigned int,GetDesCodeLenth,(void *));
+    MONO_API(handle,void,desDKey,(void *,int,void *));
+    MONO_API(handle,int,IsDesCode,(void *,int));
+    
+    
+    std::string path = "/data/local/tmp/loadbufferx";
+    std::vector<std::string> files = DirectoryListFile(path);
+    for(int i=0;i<files.size();i++){
+        char fileName[512];
+        strcpy(fileName,files[i].c_str());
+        if(strcmp(fileName,".")==0) continue;
+        if(strcmp(fileName,"..")==0) continue;
+        if(strstr(fileName,".lua")!=NULL) continue;
+        std::string inFileName = path + "/" + files[i];
+        std::vector<unsigned char> buffer = ReadFile(inFileName.c_str());
+        int isDesCode = IsDesCode(&buffer[0],buffer.size());
+        printf("%d %s\n",isDesCode,fileName);
+        if(isDesCode == 0){
+            int outSize = GetDesCodeLenth(&buffer[0]);
+            printf("%08X %08X\n",outSize,buffer.size());
+            if(outSize > 0){
+                char decryptBuffer[outSize];
+                std::string outFileName = path + "/" + files[i] + std::string(".lua");
+                desDKey(&buffer[0],buffer.size(),&decryptBuffer[0]);
+                //printf("%08X\n",ret);
+                if(DumpMemory(UINT(&decryptBuffer[0]),outSize,(char *)outFileName.c_str())){
+                    printf("save %s success\n",(char *)outFileName.c_str());
+                }
+                //DumpHex(stdout,&decryptBuffer[0],outSize);
+                //break;
+            }else{
+                break;
+            }
+        }
+    }
+    //DumpHex(stdout,&buffer[0],outSize);
+    //printf("\n");
+    //DumpHex(stdout,&decryptBuffer[0],outSize);
+    
+}
 
 int main(int argc, char** argv) {
     bool flgDump = false;
@@ -1040,6 +1085,11 @@ int main(int argc, char** argv) {
 		i++;
 		strcpy(libraryName,argv[i]);
 	    }
+	    if(strcmp(argv[i],"-tdecrypt")==0){
+                decryptDes();
+		exit(0);
+	    }
+
 	    if(strcmp(argv[i],"-tloadso")==0){
 		if(argv[i+1]==NULL){
 		    printf("USAGE: %s -tloadso fileName\n",argv[0]);

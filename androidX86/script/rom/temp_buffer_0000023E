@@ -1,0 +1,26 @@
+
+local type=type
+local error=error
+local rawget=rawget
+local getmetatable=getmetatable
+local function index(ud,k)
+    local t=getmetatable(ud)
+    repeat
+        local fun=rawget(t,k)
+        local tp=type(fun)
+        if tp=='function' then
+            return fun
+        elseif tp=='table' then
+            local f=fun[1]
+            if f then
+                return f(ud)
+            else
+                error('property '..k..' is write only')
+            end
+        end
+        t = rawget(t,'__parent')
+    until t==nil
+    error('Can not find '..k)
+end
+
+return index

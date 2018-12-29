@@ -1,0 +1,24 @@
+
+
+local getmetatable=getmetatable
+local rawget=rawget
+local error=error
+local type=type
+local function newindex(ud,k,v)
+    local t=getmetatable(ud)
+    repeat
+        local h=rawget(t,k)
+        if h then
+            if h[2] then
+                h[2](ud,v)
+                return
+            else
+                error('property '..k..' is read only')
+            end
+        end
+        t=rawget(t,'__parent')
+    until t==nil
+    error('can not find '..k)
+end
+
+return newindex

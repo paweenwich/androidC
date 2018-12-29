@@ -150,6 +150,7 @@ std::vector<unsigned char> ReadFileEx(const char *fileName)
 	    }
 	}
     }
+    fclose(f);
     return ret;
 }
 
@@ -452,6 +453,12 @@ bool isDirectoryExist(const char* dir){
     }
 }
 
+bool isFileExist(char *fileName)
+{
+  struct stat buffer;   
+  return (stat (fileName, &buffer) == 0);
+}
+
 size_t GetFilesize(const char* filename) { 
     struct stat st; 
     stat(filename, &st); 
@@ -668,11 +675,12 @@ bool IsReadable(unsigned int addr,int size)
 bool DumpMemory(unsigned int addr,int size,char *fileName)
 {
     if(IsReadable(addr,size)){
-        int fd = open(fileName, O_WRONLY|O_CREAT, 0777);
+        int fd = open(fileName, O_WRONLY|O_CREAT|O_TRUNC, 0777);
         if(fd>0){
             if (write(fd, (void *)addr, size) < 0)
             {
                 LOGD("DumpMemory: write fail");
+                close(fd);
                 return false;
             }
             close(fd);
