@@ -1097,9 +1097,31 @@ int main(int argc, char** argv) {
                 }
                 lua_State *L = slua.luaL_newstate();
                 slua.luaL_openlibs(L);
-                if(!slua.DoFile(L,"/data/local/tmp/script/rom.lua")){
-                    printf("Fail %s\n",slua.lastError.c_str());                
+                for(int i=0;i<200;i++){
+                    if(!slua.DoFile(L,"/data/local/tmp/script/rom.lua")){
+                        printf("Fail %s\n",slua.lastError.c_str());                
+                    }
                 }
+/*                std::vector<unsigned char> buffer = ReadFile("/data/local/tmp/script/rom.lua");
+                printf("size=%d\n",buffer.size());
+                int ret = slua.luaL_loadbufferx(L,(char *)&buffer[0],buffer.size(),"/data/local/tmp/script/rom.lua",NULL);
+                printf("ret=%d\n",ret);
+                if(ret !=0){
+                    std::string lastError = std::string(slua.luaL_tolstring(L, -1,NULL));
+                    LOGE("Slua::DoFile Fail load %s",lastError.c_str());
+                    slua.lua_gettop(L);      // get message from stack
+                    return false;
+                }else{
+                    ret = slua.lua_pcallk(L,0,-1,0,NULL,NULL);
+                    std::string lastError = std::string(slua.luaL_tolstring(L, -1,NULL));
+                    if(ret !=0){
+                        LOGE("Slua::DoFile exec Fail %s",lastError.c_str());
+                        return false;
+                    }else{
+                        lastError = "";
+                        return true;
+                    }
+                }*/
                 exit(0);
             }
 

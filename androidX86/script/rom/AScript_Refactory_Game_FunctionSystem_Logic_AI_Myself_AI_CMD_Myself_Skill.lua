@@ -11,6 +11,12 @@ function AI_CMD_Myself_Skill_Run.Start(self, time, deltaTime, creature, targetCr
 
 	--KKK
 	Debug.Log("KKK AI_CMD_Myself_Skill_Run.Start " .. skill.info:GetSpeakName(creature) .. " ID=" .. skill:GetSkillID());
+	if 12001 == skill:GetSkillID() then
+		Debug.Log("Reload Start");
+		ROM_Reload();
+		Debug.Log("Reload End");
+	end;
+	
 	if not noLimit and creature.data:NoAttack() and not isAttackSkil then
 		skillCanUse = creature:Logic_CheckSkillCanUseByID(skill:GetSkillID())
 		if not skillCanUse then

@@ -5,12 +5,14 @@ function ReadFile(path)
     return s
 end
 
-if Debug ~= nil then
-	Debug.Log("ROM");
+function ROM_Reload()
+	local s = ReadFile("/data/local/tmp/script/rom.lua");
+	local f = loadstring(s);
+	f();
 end;
 
-local s= ReadFile("/data/local/tmp/script/rom.lua");
-print("rom.lua");
-print(s);
+if Debug ~= nil then
+	Debug.Log("ROM Loaded");
+end;
 
-dofile("/data/local/tmp/script/rom1.lua");
+print("ROM Loaded");

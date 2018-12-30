@@ -71,6 +71,7 @@ bool Slua::Init(char *name)
     SLUAAPI(luaL_tolstring);
     SLUAAPI(lua_gettop);
     SLUAAPI(lua_pcallk);
+    SLUAAPI(luaL_loadbufferx);
     return true;
 }
 
@@ -79,13 +80,14 @@ bool Slua::DoFile(lua_State *L,char *fileName)
     int ret = luaL_loadfilex(L,"/data/local/tmp/script/rom.lua",NULL);
     if(ret !=0){
         lastError = std::string(luaL_tolstring(L, -1,NULL));
+        lua_gettop(L);      // get message from stack        
         LOGE("Slua::DoFile Fail load %s",lastError.c_str());
-        lua_gettop(L);      // get message from stack
         return false;
     }else{
-        ret = lua_pcallk(L,0,-1,0,NULL,NULL);
-        lastError = std::string(luaL_tolstring(L, -1,NULL));
+        ret = lua_pcallk(L,0,0,0,NULL,NULL);
         if(ret !=0){
+            lastError = std::string(luaL_tolstring(L, -1,NULL));
+            lua_gettop(L);      // get message from stack
             LOGE("Slua::DoFile exec Fail %s",lastError.c_str());
             return false;
         }else{

@@ -41,6 +41,7 @@
 
 #include "DLHook.h"
 #include "elf_hook.h"
+#include "Slua.h"
 
 // Unity mono compatible 
 //https://github.com/0xd4d/dnSpy-Unity-mono
@@ -62,10 +63,7 @@
 #define MonoMethod void
 #define MonoArray void
 
-#define lua_State void
-#define lua_CFunction void*
-#define lua_KContext void*
-#define lua_KFunction void*
+//#define lua_State void
 
 #define HOOKFUNCORG(r,n,p)  r (* original_ ## n) p
 #define HOOKFUNCDEF(r,n,p)  r hooked_ ## n p
@@ -339,7 +337,6 @@ HOOKFUNCPROT(int, luaL_loadbufferx, (lua_State *L, char *buff,size_t sz, char *n
 }
 */ 
 
-
 HOOKFUNCPROT(int, luaL_loadbufferx, (lua_State *L, char *buff,size_t sz, char *name, char *mode))
 {
     if(ORG(luaL_loadbufferx)!=NULL){
@@ -353,6 +350,20 @@ HOOKFUNCPROT(int, luaL_loadbufferx, (lua_State *L, char *buff,size_t sz, char *n
                 if(cleanName[i] == '@') {cleanName[i] = 'A';continue;}
                 if(cleanName[i] == '/') {cleanName[i] = '_';continue;}
                 if(cleanName[i] == ' ') {cleanName[i] = '_';continue;}
+            }
+        }
+        // check @Script/Refactory/Game/GameLauncher
+        // load my script at this point
+        if(strcmp(name,"@Script/Refactory/Game/GameLauncher")==0){
+            Slua slua;
+            if(slua.Init("libslua.so")){
+                if(slua.DoFile(L,"/data/local/tmp/script/rom.lua")){
+                    LOGD("slua.DoFile rom.lua success");
+                }else{
+                    LOGD("slua.DoFile rom.lua fail");
+                }
+            }else{
+                LOGD("slua.Init rom.lua fail");
             }
         }
         char outFileName[256];
