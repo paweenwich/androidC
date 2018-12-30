@@ -96,6 +96,13 @@ function MainView:Init()
 	
 	local CloseMore = self:FindGO("CloseMore",moreBord)
 	CloseMore.transform.localPosition = Vector3(154,-2,0)
+	
+	--KKK Enable log here
+	LogUtility.SetEnable(true);
+	LogUtility.Info("KKK LogUtility.Info");
+	LogUtility.Warning("KKK LogUtility.Warning");
+	Debug.Log("KKK Debug.Log");
+	--local me = Game.Me();
 end
 
 function MainView:TestFloat()

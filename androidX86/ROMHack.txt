@@ -124,3 +124,14 @@ The linux kernel does not really care about the dynamic segment, but looking for
     success with adddependency  
 
 can not use C++ static class variable between thread, some how it not shared
+
+
+dofile  will eventaull call loadfileex howeve, Slua prepend "." in file before it. 
+create my oen dofile 
+local function slurp(path)
+    local f = io.open(path)
+    local s = f:read("*a")
+    f:close()
+    return s
+end
+ 

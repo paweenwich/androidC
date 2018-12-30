@@ -41,9 +41,9 @@
 #include "../util/SimpleTCPServer.hpp"
 #include "../libloader/BaseCommandService.h"
 #include "../util/ProcessScanner.hpp"
-#include "../util/luascript.h"
-#include "../luaserver/lua_server.hpp"
-
+//#include "../util/luascript.h"
+//#include "../luaserver/lua_server.hpp"
+#include "../util/Slua.h"
 #define stricmp strcasecmp
 
 void *_dlopen;
@@ -1089,6 +1089,19 @@ int main(int argc, char** argv) {
                 decryptDes();
 		exit(0);
 	    }
+            if(strcmp(argv[i],"-tslua")==0){
+                Slua slua;
+                if(!slua.Init()){
+                    printf("%s",dlerror());
+                    exit(0);
+                }
+                lua_State *L = slua.luaL_newstate();
+                slua.luaL_openlibs(L);
+                if(!slua.DoFile(L,"/data/local/tmp/script/rom.lua")){
+                    printf("Fail %s\n",slua.lastError.c_str());                
+                }
+                exit(0);
+            }
 
 	    if(strcmp(argv[i],"-tloadso")==0){
 		if(argv[i+1]==NULL){
@@ -1180,9 +1193,9 @@ int main(int argc, char** argv) {
 		testLoader();
 		exit(0);
 	    }
-	    if(strcmp(argv[i],"-tlua")==0){
+/*	    if(strcmp(argv[i],"-tlua")==0){
 		//Logger *luaLogger = new AndroidLogger("testlua",true);
-		LuaScript *lua = new LuaScript(tolua_lua_server_open/*,luaLogger*/);
+		LuaScript *lua = new LuaScript(tolua_lua_server_open);
                 lua->luaLogger->logStr("Hello");
                 lua->luaLogger->logHex((unsigned char *)strcmp,35);
                 lua->luaLogger->logStr("Hello");
@@ -1193,7 +1206,7 @@ int main(int argc, char** argv) {
 		    printf("%s\n",cmds[i].c_str());
 		}
 		exit(0);
-	    }
+	    }*/
 	    
 	    if(strcmp(argv[i],"-t2")==0){
 		loadMono();

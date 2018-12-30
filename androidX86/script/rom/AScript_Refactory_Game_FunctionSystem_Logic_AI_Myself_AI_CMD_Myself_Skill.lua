@@ -8,6 +8,9 @@ AI_CMD_Myself_Skill_Run = {}
 function AI_CMD_Myself_Skill_Run.Start(self, time, deltaTime, creature, targetCreature, targetPosition, noLimit)
 	local skillCanUse = nil
 	local skill = creature.skill
+
+	--KKK
+	Debug.Log("KKK AI_CMD_Myself_Skill_Run.Start " .. skill.info:GetSpeakName(creature) .. " ID=" .. skill:GetSkillID());
 	if not noLimit and creature.data:NoAttack() and not isAttackSkil then
 		skillCanUse = creature:Logic_CheckSkillCanUseByID(skill:GetSkillID())
 		if not skillCanUse then
