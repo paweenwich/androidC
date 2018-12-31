@@ -1097,11 +1097,13 @@ int main(int argc, char** argv) {
                 }
                 lua_State *L = slua.luaL_newstate();
                 slua.luaL_openlibs(L);
-                for(int i=0;i<200;i++){
+                //printf("%d\n",slua.lua_gettop(L));
+                //for(int i=0;i<20;i++){
                     if(!slua.DoFile(L,"/data/local/tmp/script/rom.lua")){
                         printf("Fail %s\n",slua.lastError.c_str());                
                     }
-                }
+                //}
+                //printf("%d\n",slua.lua_gettop(L));
 /*                std::vector<unsigned char> buffer = ReadFile("/data/local/tmp/script/rom.lua");
                 printf("size=%d\n",buffer.size());
                 int ret = slua.luaL_loadbufferx(L,(char *)&buffer[0],buffer.size(),"/data/local/tmp/script/rom.lua",NULL);

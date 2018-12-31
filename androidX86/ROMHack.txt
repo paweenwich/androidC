@@ -10,6 +10,8 @@ adb shell 'ls /data/local/tmp/loadbufferx/*.lua' | tr -d '\r' | xargs -n1 adb pu
 adb logcat testso:* *:s
 adb logcat -c
 
+adb shell "while true; do cat; sleep 1; done < /sdcard/myfile.log"
+
 To Dump Assembly-CSharp
 - use X86 gdbserver, and forward port
 - use Win version of gdb connect to port

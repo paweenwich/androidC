@@ -47,6 +47,11 @@
     }\
 }
 
+void slua_android_log(lua_State* luaVM)
+{
+    //const char *data = lua_tostring(luaVM,-1);
+    //LOGD("%s",mesg);
+}
 
 Slua::Slua() {
 }
@@ -68,30 +73,51 @@ bool Slua::Init(char *name)
     SLUAAPI(luaL_newstate);
     SLUAAPI(luaL_loadfilex);
     SLUAAPI(luaL_openlibs);
-    SLUAAPI(luaL_tolstring);
+    //SLUAAPI(luaL_tolstring);
     SLUAAPI(lua_gettop);
+    SLUAAPI(lua_settop);
     SLUAAPI(lua_pcallk);
+    SLUAAPI(lua_tolstring);
     SLUAAPI(luaL_loadbufferx);
     return true;
 }
 
+void Slua::Pop(lua_State *L)
+{
+    int index = lua_gettop(L);
+    if(index > 0){
+        lua_settop(L,index -1);
+    }
+}
+
 bool Slua::DoFile(lua_State *L,char *fileName)
 {
+    int top = lua_gettop(L);
     int ret = luaL_loadfilex(L,"/data/local/tmp/script/rom.lua",NULL);
+    //printf("1 %d\n",lua_gettop(L));
     if(ret !=0){
-        lastError = std::string(luaL_tolstring(L, -1,NULL));
-        lua_gettop(L);      // get message from stack        
+        lastError = std::string(lua_tolstring(L, -1,NULL));
+        Pop(L);
+        //printf("2 %d\n",lua_gettop(L));
+        
+        //lua_gettop(L);      // get message from stack        
         LOGE("Slua::DoFile Fail load %s",lastError.c_str());
+        lua_settop(L,top);
         return false;
     }else{
         ret = lua_pcallk(L,0,0,0,NULL,NULL);
+        //printf("2 %d\n",lua_gettop(L));
         if(ret !=0){
-            lastError = std::string(luaL_tolstring(L, -1,NULL));
-            lua_gettop(L);      // get message from stack
+            lastError = std::string(lua_tolstring(L, -1,NULL));
+            Pop(L);
+            //printf("3 %d\n",lua_gettop(L));
+            //lua_gettop(L);      // get message from stack
             LOGE("Slua::DoFile exec Fail %s",lastError.c_str());
+            lua_settop(L,top);
             return false;
         }else{
             lastError = "";
+            lua_settop(L,top);
             return true;
         }
     }
