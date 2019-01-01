@@ -21,7 +21,7 @@ function LogDebug(data)
 	if Debug ~= nil then
 		--local st = splitByChunk(data,800);
 		--tableForEach(st,function(i,v)
-		--	Debug.Log(v);	
+		Debug.Log(data);	
 		--end);
 		RomFileLogger.log(data);
 	else
@@ -46,6 +46,26 @@ function tableForEach(t, f)
         for i, v in pairs(t) do f(i,v) end 
 end 
 
+function GameObjectToString(go,tab)
+	if tab == nil then tab = ""; end;
+	local ret = tab .. UserDataToString(go);
+	local trans = go.transform;
+	for i=0, trans.childCount-1 do
+		local goChild = trans:GetChild(i).gameObject;
+		ret = ret .. "\n" .. GameObjectToString(goChild,tab .. " ");
+	end
+	return ret;
+end;
+
+
+function UserDataToString(value)
+	local ret = "[" .. type(value) .. "] " .. tostring(value);
+	if string.match(ret, "(UnityEngine.GameObject)") then	
+		ret = "" .. tostring(value.name) .. " " .. tostring(value.scene) .. " " .. tostring(value.activeSelf);
+	end;
+	return ret;
+end;
+
 function MyTostring(value,level)
   local str = ''
   if level == nil then level = 0; end;
@@ -53,6 +73,9 @@ function MyTostring(value,level)
 	return tostring(value);
   end
   if (type(value) ~= 'table') then
+	if type(value) == 'userdata' then
+		return UserDataToString(value);
+	end;
 	if type(value) == 'function' then
 		return "[func]";
 	end;
@@ -152,19 +175,26 @@ if FunctionChangeScene~= nil then
 end;
 if MiniMapWindow~= nil then
 	function MiniMapWindow:Show()
-		LogDebug("MiniMapWindow:Show()");
+		--KKK
+		--Debug.Log("Reload Start");
+		--ROM_Reload();
+		--Debug.Log("Reload End");
+	
 		self.active = true;
 		self.gameObject:SetActive(true);
 
 		self:OpenCheckMyPos();
 
 		self:PlayQuestSymbolShow();
+		
 		--LogDebug(MyTostring(Game.Myself));
 		--Game.Myself:Client_MoveTo(p)
 		local uiCamera = NGUIUtil:GetCameraByLayername("UI");
 		local tempV2, tempV3, tempRot = LuaVector2(), LuaVector3(), LuaQuaternion();
 		LogDebug(MyTostring(uiCamera));
 		self:AddClickEvent(self.mapTexture.gameObject, function (go)
+			--UIUtil.FloatShowyMsg("Click");	-- simple center message
+			--UIUtil.FloatMsgByText("Click");		-- center stack mesage
 			LogDebug("MiniMap click");
 			if(self.lock)then
 				LogDebug("MiniMap Lock");	
@@ -193,6 +223,21 @@ if MiniMapWindow~= nil then
 					--Game.Myself:Client_PlaceTo(p,true);	--client side only
 				end;
 			end;
+			LogDebug("g_MainView " .. MyTostring(g_MainView));
+			local go = self.gameObject;
+			local childCount = go.transform.childCount;
+			LogDebug("childCount " .. childCount);
+			local trans = go.transform;
+			for i=0, trans.childCount-1 do
+				local transChild = trans:GetChild(i);
+				--LogDebug("#"..i.. " " .. MyTostring(transChild));
+				--LogDebug("#"..i.. " " ..  MyTostring(transChild.gameObject));
+				LogDebug(GameObjectToString(transChild.gameObject));
+				--transChild.gameObject.layer = layer;
+				--UIUtil.ChangeLayer(transChild.gameObject, layer);
+			end
+			LogDebug("mapLabel " .. MyTostring(self.mapLabel));
+			
 		end);
 	end
 end;
@@ -207,6 +252,6 @@ a.f3 = b;
 LogDebug(MyTostring(a));
 --LogDebug(MyTostring(b));
 
-LogDebug("ROM Loaded 1.0");
+LogDebug("ROM Loaded 1.02");
 
 

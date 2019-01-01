@@ -21,6 +21,8 @@ rom:
 	adb push script/rom/AScript_FrameWork_GUI_view_MainView.lua /data/local/tmp/script
 	adb push script/rom/AScript_Refactory_Game_FunctionSystem_Logic_AI_Myself_AI_CMD_Myself_Skill.lua /data/local/tmp/script
 	adb push script/rom/AScript_Refactory_Game_FunctionSystem_Logic_AI_Myself_AI_Myself.lua /data/local/tmp/script
+	adb push script/rom/AScript_FrameWork_GUI_view_MainSubviews_MiniMapWindow.lua /data/local/tmp/script
+	adb push script/rom/AScript_FrameWork_GUI_view_MainView.lua /data/local/tmp/script
 	adb push script/rom/rom.lua /data/local/tmp/script
 
 clean:

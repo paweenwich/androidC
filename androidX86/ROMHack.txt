@@ -136,4 +136,64 @@ local function slurp(path)
     f:close()
     return s
 end
- 
+-- show message
+UIUtil.FloatShowyMsg("Click");
+
+-- my char
+Game.Myself
+    position = Game.Myself:GetPosition();
+
+-- map
+Game.MapManager 
+
+MainViewMiniMap has MiniMapWindow 
+local miniMapWindowGO = self:FindGO("MiniMapWindow");
+
+-- timer
+function MiniMapWindow:OpenCheckMyPos()
+	TimeTickManager.Me():CreateTick(0, 33, MiniMapWindow._CheckMyPos, self, 1);
+end
+
+function MiniMapWindow._CheckMyPos(self, deltatime)
+	self:UpdateMyPos();
+end
+
+-- run time obj
+	local nearlyGrid = self:FindGO("NearlyGrid");
+	local wrapConfig = {
+		wrapObj = nearlyGrid,
+		cellName = "NearlyCreatureCell", 
+		control = NearlyCreatureCell, 
+		dir = 1,
+	}
+	self.nearlyCreaturesCtl = WrapCellHelper.new(wrapConfig)	
+	self.nearlyCreaturesCtl:AddEventListener(MouseEvent.MouseClick, self.ClickNearlyCell, self)
+---
+SubView = class("SubView", CoreView)
+CoreView = class("CoreView",EventDispatcher) + autoImport("UIPlayerSceneInfo");
+EventDispatcher = class("EventDispatcher")
+
+-- mission command
+function MiniMapWindow:CloseCheckMyPos()
+	TimeTickManager.Me():ClearTick(self, 1);
+end
+
+				TableUtility.TableClear(tempArgs);
+				
+				tempArgs.targetMapID = currentMapID;
+				tempArgs.targetPos = p;
+				tempArgs.showClickGround = true
+				tempArgs.allowExitPoint = true
+
+				local x,y,z = p[1],p[2],p[3];
+				tempArgs.callback = function(cmd, event)
+					if MissionCommandMove.CallbackEvent.TeleportFailed == event then
+						tempV3:Set(x,y,z);
+						Game.Myself:Client_MoveTo( tempV3 );
+					end
+				end
+
+				local cmd = MissionCommandFactory.CreateCommand(tempArgs, MissionCommandMove);
+				if(cmd)then
+					Game.Myself:Client_SetMissionCommand( cmd );
+				end
