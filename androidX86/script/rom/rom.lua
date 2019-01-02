@@ -61,7 +61,10 @@ end;
 function UserDataToString(value)
 	local ret = "[" .. type(value) .. "] " .. tostring(value);
 	if string.match(ret, "(UnityEngine.GameObject)") then	
-		ret = "" .. tostring(value.name) .. " " .. tostring(value.scene) .. " " .. tostring(value.activeSelf);
+		ret = "" .. tostring(value.name) .. " " .. MyTostring(value.scene) .. " " .. tostring(value.activeSelf);
+	end;
+	if string.match(ret, "(UnityEngine.SceneManagement.Scene)") then	
+		ret = "Scene " .. value.name .. " " .. value.path .. " " .. value.rootCount;
 	end;
 	return ret;
 end;
@@ -237,7 +240,8 @@ if MiniMapWindow~= nil then
 				--UIUtil.ChangeLayer(transChild.gameObject, layer);
 			end
 			LogDebug("mapLabel " .. MyTostring(self.mapLabel));
-			
+			local activeScene = SceneManagement.SceneManager.GetActiveScene();
+			LogDebug("activeScene " .. MyTostring(activeScene));
 		end);
 	end
 end;
