@@ -79,6 +79,7 @@ extern "C" {
     unsigned int FinddlopenAddress(int pid);
     unsigned int FindwriteAddress(int pid);
     unsigned int GetBaseLibraryTextSize(const char* libname,int pid);
+    bool isFileExist(char *fileName);
     bool isDirectoryExist(const char* dir);
     size_t GetFilesize(const char* filename); 
     double GetTickCount(void); 
