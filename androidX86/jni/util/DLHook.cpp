@@ -75,11 +75,7 @@
 
 #define HOOKFUNC(n) \
 	if(strcmp(#n,symbol)==0){\
-<<<<<<< HEAD
 	    LOGD("hooked it " #n);\
-=======
-	    LOGD("hooked it");\
->>>>>>> 5970d6abf07c08291caea1d56efd31fa8392563f
 	    unsigned int *ptr = (unsigned int *)&original_ ## n;\
 	    *ptr = UINT(dlsym_ret);\
 	    dlsym_ret = (void *) hooked_ ## n;\

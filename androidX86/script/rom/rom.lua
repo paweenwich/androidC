@@ -169,7 +169,25 @@ else
 	LogDebug("MainViewHeadPage==nil");
 end;
 
+if NCreature ~= nil then
+    LogDebug("Mod NCreature");
+    function NCreature:Server_SetDirCmd(mode,dir,noSmooth)
+        --helplog(string.format("Server SetDirCmd Player:%s Dir:%s", self.data.name, dir));
+        self.ai:PushCommand(FactoryAICMD.GetSetAngleYCmd(mode,dir,noSmooth), self)
+    end
+    function NCreature:GetClickable()
+        LogDebug("NCreature:GetClickable()");
+        --LogDebug(MyTostring(self.data));
+        LogDebug(MyTostring(self.assetRole));
+        --self:Hide();
+        return not self.data:NoAccessable()
+    end
+    
+end;
+
+
 if FunctionChangeScene~= nil then
+    LogDebug("Mod FunctionChangeScene");
 	function FunctionChangeScene:EnterScene()
 		LogDebug("GameAfterLoadSceneState:EnterScene()");
 		SceneProxy.Instance:EnterScene()
@@ -177,6 +195,7 @@ if FunctionChangeScene~= nil then
 	end
 end;
 if MiniMapWindow~= nil then
+    LogDebug("Mod MiniMapWindow");
 	function MiniMapWindow:Show()
 		--KKK
 		--Debug.Log("Reload Start");
