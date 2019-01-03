@@ -1092,14 +1092,19 @@ int main(int argc, char** argv) {
             if(strcmp(argv[i],"-tslua")==0){
                 Slua slua;
                 if(!slua.Init()){
-                    printf("%s",dlerror());
+                    printf("slua Init Fail %s\n",dlerror());
                     exit(0);
                 }
+		char *fileName = "/data/local/tmp/script/rom.lua";
+		if(argv[i+1]!=NULL){
+		    fileName = argv[i+1];
+		}
+		printf("Run File [%s]\n",fileName);
                 lua_State *L = slua.luaL_newstate();
                 slua.luaL_openlibs(L);
                 //printf("%d\n",slua.lua_gettop(L));
                 //for(int i=0;i<20;i++){
-                    if(!slua.DoFile(L,"/data/local/tmp/script/rom.lua")){
+                    if(!slua.DoFile(L,fileName)){
                         printf("Fail %s\n",slua.lastError.c_str());                
                     }
                 //}

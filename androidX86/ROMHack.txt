@@ -145,6 +145,9 @@ local function slurp(path)
     f:close()
     return s
 end
+-- class 
+org.puremvc.lua_multicore_help_oop.lua
+
 -- show message
 UIUtil.FloatShowyMsg("Click");
 
@@ -206,4 +209,47 @@ end
 				if(cmd)then
 					Game.Myself:Client_SetMissionCommand( cmd );
 				end
+
+
+Game.me()   //Game_Game.lua
+    self.dataStructureManager = DataStructureManager.new()
+    self.functionSystemManager = FunctionSystemManager.new()
+	self.luaGOPoolManager = GOLuaPoolManager.new()
+	self.assetManager = AssetManagerRefactory.new()
+	self.logicManager = LogicManager.new()
+	    self.logicCreature = LogicManager_Creature.new()
+	    self.logicSkill = LogicManager_Skill.new()
+	    self.logicRolePart = LogicManager_RolePart.new()
+	    -- set global objects
+	    Game.LogicManager_Creature = self.logicCreature
+	    Game.LogicManager_Skill = self.logicSkill
+	    Game.LogicManager_RolePart = self.logicRolePart
+	self.mapManager = MapManager.new()
+	self.creatureUIManager = CreatureUIManager.new()
+	self.uiLongPressManager = UILongPressManager.new()
+	self.textureScale = FunctionTextureScale.new()
+	self.socialManager = SocialManager.new()
+	self.effectManager = EffectManager.new()
+	self.chatSystemManager = ChatSystemManager.new()
+	self.skillManager = SkillManager.new()
+	self.wwwRequestManager = WWWRequestManager.new()
+	self.questGuildManager = QuestGuildManager.new()
+	self.questCountDownManager = QuestCountDownManager.new()
+
+	-- set global objects
+	Game.GOLuaPoolManager = self.luaGOPoolManager
+	Game.AssetManager = self.assetManager
+	Game.LogicManager = self.logicManager
+	Game.MapManager = self.mapManager
+	Game.CreatureUIManager = self.creatureUIManager
+	Game.UILongPressManager = self.uiLongPressManager
+	Game.SocialManager = self.socialManager
+	Game.EffectManager = self.effectManager
+	Game.ChatSystemManager = self.chatSystemManager
+	Game.SkillManager = self.skillManager
+	Game.WWWRequestManager = self.wwwRequestManager
+	Game.QuestGuildManager = self.questGuildManager
+	Game.QuestCountDownManager = self.questCountDownManager
+    self.guiSystemManager = GUISystemManager.new()
+    self.gcSystemManager = GCSystemManager.new()
 

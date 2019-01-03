@@ -93,7 +93,7 @@ void Slua::Pop(lua_State *L)
 bool Slua::DoFile(lua_State *L,char *fileName)
 {
     int top = lua_gettop(L);
-    int ret = luaL_loadfilex(L,"/data/local/tmp/script/rom.lua",NULL);
+    int ret = luaL_loadfilex(L,fileName,NULL);
     //printf("1 %d\n",lua_gettop(L));
     if(ret !=0){
         lastError = std::string(lua_tolstring(L, -1,NULL));

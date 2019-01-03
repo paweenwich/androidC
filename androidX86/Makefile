@@ -1,7 +1,7 @@
 make_and_install:   all	install_C
 
 install:    all install_C 
-all:	jni/luaServer/lua_server.cpp ragnarok ragnarokMono elf rom
+all:	jni/luaServer/lua_server.cpp ragnarok ragnarokMono elf mtail rom
 #	ndk-build.cmd V=1
 	ndk-build.cmd
 	adb push libs/x86/scrcapx86 /data/local/tmp/scrcapx86
@@ -23,7 +23,10 @@ rom:
 	adb push script/rom/AScript_Refactory_Game_FunctionSystem_Logic_AI_Myself_AI_Myself.lua /data/local/tmp/script
 	adb push script/rom/AScript_FrameWork_GUI_view_MainSubviews_MiniMapWindow.lua /data/local/tmp/script
 	adb push script/rom/AScript_FrameWork_GUI_view_MainView.lua /data/local/tmp/script
+#	oop for test
+	adb push script/rom/AScript_org_puremvc_lua_multicore_help_oop.lua /data/local/tmp/script
 	adb push script/rom/rom.lua /data/local/tmp/script
+	adb push script/rom/test.lua /data/local/tmp/script
 
 clean:
 	@rm -rf obj libs
@@ -32,6 +35,12 @@ elf:
 	ndk-build.cmd -C jni/tracer
 	adb push libs/x86/elf /data/local/tmp/elf
 	adb shell chmod 777 /data/local/tmp/elf
+
+mtail:
+	ndk-build.cmd -C jni/tracer
+	adb push libs/x86/mtail /data/local/tmp/mtail
+	adb shell chmod 777 /data/local/tmp/mtail
+
 
 ragnarokMono:
 	$(MAKE) -C mono/rom

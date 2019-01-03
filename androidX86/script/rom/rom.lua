@@ -18,15 +18,16 @@ end;
 
 
 function LogDebug(data)
+    local logData = os.date("%x %X") .. ' ' .. data;
 	if Debug ~= nil then
 		--local st = splitByChunk(data,800);
 		--tableForEach(st,function(i,v)
-		Debug.Log(data);	
+		Debug.Log(logData);	
 		--end);
-		RomFileLogger.log(data);
+		RomFileLogger.log(logData);
 	else
-		RomFileLogger.log(data);
-		--print(data);
+		RomFileLogger.log(logData);
+		print(logData);
 		--local st = splitByChunk(data,5);
 		--tableForEach(st,function(i,v)
 		--	print(v);	
@@ -136,6 +137,41 @@ function ROM_Reload()
 	f();
 end;
 
+function DumpMyself()
+    LogDebug("SKILL_POINT=" .. (Game.Myself.data.userdata:Get(UDEnum.SKILL_POINT) or 0));
+    LogDebug("BATTLEPOINT=" .. (Game.Myself.data.userdata:Get(UDEnum.BATTLEPOINT) or 0));
+    LogDebug("ROLEEXP=" .. (Game.Myself.data.userdata:Get(UDEnum.ROLEEXP) or 0));
+    LogDebug("JOBEXP=" .. (Game.Myself.data.userdata:Get(UDEnum.JOBEXP) or 0));
+    LogDebug("KILLERNAME=" .. (Game.Myself.data.userdata:Get(UDEnum.KILLERNAME) or 0));
+    LogDebug("DROPBASEEXP=" .. (Game.Myself.data.userdata:Get(UDEnum.DROPBASEEXP) or 0));
+    LogDebug("NORMAL_SKILL=" .. (Game.Myself.data.userdata:Get(UDEnum.NORMAL_SKILL) or 0));
+    LogDebug("PET_PARTNER=" .. (Game.Myself.data.userdata:Get(UDEnum.PET_PARTNER) or 0));
+    LogDebug("NAME=" .. (Game.Myself.data.userdata:Get(UDEnum.NAME) or 0));
+    LogDebug("proxyName=" .. MyselfProxy.Instance.proxyName);
+    LogDebug("Level=" .. MyselfProxy.Instance:RoleLevel());
+    LogDebug("Zeny=" .. MyselfProxy.Instance:GetROB());
+    LogDebug("Gold=" .. MyselfProxy.Instance:GetGold());
+    LogDebug("Diamond=" .. MyselfProxy.Instance:GetDiamond());
+    LogDebug("Garden=" .. MyselfProxy.Instance:GetGarden());
+    LogDebug("Laboratory=" .. MyselfProxy.Instance:GetLaboratory());
+    LogDebug("JobLevel=" .. MyselfProxy.Instance:JobLevel());
+    LogDebug("ZoneId=" .. MyselfProxy.Instance:GetZoneId());
+    LogDebug("ZoneString=" .. MyselfProxy.Instance:GetZoneString());
+    LogDebug("GetMyProfession=" .. MyselfProxy.Instance:GetMyProfession());
+    LogDebug("GetMyProfessionType=" .. MyselfProxy.Instance:GetMyProfessionType());
+    LogDebug("GetMyMapID=" .. MyselfProxy.Instance:GetMyMapID());
+    LogDebug("GetMySex=" .. MyselfProxy.Instance:GetMySex());
+    LogDebug("GetQuota=" .. MyselfProxy.Instance:GetQuota());
+    LogDebug("GetQuotaLock=" .. MyselfProxy.Instance:GetQuotaLock());
+    LogDebug("GetHasCharge=" .. MyselfProxy.Instance:GetHasCharge());
+    LogDebug("GetFashionHide=" .. MyselfProxy.Instance:GetFashionHide());
+    LogDebug("GetPvpCoin=" .. MyselfProxy.Instance:GetPvpCoin());
+    LogDebug("GetLottery=" .. MyselfProxy.Instance:GetLottery());
+    LogDebug("GetGuildHonor=" .. MyselfProxy.Instance:GetGuildHonor());
+    LogDebug("GetServantFavorability=" .. MyselfProxy.Instance:GetServantFavorability());
+    LogDebug("GetBoothScore=" .. MyselfProxy.Instance:GetBoothScore());
+end;
+
 
 if Game~=nil then
 	--LogDebug(Game.Me():GetResolutionNames());
@@ -178,13 +214,50 @@ if NCreature ~= nil then
     function NCreature:GetClickable()
         LogDebug("NCreature:GetClickable()");
         --LogDebug(MyTostring(self.data));
-        LogDebug(MyTostring(self.assetRole));
+        --LogDebug(MyTostring(self.assetRole));
         --self:Hide();
         return not self.data:NoAccessable()
     end
     
 end;
 
+function onHPChange(param)
+    LogDebug("onHPChange");
+end;
+
+if EventManager~=nil and MyselfEvent ~= nil then
+    EventManager.Me():RemoveEventListener(MyselfEvent.HpChange,onHPChange,nil);
+    EventManager.Me():AddEventListener(MyselfEvent.HpChange,onHPChange,nil);
+    LogDebug("AddEventListener");
+end;    
+
+if Game~=nil and Game.LogicManager_Myself_Props ~= nil and Game.me~=nil then
+    LogDebug(tostring(Game.me.functionSystemManager.logicManager));
+    LogDebug(tostring(Game.LogicManager));
+    LogDebug(tostring(Game.LogicManager_Myself_Props));
+    LogDebug(tostring(Game.LogicManager_Myself_Props.UpdateHp));
+    LogDebug("Before");
+    --LogDebug(tostring(Game.LogicManager_Player_Props));
+    --LogDebug(tostring(Game.me.functionSystemManager.logicManager.logicCreature.playerPropsManager));
+    --function Game.LogicManager_Myself_Props:UpdateHp(ncreature,propName,oldValue,p)
+    --    LogDebug("onHPChange " .. oldValue .. ' ' .. p:GetValue());
+    --    LogicManager_Myself_Props.super.UpdateHp(self,ncreature,propName,oldValue,p)
+    --    EventManager.me:PassEvent(MyselfEvent.HpChange,p:GetValue())
+    --end
+    function Game.LogicManager_Creature:Update(time, deltaTime)
+        self:UpdateNpc(time,deltaTime)
+        self:UpdatePets(time,deltaTime)
+        self:UpdatePlayer(time,deltaTime)
+        self:UpdateMyself(time,deltaTime)
+
+        self.roleDressManager:Update(time, deltaTime)
+        self.hatredManager:Update(time, deltaTime)
+    end
+    --LogDebug(tostring(Game.me.functionSystemManager.logicManager));    
+    LogDebug("After");
+    LogDebug(tostring(Game.LogicManager_Myself_Props.UpdateHp));
+    LogDebug("LogicManager_Myself_Props");
+end;
 
 if FunctionChangeScene~= nil then
     LogDebug("Mod FunctionChangeScene");
@@ -229,8 +302,9 @@ if MiniMapWindow~= nil then
 			local p = self:MapPosToScene(tempV3);
 			LogDebug("MapPos " .. MyTostring(tempV3));
 			LogDebug("ScenePos " .. MyTostring(p));
+            local currentMapID = Game.MapManager:GetMapID();            
 			if(p)then
-				local currentMapID = Game.MapManager:GetMapID();
+
 				LogDebug("currentMapID " .. MyTostring(currentMapID));
 				LogDebug("Table_Map[currentMapID] " .. MyTostring(Table_Map[currentMapID]));
 				local disableInnerTeleport = Table_Map[currentMapID].MapNavigation
@@ -261,6 +335,30 @@ if MiniMapWindow~= nil then
 			LogDebug("mapLabel " .. MyTostring(self.mapLabel));
 			local activeScene = SceneManagement.SceneManager.GetActiveScene();
 			LogDebug("activeScene " .. MyTostring(activeScene));
+            --DumpMyself();
+            --UIUtil.PopUpConfirmYesNoView("Title","Desc");
+            
+            local questlst = QuestProxy.Instance:getQuestListByMapAndSymbol(currentMapID);
+            for k, q in pairs(questlst) do
+                LogDebug(tostring(k));
+                local params = q.staticData and q.staticData.Params;
+                local symbolType = QuestSymbolCheck.GetQuestSymbolByQuest(q);
+                LogDebug(tostring(params) .. ' ' .. MyTostring(params.ShowSymbol) .. ' ' .. tostring(symbolType));
+                local uniqueid, npcid = params.uniqueid, params.npc;
+                npcid = type(npcid) == "table" and npcid[1] or npcid;
+                local npcPoint,combineId;
+				if( uniqueid )then
+					npcPoint = Game.MapManager:FindNPCPoint( uniqueid );
+				elseif(npcid)then
+					--npcPoint = self:GetMapNpcPointByNpcId( npcid );
+					uniqueid = npcPoint and npcPoint.uniqueID or 0;
+				else
+					combineId = q.questDataStepType..q.id;
+				end
+                LogDebug("uniqueid=" .. tostring(uniqueid) .. ' npcid=' .. MyTostring(npcid) .. ' npcPoint=' .. MyTostring(npcPoint));
+                
+            end
+            --LogDebug(MyTostring(questlst));
 		end);
 	end
 end;
