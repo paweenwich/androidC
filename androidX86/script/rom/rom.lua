@@ -70,6 +70,32 @@ function UserDataToString(value)
 	return ret;
 end;
 
+function ListField(obj,tab)
+    tab = tab or "";
+    if (type(obj) == 'table') then
+        tableForEach(obj, function(i, v)
+            -- skip function
+            if(type(v) == 'function') then
+                
+                return;
+            end;
+            if(type(v) == 'table') then
+                if tab == " " then
+                    LogDebug(tab .. i .. " " .. tostring(v));
+                else
+                    LogDebug(tab .. i);                
+                    ListField(v,tab .. " ");
+                end;
+            else
+                LogDebug(tab .. i .. "=" .. tostring(v));
+            end;
+        end)
+    else
+        LogDebug(tostring(obj));
+    end;
+end;
+
+
 function MyTostring(value,level)
   local str = ''
   if level == nil then level = 0; end;
@@ -134,7 +160,14 @@ end
 function ROM_Reload()
 	local s = ReadFile("/data/local/tmp/script/rom.lua");
 	local f = loadstring(s);
-	f();
+    if f~=nil then
+        f();
+    else
+        if UIUtil ~= nil then
+            UIUtil.FloatMsgByText("Fail: ROM_Reload");		
+        end;
+        LogDebug("Fail: ROM_Reload");
+    end;
 end;
 
 function DumpMyself()
@@ -267,6 +300,46 @@ if FunctionChangeScene~= nil then
 		SceneProxy.Instance.sceneLoader:SetAllowSceneActivation()
 	end
 end;
+
+function ROM_IsObjectInit(obj)
+    return obj~=nil and obj.me ~= nil 
+end;
+
+if MyTick == nil then
+    MyTick = class("MyTick")   
+end;
+MyTick.version = "1.0";
+function MyTick:ctor()
+    self.version = MyTick.version;
+    LogDebug("MyTick:ctor()");
+end
+
+function MyTick:Tick()
+    LogDebug("MyTick:Tick() " .. tostring(self) .." " .. self.version .. " *");
+end;
+
+function MyTick:start()
+    if ROM_IsObjectInit(TimeTickManager) then
+        LogDebug("MyTick:start() " .. self.version);
+        self.timeTick = TimeTickManager.Me():CreateTick(0,2000,self.Tick,self);
+        LogDebug(MyTostring(self.timeTick));
+    end;
+end;
+
+function MyTick:stop()
+    if ROM_IsObjectInit(TimeTickManager) then
+        LogDebug("MyTick:stop()");
+        TimeTickManager.Me():ClearTick(self);
+    end;
+end;
+
+if myTick == nil or myTick.version ~= MyTick.version then
+    myTick = MyTick.new();
+end;
+LogDebug("myTick=" .. tostring(myTick) .. " " .. tostring(myTick.version));
+--myTick.stop();
+--myTick.start();
+
 if MiniMapWindow~= nil then
     LogDebug("Mod MiniMapWindow");
 	function MiniMapWindow:Show()
@@ -319,45 +392,24 @@ if MiniMapWindow~= nil then
 					--Game.Myself:Client_PlaceTo(p,true);	--client side only
 				end;
 			end;
-			LogDebug("g_MainView " .. MyTostring(g_MainView));
-			local go = self.gameObject;
-			local childCount = go.transform.childCount;
-			LogDebug("childCount " .. childCount);
-			local trans = go.transform;
-			for i=0, trans.childCount-1 do
-				local transChild = trans:GetChild(i);
-				--LogDebug("#"..i.. " " .. MyTostring(transChild));
-				--LogDebug("#"..i.. " " ..  MyTostring(transChild.gameObject));
-				LogDebug(GameObjectToString(transChild.gameObject));
-				--transChild.gameObject.layer = layer;
-				--UIUtil.ChangeLayer(transChild.gameObject, layer);
-			end
-			LogDebug("mapLabel " .. MyTostring(self.mapLabel));
-			local activeScene = SceneManagement.SceneManager.GetActiveScene();
-			LogDebug("activeScene " .. MyTostring(activeScene));
+            --myTick:stop();
+            --myTick:start();
+            if Game.Myself.ai.autoAI_Rom == nil then
+                Game.Myself.ai.autoAI_Rom = AutoAI_Rom.new();
+                Game.Myself.ai.idleAIManager:PushAI(Game.Myself.ai.autoAI_Rom);
+                LogDebug("set AutoAI_Rom");
+            else
+                local index = TableUtil.FindKeyByValue(Game.Myself.ai.idleAIManager.ais,Game.Myself.ai.autoAI_Rom);
+                Game.Myself.ai.autoAI_Rom = AutoAI_Rom.new();
+                Game.Myself.ai.idleAIManager.ais[index] = Game.Myself.ai.autoAI_Rom;
+                LogDebug("set new AutoAI_Rom");
+            end;
+            --ListField(Game.Myself.ai);
+            ListField(g_MainView.super);
+            --DumpSelf(self);
             --DumpMyself();
-            --UIUtil.PopUpConfirmYesNoView("Title","Desc");
+
             
-            local questlst = QuestProxy.Instance:getQuestListByMapAndSymbol(currentMapID);
-            for k, q in pairs(questlst) do
-                LogDebug(tostring(k));
-                local params = q.staticData and q.staticData.Params;
-                local symbolType = QuestSymbolCheck.GetQuestSymbolByQuest(q);
-                LogDebug(tostring(params) .. ' ' .. MyTostring(params.ShowSymbol) .. ' ' .. tostring(symbolType));
-                local uniqueid, npcid = params.uniqueid, params.npc;
-                npcid = type(npcid) == "table" and npcid[1] or npcid;
-                local npcPoint,combineId;
-				if( uniqueid )then
-					npcPoint = Game.MapManager:FindNPCPoint( uniqueid );
-				elseif(npcid)then
-					--npcPoint = self:GetMapNpcPointByNpcId( npcid );
-					uniqueid = npcPoint and npcPoint.uniqueID or 0;
-				else
-					combineId = q.questDataStepType..q.id;
-				end
-                LogDebug("uniqueid=" .. tostring(uniqueid) .. ' npcid=' .. MyTostring(npcid) .. ' npcPoint=' .. MyTostring(npcPoint));
-                
-            end
             --LogDebug(MyTostring(questlst));
 		end);
 	end
@@ -370,9 +422,80 @@ b = {5,6,a};
 a.f3 = b;
 
 --LogDebug(MyTostring("1234"));
-LogDebug(MyTostring(a));
+--LogDebug(MyTostring(a));
 --LogDebug(MyTostring(b));
 
 LogDebug("ROM Loaded 1.02");
+
+function DumpQuest()
+    local currentMapID = Game.MapManager:GetMapID(); 
+    local questlst = QuestProxy.Instance:getQuestListByMapAndSymbol(currentMapID);
+    for k, q in pairs(questlst) do
+        LogDebug(tostring(k));
+        local params = q.staticData and q.staticData.Params;
+        local symbolType = QuestSymbolCheck.GetQuestSymbolByQuest(q);
+        LogDebug(tostring(params) .. ' ' .. MyTostring(params.ShowSymbol) .. ' ' .. tostring(symbolType));
+        local uniqueid, npcid = params.uniqueid, params.npc;
+        npcid = type(npcid) == "table" and npcid[1] or npcid;
+        local npcPoint,combineId;
+        if( uniqueid )then
+            npcPoint = Game.MapManager:FindNPCPoint( uniqueid );
+        elseif(npcid)then
+            --npcPoint = self:GetMapNpcPointByNpcId( npcid );
+            uniqueid = npcPoint and npcPoint.uniqueID or 0;
+        else
+            combineId = q.questDataStepType..q.id;
+        end
+        LogDebug("uniqueid=" .. tostring(uniqueid) .. ' npcid=' .. MyTostring(npcid) .. ' npcPoint=' .. MyTostring(npcPoint));
+    end
+end;
+
+function DumpSelf(self)
+    LogDebug("g_MainView " .. MyTostring(g_MainView));
+    local go = self.gameObject;
+    local childCount = go.transform.childCount;
+    LogDebug("childCount " .. childCount);
+    local trans = go.transform;
+    for i=0, trans.childCount-1 do
+        local transChild = trans:GetChild(i);
+        --LogDebug("#"..i.. " " .. MyTostring(transChild));
+        --LogDebug("#"..i.. " " ..  MyTostring(transChild.gameObject));
+        LogDebug(GameObjectToString(transChild.gameObject));
+        --transChild.gameObject.layer = layer;
+        --UIUtil.ChangeLayer(transChild.gameObject, layer);
+    end
+    LogDebug("mapLabel " .. MyTostring(self.mapLabel));
+    local activeScene = SceneManagement.SceneManager.GetActiveScene();
+    LogDebug("activeScene " .. MyTostring(activeScene));
+end;
+
+
+AutoAI_Rom = class("AutoAI_Rom")
+
+function AutoAI_Rom:ctor()
+    LogDebug("AutoAI_Rom:ctor()");
+end
+
+function AutoAI_Rom:Clear(idleElapsed, time, deltaTime, creature)
+    LogDebug("AutoAI_Rom:Clear()");
+end
+
+function AutoAI_Rom:Prepare(idleElapsed, time, deltaTime, creature)
+--    LogDebug("AutoAI_Rom:Prepare()");
+	return true
+end
+
+function AutoAI_Rom:Start(idleElapsed, time, deltaTime, creature)
+--    LogDebug("AutoAI_Rom:Start()");
+end
+
+function AutoAI_Rom:End(idleElapsed, time, deltaTime, creature)
+--    LogDebug("AutoAI_Rom:End()");
+end
+
+function AutoAI_Rom:Update(idleElapsed, time, deltaTime, creature)
+--    LogDebug("AutoAI_Rom:Update()");
+	return false
+end
 
 

@@ -1,4 +1,6 @@
 local MainView = class("MainView",ContainerView)
+--KKK make it global
+g_MainView = MainView
 
 MainView.ViewType = UIViewType.MainLayer
 

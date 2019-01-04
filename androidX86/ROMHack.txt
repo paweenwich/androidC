@@ -131,6 +131,10 @@ The linux kernel does not really care about the dynamic segment, but looking for
 
 can not use C++ static class variable between thread, some how it not shared
 
+Lua:
+   lua oop seem to work, if we overrride (reload) Class method, instance method is refresh also.
+however, if code keep just function (Ex self.xxx), that function will not update because lua will just 
+call that function address which is old. 
 
 TODO:
 - dump dir (storage/emulated/0/Android/obb/com.gravity.romg/main.495.com.gravity.romg.obb/...) while in proc
@@ -186,9 +190,6 @@ CoreView = class("CoreView",EventDispatcher) + autoImport("UIPlayerSceneInfo");
 EventDispatcher = class("EventDispatcher")
 
 -- mission command
-function MiniMapWindow:CloseCheckMyPos()
-	TimeTickManager.Me():ClearTick(self, 1);
-end
 
 				TableUtility.TableClear(tempArgs);
 				
@@ -218,6 +219,27 @@ Game.me()   //Game_Game.lua
 	self.assetManager = AssetManagerRefactory.new()
 	self.logicManager = LogicManager.new()
 	    self.logicCreature = LogicManager_Creature.new()
+		self.npcUserDataManager = LogicManager_Npc_Userdata.new()
+		self.playerUserDataManager = LogicManager_Player_Userdata.new()
+		self.myselfUserDataManager = LogicManager_Myself_Userdata.new()
+		self.npcPropsManager = LogicManager_Npc_Props.new()
+		self.petPropsManager = LogicManager_Pet_Props.new()
+		self.playerPropsManager = LogicManager_Player_Props.new()
+		self.myselfPropsManager = LogicManager_Myself_Props.new()
+		self.roleDressManager = LogicManager_RoleDress.new()
+		self.handInHandManager = LogicManager_HandInHand.new()
+		self.hatredManager = LogicManager_Hatred.new()
+		-- set global objects
+		Game.LogicManager_Npc_Userdata = self.npcUserDataManager
+		Game.LogicManager_Player_Userdata = self.playerUserDataManager
+		Game.LogicManager_Player_Props = self.playerPropsManager
+		Game.LogicManager_Myself_Props = self.myselfPropsManager
+		Game.LogicManager_Npc_Props = self.npcPropsManager
+		Game.LogicManager_Pet_Props = self.petPropsManager
+		Game.LogicManager_Myself_Userdata = self.myselfUserDataManager
+		Game.LogicManager_RoleDress = self.roleDressManager
+		Game.LogicManager_HandInHand = self.handInHandManager
+		Game.LogicManager_Hatred = self.hatredManager
 	    self.logicSkill = LogicManager_Skill.new()
 	    self.logicRolePart = LogicManager_RolePart.new()
 	    -- set global objects
