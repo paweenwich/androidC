@@ -1,10 +1,3 @@
-function ReadFile(path)
-    local f = io.open(path)
-    local s = f:read("*a")
-    f:close()
-    return s
-end
-
 if RomFileLogger == nil then
 	RomFileLogger = {};
 	RomFileLogger.f = io.open("/data/local/tmp/rom.log", "a");
@@ -15,200 +8,47 @@ RomFileLogger.log = function(data)
 	RomFileLogger.f:flush();
 end;
 
-
-
 function LogDebug(data)
     local logData = os.date("%x %X") .. ' ' .. data;
 	if Debug ~= nil then
-		--local st = splitByChunk(data,800);
-		--tableForEach(st,function(i,v)
 		Debug.Log(logData);	
-		--end);
 		RomFileLogger.log(logData);
 	else
 		RomFileLogger.log(logData);
 		print(logData);
-		--local st = splitByChunk(data,5);
-		--tableForEach(st,function(i,v)
-		--	print(v);	
-		--end);
 	end;
 end;
 
-function splitByChunk(text, chunkSize)
-    local s = {}
-    for i=1, #text, chunkSize do
-        s[#s+1] = text:sub(i,i+chunkSize - 1)
-    end
+function ReadFile(path)
+    local f = io.open(path)
+    local s = f:read("*a")
+    f:close()
     return s
 end
 
-function tableForEach(t, f) 
-        for i, v in pairs(t) do f(i,v) end 
-end 
-
-function GameObjectToString(go,tab)
-	if tab == nil then tab = ""; end;
-	local ret = tab .. UserDataToString(go);
-	local trans = go.transform;
-	for i=0, trans.childCount-1 do
-		local goChild = trans:GetChild(i).gameObject;
-		ret = ret .. "\n" .. GameObjectToString(goChild,tab .. " ");
-	end
-	return ret;
-end;
-
-
-function UserDataToString(value)
-	local ret = "[" .. type(value) .. "] " .. tostring(value);
-	if string.match(ret, "(UnityEngine.GameObject)") then	
-		ret = "" .. tostring(value.name) .. " " .. MyTostring(value.scene) .. " " .. tostring(value.activeSelf);
-	end;
-	if string.match(ret, "(UnityEngine.SceneManagement.Scene)") then	
-		ret = "Scene " .. value.name .. " " .. value.path .. " " .. value.rootCount;
-	end;
-	return ret;
-end;
-
-function ListField(obj,tab)
-    tab = tab or "";
-    if (type(obj) == 'table') then
-        tableForEach(obj, function(i, v)
-            -- skip function
-            if(type(v) == 'function') then
-                
-                return;
-            end;
-            if(type(v) == 'table') then
-                if tab == " " then
-                    LogDebug(tab .. i .. " " .. tostring(v));
-                else
-                    LogDebug(tab .. i);                
-                    ListField(v,tab .. " ");
-                end;
-            else
-                LogDebug(tab .. i .. "=" .. tostring(v));
-            end;
-        end)
-    else
-        LogDebug(tostring(obj));
-    end;
-end;
-
-
-function MyTostring(value,level)
-  local str = ''
-  if level == nil then level = 0; end;
-  if level > 2 then
-	return tostring(value);
-  end
-  if (type(value) ~= 'table') then
-	if type(value) == 'userdata' then
-		return UserDataToString(value);
-	end;
-	if type(value) == 'function' then
-		return "[func]";
-	end;
-	if type(value) == 'boolean' then
-		return tostring(value);
-	end;
-	if (type(value) == 'number') then
-	  str = "" .. value;
-    else 
-		if (type(value) == 'string') then
-		  --str = string.format("%q", value)
-		  str = string.format("%s", value)
-		else
-			if(value == nil) then
-				str = "(nil)";
-			else
-				str = "[" .. type(value) .. "] " .. tostring(value);
-			end;
-		end
-	end;
-  else
-    local auxTable = {}
-    --table.foreach(value, function(i, v)
-	tableForEach(value, function(i, v)
-      if (tonumber(i) ~= i) then
-        table.insert(auxTable, i)
-      else
-        table.insert(auxTable, tostring(i))
-      end
-    end)
-    table.sort(auxTable)
-
-    str = str..'{'
-    local separator = ""
-    local entry = ""
-    --table.foreachi (auxTable, function (i, fieldName)
-	tableForEach(auxTable, function (i, fieldName)
-      if ((tonumber(fieldName)) and (tonumber(fieldName) > 0)) then
-        entry = MyTostring(value[tonumber(fieldName)],level + 1)
-      else
-        entry = fieldName.." = ".. MyTostring(value[fieldName], level + 1)
-      end
-      str = str..separator..entry
-      separator = ", "
-    end)
-    str = str..'}'
-  end
-  return str
-end
-
-
-function ROM_Reload()
-	local s = ReadFile("/data/local/tmp/script/rom.lua");
+function ROM_DoFile(fileName)
+	LogDebug("ROM_DoFile " .. fileName);
+	local s = ReadFile(fileName);
 	local f = loadstring(s);
     if f~=nil then
         f();
+		LogDebug("ROM_DoFile success " .. fileName);
+		return true;
     else
         if UIUtil ~= nil then
-            UIUtil.FloatMsgByText("Fail: ROM_Reload");		
+            UIUtil.FloatMsgByText("ROM_DoFile Fail (loadstring)");		
         end;
-        LogDebug("Fail: ROM_Reload");
+        LogDebug("ROM_DoFile Fail (loadstring)");
+		return false;
     end;
 end;
 
-function DumpMyself()
-    LogDebug("SKILL_POINT=" .. (Game.Myself.data.userdata:Get(UDEnum.SKILL_POINT) or 0));
-    LogDebug("BATTLEPOINT=" .. (Game.Myself.data.userdata:Get(UDEnum.BATTLEPOINT) or 0));
-    LogDebug("ROLEEXP=" .. (Game.Myself.data.userdata:Get(UDEnum.ROLEEXP) or 0));
-    LogDebug("JOBEXP=" .. (Game.Myself.data.userdata:Get(UDEnum.JOBEXP) or 0));
-    LogDebug("KILLERNAME=" .. (Game.Myself.data.userdata:Get(UDEnum.KILLERNAME) or 0));
-    LogDebug("DROPBASEEXP=" .. (Game.Myself.data.userdata:Get(UDEnum.DROPBASEEXP) or 0));
-    LogDebug("NORMAL_SKILL=" .. (Game.Myself.data.userdata:Get(UDEnum.NORMAL_SKILL) or 0));
-    LogDebug("PET_PARTNER=" .. (Game.Myself.data.userdata:Get(UDEnum.PET_PARTNER) or 0));
-    LogDebug("NAME=" .. (Game.Myself.data.userdata:Get(UDEnum.NAME) or 0));
-    LogDebug("proxyName=" .. MyselfProxy.Instance.proxyName);
-    LogDebug("Level=" .. MyselfProxy.Instance:RoleLevel());
-    LogDebug("Zeny=" .. MyselfProxy.Instance:GetROB());
-    LogDebug("Gold=" .. MyselfProxy.Instance:GetGold());
-    LogDebug("Diamond=" .. MyselfProxy.Instance:GetDiamond());
-    LogDebug("Garden=" .. MyselfProxy.Instance:GetGarden());
-    LogDebug("Laboratory=" .. MyselfProxy.Instance:GetLaboratory());
-    LogDebug("JobLevel=" .. MyselfProxy.Instance:JobLevel());
-    LogDebug("ZoneId=" .. MyselfProxy.Instance:GetZoneId());
-    LogDebug("ZoneString=" .. MyselfProxy.Instance:GetZoneString());
-    LogDebug("GetMyProfession=" .. MyselfProxy.Instance:GetMyProfession());
-    LogDebug("GetMyProfessionType=" .. MyselfProxy.Instance:GetMyProfessionType());
-    LogDebug("GetMyMapID=" .. MyselfProxy.Instance:GetMyMapID());
-    LogDebug("GetMySex=" .. MyselfProxy.Instance:GetMySex());
-    LogDebug("GetQuota=" .. MyselfProxy.Instance:GetQuota());
-    LogDebug("GetQuotaLock=" .. MyselfProxy.Instance:GetQuotaLock());
-    LogDebug("GetHasCharge=" .. MyselfProxy.Instance:GetHasCharge());
-    LogDebug("GetFashionHide=" .. MyselfProxy.Instance:GetFashionHide());
-    LogDebug("GetPvpCoin=" .. MyselfProxy.Instance:GetPvpCoin());
-    LogDebug("GetLottery=" .. MyselfProxy.Instance:GetLottery());
-    LogDebug("GetGuildHonor=" .. MyselfProxy.Instance:GetGuildHonor());
-    LogDebug("GetServantFavorability=" .. MyselfProxy.Instance:GetServantFavorability());
-    LogDebug("GetBoothScore=" .. MyselfProxy.Instance:GetBoothScore());
+ROM_DoFile("/data/local/tmp/script/romUtil.lua");
+
+function ROM_Reload()
+	return ROM_DoFile("/data/local/tmp/script/rom.lua");
 end;
 
-
-if Game~=nil then
-	--LogDebug(Game.Me():GetResolutionNames());
-end;
 if AI_Myself~=nil then
 	function AI_Myself:_Idle(time, deltaTime, creature)
 		--LogDebug("AI_Myself:_Idle " .. time .. ' ' .. deltaTime);
@@ -305,38 +145,40 @@ function ROM_IsObjectInit(obj)
     return obj~=nil and obj.me ~= nil 
 end;
 
-if MyTick == nil then
-    MyTick = class("MyTick")   
+if MyTick == nil and class ~= nil then
+    MyTick = class("MyTick");   
 end;
-MyTick.version = "1.0";
-function MyTick:ctor()
-    self.version = MyTick.version;
-    LogDebug("MyTick:ctor()");
-end
+if MyTick ~= nil then
+	MyTick.version = "1.0";
+	function MyTick:ctor()
+		self.version = MyTick.version;
+		LogDebug("MyTick:ctor()");
+	end
 
-function MyTick:Tick()
-    LogDebug("MyTick:Tick() " .. tostring(self) .." " .. self.version .. " *");
-end;
+	function MyTick:Tick()
+		LogDebug("MyTick:Tick() " .. tostring(self) .." " .. self.version .. " *");
+	end;
 
-function MyTick:start()
-    if ROM_IsObjectInit(TimeTickManager) then
-        LogDebug("MyTick:start() " .. self.version);
-        self.timeTick = TimeTickManager.Me():CreateTick(0,2000,self.Tick,self);
-        LogDebug(MyTostring(self.timeTick));
-    end;
-end;
+	function MyTick:start()
+		if ROM_IsObjectInit(TimeTickManager) then
+			LogDebug("MyTick:start() " .. self.version);
+			self.timeTick = TimeTickManager.Me():CreateTick(0,2000,self.Tick,self);
+			LogDebug(MyTostring(self.timeTick));
+		end;
+	end;
 
-function MyTick:stop()
-    if ROM_IsObjectInit(TimeTickManager) then
-        LogDebug("MyTick:stop()");
-        TimeTickManager.Me():ClearTick(self);
-    end;
-end;
+	function MyTick:stop()
+		if ROM_IsObjectInit(TimeTickManager) then
+			LogDebug("MyTick:stop()");
+			TimeTickManager.Me():ClearTick(self);
+		end;
+	end;
 
-if myTick == nil or myTick.version ~= MyTick.version then
-    myTick = MyTick.new();
+	if myTick == nil or myTick.version ~= MyTick.version then
+		myTick = MyTick.new();
+	end;
 end;
-LogDebug("myTick=" .. tostring(myTick) .. " " .. tostring(myTick.version));
+--LogDebug("myTick=" .. tostring(myTick) .. " " .. tostring(myTick.version));
 --myTick.stop();
 --myTick.start();
 
@@ -392,110 +234,148 @@ if MiniMapWindow~= nil then
 					--Game.Myself:Client_PlaceTo(p,true);	--client side only
 				end;
 			end;
-            --myTick:stop();
-            --myTick:start();
-            if Game.Myself.ai.autoAI_Rom == nil then
-                Game.Myself.ai.autoAI_Rom = AutoAI_Rom.new();
-                Game.Myself.ai.idleAIManager:PushAI(Game.Myself.ai.autoAI_Rom);
-                LogDebug("set AutoAI_Rom");
-            else
-                local index = TableUtil.FindKeyByValue(Game.Myself.ai.idleAIManager.ais,Game.Myself.ai.autoAI_Rom);
-                Game.Myself.ai.autoAI_Rom = AutoAI_Rom.new();
-                Game.Myself.ai.idleAIManager.ais[index] = Game.Myself.ai.autoAI_Rom;
-                LogDebug("set new AutoAI_Rom");
-            end;
-            --ListField(Game.Myself.ai);
-            ListField(g_MainView.super);
-            --DumpSelf(self);
-            --DumpMyself();
-
-            
-            --LogDebug(MyTostring(questlst));
+			OnMiniMapClick(self);
 		end);
 	end
 end;
+toggle = 1;
 
-a = {
-	f1=11,f2=22,{2,2,2}
-};
-b = {5,6,a};
-a.f3 = b;
-
---LogDebug(MyTostring("1234"));
---LogDebug(MyTostring(a));
---LogDebug(MyTostring(b));
-
-LogDebug("ROM Loaded 1.02");
-
-function DumpQuest()
-    local currentMapID = Game.MapManager:GetMapID(); 
-    local questlst = QuestProxy.Instance:getQuestListByMapAndSymbol(currentMapID);
-    for k, q in pairs(questlst) do
-        LogDebug(tostring(k));
-        local params = q.staticData and q.staticData.Params;
-        local symbolType = QuestSymbolCheck.GetQuestSymbolByQuest(q);
-        LogDebug(tostring(params) .. ' ' .. MyTostring(params.ShowSymbol) .. ' ' .. tostring(symbolType));
-        local uniqueid, npcid = params.uniqueid, params.npc;
-        npcid = type(npcid) == "table" and npcid[1] or npcid;
-        local npcPoint,combineId;
-        if( uniqueid )then
-            npcPoint = Game.MapManager:FindNPCPoint( uniqueid );
-        elseif(npcid)then
-            --npcPoint = self:GetMapNpcPointByNpcId( npcid );
-            uniqueid = npcPoint and npcPoint.uniqueID or 0;
-        else
-            combineId = q.questDataStepType..q.id;
-        end
-        LogDebug("uniqueid=" .. tostring(uniqueid) .. ' npcid=' .. MyTostring(npcid) .. ' npcPoint=' .. MyTostring(npcPoint));
-    end
+myButton = myButton or {};
+function EnsureMyButtom(name)
+	if myButton[name] == nil then	
+		local obj = g_mainView:FindGO(name);
+		if obj ~= nil then
+			LogDebug(GameObjectToString(obj));
+			myButton[name] = GameObject.Instantiate(obj);
+		else	
+			LogDebug("EnsureMyButtom Fail " .. name .. " not found");
+		end;
+	end;
+	return myButton[name] ~= nil;
 end;
 
-function DumpSelf(self)
-    LogDebug("g_MainView " .. MyTostring(g_MainView));
-    local go = self.gameObject;
-    local childCount = go.transform.childCount;
-    LogDebug("childCount " .. childCount);
-    local trans = go.transform;
-    for i=0, trans.childCount-1 do
-        local transChild = trans:GetChild(i);
-        --LogDebug("#"..i.. " " .. MyTostring(transChild));
-        --LogDebug("#"..i.. " " ..  MyTostring(transChild.gameObject));
-        LogDebug(GameObjectToString(transChild.gameObject));
-        --transChild.gameObject.layer = layer;
-        --UIUtil.ChangeLayer(transChild.gameObject, layer);
-    end
-    LogDebug("mapLabel " .. MyTostring(self.mapLabel));
-    local activeScene = SceneManagement.SceneManager.GetActiveScene();
-    LogDebug("activeScene " .. MyTostring(activeScene));
+if g_mainView ~= nil then
+	local tempVector3 = LuaVector3.zero
+	local testButton = g_mainView:FindGO("TestFloat");
+	--LogDebug(GameObjectToString(testButton));
+	if cpytestButton == nil then
+		-- create another test button
+		cpytestButton = GameObject.Instantiate(testButton);
+	else
+	end
+
+	local uiCamera = NGUIUtil:GetCameraByLayername("UI");	
+	LogDebug(GameObjectToString(uiCamera));
+	--tempVector3:Set(0.1,0.5,uiCamera.nearClipPlane);
+	tempVector3:Set(0.05,0.5,0);
+	local p = uiCamera:ViewportToWorldPoint(tempVector3);
+	LogDebug(MyTostring(p));
+	--LogDebug(MyTostring(GUI.Button()));
+	--LogDebug(MyTostring(cpytestButton.transform.rect));
+	cpytestButton.transform.position = p;
+	cpytestButton:SetActive(true);
+	
+	--tempVector3:Set(10,10,0);
+	--cpytestButton.transform.localPosition = tempVector3
+	--tempVector3:Set(0.5,0.5,0.5);
+	--cpytestButton.transform.localScale = tempVector3	
+	g_mainView:AddClickEvent(cpytestButton, function (g)
+		if ROM_Reload() then
+			UIUtil.FloatMsgByText("Reload Success");
+		end;
+	end);
+	--LogDebug(GameObjectToString(cpytestButton.transform.parent.gameObject));	--UIRoot
+	--LogDebug(GameObjectToString(cpytestButton));
+	--local label = UIUtil.FindGO("Label",cpytestButton);
+	--LogDebug(GameObjectToString(label));
+	
+	if cpySwitch == nil then
+		local obj = g_mainView:FindGO("SkillShortCutSwitch");
+		LogDebug(GameObjectToString(obj));
+		cpySwitch = GameObject.Instantiate(obj);
+	end;
+	cpySwitch:SetActive(false);
+
+	if cpySwitchIcon == nil then	
+		local obj = g_mainView:FindGO("SwitchIcon");
+		LogDebug(GameObjectToString(obj));
+		cpySwitchIcon = GameObject.Instantiate(obj);
+	end;
+	cpySwitchIcon:SetActive(false);
+	
+	local obj = g_mainView:FindGO("SkillBord");
+	LogDebug(GameObjectToString(obj));
+	
+	if cpyCancelTransformBtn == nil then	
+		local obj = g_mainView:FindGO("cancelTransformBtn");
+		LogDebug(GameObjectToString(obj));
+		cpyCancelTransformBtn = GameObject.Instantiate(obj);
+	end;
+	cpyCancelTransformBtn:SetActive(false);
+
+	if EnsureMyButtom("ShortCutSkill_") then
+		myButton["ShortCutSkill_"]:SetActive(false);
+		local sprite = GameObjectUtil.Instance:DeepFindChild(myButton["ShortCutSkill_"], "Icon"):GetComponent(UISprite)
+		LogDebug(GameObjectToString(sprite));
+		LogDebug(MyTostring(sprite.material));
+		LogDebug(MyTostring(sprite.material.mainTexture));
+		local tabs = GameObjectUtil.Instance:GetAllComponentsInChildren(myButton["ShortCutSkill_"], MonoBehaviour, false) or {};
+		LogDebug(MyTostring(tabs));
+		
+	end;
+	local tabs = GameObjectUtil.Instance:GetAllComponentsInChildren(cpytestButton, MonoBehaviour, false) or {};
+	LogDebug(MyTostring(tabs));
+	local label = UIUtil.FindAllComponents(cpytestButton, UILabel, false) -- cpytestButton:GetComponent(UILabel);
+	label[1].text = "Reload";
+	label[1].fontSize = 30;
+	
+	LogDebug(MyTostring(label[1]));
+--	LogDebug(MyTostring(cpytestButton));
+	--local objs = cpytestButton:GetRootGameObjects();
+	--local skillBord = g_mainView:FindGO("SkillBord");
+	--LogDebug(MyTostring(objs));
+	--LogDebug(MyTostring(skillBord.transform.parent.gameObject));	--Anchor_DownRight
+	
 end;
 
+function OnMiniMapClick(self)
+	--myTick:stop();
+	--myTick:start();
+	if Game.Myself.ai.autoAI_Rom == nil then
+		Game.Myself.ai.autoAI_Rom = AutoAI_Rom.new();
+		Game.Myself.ai.idleAIManager:PushAI(Game.Myself.ai.autoAI_Rom);
+		LogDebug("set AutoAI_Rom");
+	else
+		local index = TableUtil.FindKeyByValue(Game.Myself.ai.idleAIManager.ais,Game.Myself.ai.autoAI_Rom);
+		Game.Myself.ai.autoAI_Rom = AutoAI_Rom.new();
+		Game.Myself.ai.idleAIManager.ais[index] = Game.Myself.ai.autoAI_Rom;
+		LogDebug("set new AutoAI_Rom");
+	end;
+	--ListField(Game.Myself.ai);
+	--ListField(g_MainView);	--class
+	--ListField(g_mainView);	--instance
+	--DumpSelf(self);
+	--DumpMyself();
+	local testButton = g_mainView:FindGO("TestFloat");
+	LogDebug(MyTostring(testButton));
+	local activeScene = SceneManagement.SceneManager.GetActiveScene();
+	LogDebug(MyTostring(activeScene));
+	--SceneManagement.SceneManager.LoadScene(testButton.name);
+	--g_mainView.topFuncs:SetActive(true);	-- OK top left menu
+	--g_mainView.moreBord:SetActive(true);	-- OK more board 
+	--g_mainView.Anchor_DownLeft:SetActive(toggle%2 == 1);	-- OK lower left (chat and EXP bar)
+	--g_mainView.raidMsgRoot:SetActive(toggle%2 == 1);	-- UNKNOWN
+	--g_mainView.mainBord:SetActive(toggle%2 == 1);	-- everything beside background
+	--g_mainView:FindGO("SkillBord"):SetActive(toggle%2 == 1); -- skill button
+	--LogDebug(MyTostring(questlst));
+	if toggle%2 == 1 then
+		--UIUtil.FloatMsgByText("Show");
+	end;
+	--testButton:SetActive(toggle%2 == 1);
+	toggle = toggle + 1;
+	
+	LogDebug("" .. toggle .. " " .. (toggle%2));
+end;
 
-AutoAI_Rom = class("AutoAI_Rom")
-
-function AutoAI_Rom:ctor()
-    LogDebug("AutoAI_Rom:ctor()");
-end
-
-function AutoAI_Rom:Clear(idleElapsed, time, deltaTime, creature)
-    LogDebug("AutoAI_Rom:Clear()");
-end
-
-function AutoAI_Rom:Prepare(idleElapsed, time, deltaTime, creature)
---    LogDebug("AutoAI_Rom:Prepare()");
-	return true
-end
-
-function AutoAI_Rom:Start(idleElapsed, time, deltaTime, creature)
---    LogDebug("AutoAI_Rom:Start()");
-end
-
-function AutoAI_Rom:End(idleElapsed, time, deltaTime, creature)
---    LogDebug("AutoAI_Rom:End()");
-end
-
-function AutoAI_Rom:Update(idleElapsed, time, deltaTime, creature)
---    LogDebug("AutoAI_Rom:Update()");
-	return false
-end
-
+LogDebug("ROM Loaded 1.03");
 
