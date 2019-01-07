@@ -310,8 +310,15 @@ if g_mainView ~= nil then
 		local obj = g_mainView:FindGO("cancelTransformBtn");
 		LogDebug(GameObjectToString(obj));
 		cpyCancelTransformBtn = GameObject.Instantiate(obj);
+--		cpytestButton:SetActive(true);
 	end;
-	cpyCancelTransformBtn:SetActive(false);
+	tempVector3:Set(0.05,0.40,0);
+	local p = uiCamera:ViewportToWorldPoint(tempVector3);
+	cpyCancelTransformBtn.transform.localScale = Vector3(1,0.5,1);
+	cpyCancelTransformBtn.transform.position = p;
+	UIUtil.FindGO("Icon", cpyCancelTransformBtn):SetActive(false);
+	UIUtil.FindGO("Bg", cpyCancelTransformBtn):SetActive(true);
+	cpyCancelTransformBtn:SetActive(true);
 
 	if EnsureMyButtom("ShortCutSkill_") then
 		myButton["ShortCutSkill_"]:SetActive(false);
@@ -319,8 +326,10 @@ if g_mainView ~= nil then
 		LogDebug(GameObjectToString(sprite));
 		LogDebug(MyTostring(sprite.material));
 		LogDebug(MyTostring(sprite.material.mainTexture));
-		local tabs = GameObjectUtil.Instance:GetAllComponentsInChildren(myButton["ShortCutSkill_"], MonoBehaviour, false) or {};
+		local tabs = GameObjectUtil.Instance:GetAllComponentsInChildren(myButton["ShortCutSkill_"], UILabel, false) or {};
 		LogDebug(MyTostring(tabs));
+		LogDebug(MyTostring(tabs[1].trueTypeFont));
+		
 		
 	end;
 	local tabs = GameObjectUtil.Instance:GetAllComponentsInChildren(cpytestButton, MonoBehaviour, false) or {};
@@ -330,6 +339,8 @@ if g_mainView ~= nil then
 	label[1].fontSize = 30;
 	
 	LogDebug(MyTostring(label[1]));
+	LogDebug(MyTostring(label[1].trueTypeFont));
+	
 --	LogDebug(MyTostring(cpytestButton));
 	--local objs = cpytestButton:GetRootGameObjects();
 	--local skillBord = g_mainView:FindGO("SkillBord");
