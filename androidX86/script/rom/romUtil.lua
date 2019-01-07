@@ -10,14 +10,16 @@ function tableForEach(t, f)
         for i, v in pairs(t) do f(i,v) end 
 end 
 
-function GameObjectToString(go,tab)
-	if tab == nil then tab = ""; end;
+function GameObjectToString(go,tab,visible)
+	tab = tab or "";
 	if go == nil then return "NULL"; end;
 	local ret = tab .. UserDataToString(go);
 	local trans = go.transform;
 	for i=0, trans.childCount-1 do
 		local goChild = trans:GetChild(i).gameObject;
-		ret = ret .. "\n" .. GameObjectToString(goChild,tab .. " ");
+        if visible == nil or goChild.activeSelf == visible then
+            ret = ret .. "\n" .. GameObjectToString(goChild,tab .. " ",visible);
+        end;
 	end
 	return ret;
 end;
@@ -27,7 +29,14 @@ function UserDataToString(value)
 	local ret = "[" .. type(value) .. "] " .. tostring(value);
 	if string.match(ret, "(UnityEngine.GameObject)") then	
 		--ret = "[GameObject] name=" .. tostring(value.name) .. " scene=" .. MyTostring(value.scene) .. " " .. tostring(value.activeSelf);
-		ret = "[GameObject] name=" .. tostring(value.name) ..  " " .. tostring(value.activeSelf);
+        if value.name == "Label" then
+            local label = value:GetComponent(UILabel);
+            if label ~= nil then
+                ret = "[GameObject] name=" .. tostring(value.name) ..  " text=" .. label.text .. " " .. tostring(value.activeSelf);        
+                return ret;
+            end;
+        end;
+        ret = "[GameObject] name=" .. tostring(value.name) ..  " " .. tostring(value.activeSelf);        
 	end;
 	if string.match(ret, "(UnityEngine.SceneManagement.Scene)") then	
 		--ret = "[Scene] name=" .. value.name .. " path=" .. value.path .. " rootCount=" .. value.rootCount;
@@ -43,7 +52,8 @@ function UserDataToString(value)
 	return ret;
 end;
 
-function ListField(obj,tab,tableHash)
+function ListField(obj,tab,tableHash,targetTab)
+    targetTab = targetTab or "       ";
     tab = tab or "";
 	tableHash = tableHash or {};
     if (type(obj) == 'table') then
@@ -61,16 +71,13 @@ function ListField(obj,tab,tableHash)
 				LogDebug(tab .. "[" .. tostring(i) ..  "] " .. tostring(v));			
 				return;
 			end;
-			if (type(i) == 'number') then
-				LogDebug(tab .. "[" .. i ..  "] " .. tostring(v));			
-				return;
-			end;
-			if (type(i) == 'number') then
-				LogDebug(tab .. "[" .. i ..  "] " .. tostring(v));			
-				return;
-			end;
-			if (type(i) == 'string') then			
-				if (i == "__cname") or  (i == "__ctype") then
+--			if (type(i) == 'number') then
+--				LogDebug(tab .. "[" .. i ..  "] " .. tostring(v));			
+--				return;
+--			end;
+			if (type(i) == 'string') or (type(i) == 'number') then
+                local key = tostring(i);
+				if (key == "__cname") or  (key == "__ctype") then
 					return;
 				end;
 				-- skip function
@@ -78,14 +85,14 @@ function ListField(obj,tab,tableHash)
 					return;
 				end;
 				if(type(v) == 'table') then
-					if tab == "       " then
-						LogDebug(tab .. i .. " " .. tostring(v) .. " >");			
+					if tab == targetTab then
+						LogDebug(tab .. key .. " " .. tostring(v) .. " >");			
 					else
-						LogDebug(tab .. i .. " " .. tostring(v));							
-						ListField(v,tab .. " ",tableHash);
+						LogDebug(tab .. key .. " " .. tostring(v));							
+						ListField(v,tab .. " ",tableHash,targetTab);
 					end;
 				else
-					LogDebug(tab .. i .. "=" .. tostring(v));
+					LogDebug(tab .. key .. "=" .. tostring(v));
 				end;
 			end;
         end)
@@ -235,33 +242,149 @@ function DumpSelf(self)
     LogDebug("activeScene " .. MyTostring(activeScene));
 end;
 
+
+
+function MonsterToString(m)
+    return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type;
+end;
+
+function SkillToString(s)
+    local skillInfo = Game.LogicManager_Skill:GetSkillInfo(s.id);
+    return "ID=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType;
+end;
+
+
+
+function DumpLearnSkill()
+    local lstSkill = SkillProxy.Instance.learnedSkills;
+    tableForEach(lstSkill, function(i, v)
+        local skills = v;
+        --local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skill:GetID());
+        --ListField(skill.id);
+        tableForEach(skills, function(i, v)
+            local skill = v;
+            LogDebug(SkillToString(skill));
+            --LogDebug(MyTostring(skill.id));
+        end);
+    end);    
+end;
+
+function DumpMonsters()
+    local lst = NSceneNpcProxy.Instance.npcMap;
+    tableForEach(lst, function(i, v)
+        local mons = v;
+        tableForEach(mons, function(i, v)
+            local mon = v;
+            LogDebug(MonsterToString(mon));
+        end);
+    end);    
+end;
+
+
 if class ~= nil then
 	AutoAI_Rom = class("AutoAI_Rom")
 
 	function AutoAI_Rom:ctor()
+        self.enable = false;
 		LogDebug("AutoAI_Rom:ctor()");
 	end
+    
+    function AutoAI_Rom:Enable(value)
+        self.enable = value;
+    end;
+    
+    function AutoAI_Rom:IsEnable()
+        return self.enable;
+    end;
+    
 
 	function AutoAI_Rom:Clear(idleElapsed, time, deltaTime, creature)
 		LogDebug("AutoAI_Rom:Clear()");
 	end
 
 	function AutoAI_Rom:Prepare(idleElapsed, time, deltaTime, creature)
-	--    LogDebug("AutoAI_Rom:Prepare()");
-		return true
+        if self.enable then
+            local npc = ROM_FindNearestMonsterEx(myMonsterList);
+            if npc ~= nil then
+--              LogDebug("AutoAI_Rom:Prepare() true");   
+                self.target = npc;
+                Game.Myself:Client_LockTarget(npc);
+                --Game.Myself:Client_MoveTo(npc:GetPosition(),true);	-- ignore mesg seem to work                
+                return true
+            end;
+        end;
+        --LogDebug("AutoAI_Rom:Prepare() false");        
+        return false
 	end
 
 	function AutoAI_Rom:Start(idleElapsed, time, deltaTime, creature)
-	--    LogDebug("AutoAI_Rom:Start()");
+	    LogDebug("AutoAI_Rom:Start()");
+        if self.target ~= nil then
+            local npc = self.target;
+            --local npc = NSceneNpcProxy.Instance:FindNearestNpc(Game.Myself:GetPosition(), 10001);
+            --Game.Myself:Client_LockTarget(npc);
+    --[[        local lstAttkSkill = SkillProxy.Instance.learnedSkills[10];
+            tableForEach(lstAttkSkill, function(i, v)
+                    local skill = v;
+                    --LogDebug(MyTostring(skill.id) .. " " .. );
+                    local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skill:GetID());
+                    LogDebug("id=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType);
+                    --ListField(skillInfo);
+            end);]]
+            Game.Myself:Client_UseSkill(145001, npc,nil,nil,true);
+            Game.Myself:Client_UseSkill(143001, npc,nil,nil,true);
+        end;
 	end
 
 	function AutoAI_Rom:End(idleElapsed, time, deltaTime, creature)
-	--    LogDebug("AutoAI_Rom:End()");
+        self.target = nil;
+	    LogDebug("AutoAI_Rom:End()");
 	end
 
 	function AutoAI_Rom:Update(idleElapsed, time, deltaTime, creature)
-	--    LogDebug("AutoAI_Rom:Update()");
+	    LogDebug("AutoAI_Rom:Update()");
 		return false
 	end
 
 end;
+
+
+function ROM_FindNearestMonster(monlist)
+    local minDist = 100000;
+    local retNpc = nil;
+    local myPos = Game.Myself:GetPosition();
+    tableForEach(monlist,function(i,v)
+        local npc = NSceneNpcProxy.Instance:FindNearestNpc(myPos, v);
+        if npc ~= nil then
+            local distance = LuaVector3.Distance(myPos, npc:GetPosition());
+            LogDebug("ID=" .. v .. " dist=" .. tostring(distance));
+            if distance < minDist then
+                retNpc = npc;
+                minDist = distance;
+            end;
+        else
+            LogDebug("ID=" .. v .. " not found");
+        end;
+    end);
+    return retNpc;
+end;
+
+function ROM_FindNearestMonsterEx(monlist)
+    local mons = ROM_GetAllMonster();
+    local minDist = 100000;
+    local retNpc = nil;
+    local myPos = Game.Myself:GetPosition();
+    tableForEach(mons,function(i,v)
+        local npc = v;
+        local distance = LuaVector3.Distance(myPos, npc:GetPosition());
+        --LogDebug("ID=" .. v .. " dist=" .. tostring(distance));
+        if distance < minDist then
+            retNpc = npc;
+            minDist = distance;
+        end;
+    end);
+    return retNpc;
+end;
+
+
+

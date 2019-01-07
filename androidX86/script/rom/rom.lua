@@ -84,24 +84,24 @@ if NCreature ~= nil then
         --helplog(string.format("Server SetDirCmd Player:%s Dir:%s", self.data.name, dir));
         self.ai:PushCommand(FactoryAICMD.GetSetAngleYCmd(mode,dir,noSmooth), self)
     end
-    function NCreature:GetClickable()
-        LogDebug("NCreature:GetClickable()");
+    --function NCreature:GetClickable()
+    --    LogDebug("NCreature:GetClickable()");
         --LogDebug(MyTostring(self.data));
         --LogDebug(MyTostring(self.assetRole));
         --self:Hide();
-        return not self.data:NoAccessable()
-    end
+    --    return not self.data:NoAccessable()
+    --end
     
 end;
 
-function onHPChange(param)
-    LogDebug("onHPChange");
-end;
+--function onHPChange(param)
+--    LogDebug("onHPChange");
+--end;
 
 if EventManager~=nil and MyselfEvent ~= nil then
-    EventManager.Me():RemoveEventListener(MyselfEvent.HpChange,onHPChange,nil);
-    EventManager.Me():AddEventListener(MyselfEvent.HpChange,onHPChange,nil);
-    LogDebug("AddEventListener");
+--    EventManager.Me():RemoveEventListener(MyselfEvent.HpChange,onHPChange,nil);
+--    EventManager.Me():AddEventListener(MyselfEvent.HpChange,onHPChange,nil);
+--    LogDebug("AddEventListener");
 end;    
 
 if Game~=nil and Game.LogicManager_Myself_Props ~= nil and Game.me~=nil then
@@ -175,13 +175,14 @@ if MyTick ~= nil then
 	end;
 
 	if myTick == nil or myTick.version ~= MyTick.version then
+        LogDebug("Create MyTick");
 		myTick = MyTick.new();
 	end;
 end;
 --LogDebug("myTick=" .. tostring(myTick) .. " " .. tostring(myTick.version));
 --myTick.stop();
 --myTick.start();
-
+--[[
 if MiniMapWindow~= nil then
     LogDebug("Mod MiniMapWindow");
 	function MiniMapWindow:Show()
@@ -239,6 +240,7 @@ if MiniMapWindow~= nil then
 	end
 end;
 toggle = 1;
+]]
 
 myButton = myButton or {};
 function EnsureMyButtom(name)
@@ -254,114 +256,96 @@ function EnsureMyButtom(name)
 	return myButton[name] ~= nil;
 end;
 
+function CreateMyButton(text,pos,onclick)
+    if g_mainView == nil then 
+        LogDebug("CreateMyButton: g_mainView not found");
+        return nil 
+    end;
+    local templateButton = g_mainView:FindGO("RewardButton");
+    if templateButton == nil then 
+        LogDebug("CreateMyButton: RewardButton not found");
+        return nil 
+    end;
+    local uiCamera = NGUIUtil:GetCameraByLayername("UI");	
+    if uiCamera == nil then 
+        LogDebug("CreateMyButton: uiCamera not found");
+        return nil 
+    end;
+    local ret = myButton[text];
+    if ret == nil then
+        ret = GameObject.Instantiate(templateButton);
+        myButton[text] = ret;
+        ret:SetActive(false);
+        UIUtil.FindGO("Sprite",ret):SetActive(false);
+        local label = UIUtil.FindGO("Label",ret);
+        --LogDebug(MyTostring(label.transform.localPosition));
+        label.transform.localPosition = Vector3(0,0,0);
+        label:GetComponent(UILabel).text = text;
+        --ret.transform:SetParent(templateButton.transform.parent);
+        if pos~= nil then
+            ret.transform.position = uiCamera:ViewportToWorldPoint(pos);
+        end;
+    end;
+    return ret;
+end;
+
 if g_mainView ~= nil then
 	local tempVector3 = LuaVector3.zero
 	local testButton = g_mainView:FindGO("TestFloat");
-	--LogDebug(GameObjectToString(testButton));
-	if cpytestButton == nil then
-		-- create another test button
-		cpytestButton = GameObject.Instantiate(testButton);
-	else
-	end
-
 	local uiCamera = NGUIUtil:GetCameraByLayername("UI");	
-	LogDebug(GameObjectToString(uiCamera));
-	--tempVector3:Set(0.1,0.5,uiCamera.nearClipPlane);
-	tempVector3:Set(0.05,0.5,0);
-	local p = uiCamera:ViewportToWorldPoint(tempVector3);
-	LogDebug(MyTostring(p));
-	--LogDebug(MyTostring(GUI.Button()));
-	--LogDebug(MyTostring(cpytestButton.transform.rect));
-	cpytestButton.transform.position = p;
-	cpytestButton:SetActive(true);
-	
-	--tempVector3:Set(10,10,0);
-	--cpytestButton.transform.localPosition = tempVector3
-	--tempVector3:Set(0.5,0.5,0.5);
-	--cpytestButton.transform.localScale = tempVector3	
-	g_mainView:AddClickEvent(cpytestButton, function (g)
-		if ROM_Reload() then
-			UIUtil.FloatMsgByText("Reload Success");
-		end;
-	end);
-	--LogDebug(GameObjectToString(cpytestButton.transform.parent.gameObject));	--UIRoot
-	--LogDebug(GameObjectToString(cpytestButton));
-	--local label = UIUtil.FindGO("Label",cpytestButton);
-	--LogDebug(GameObjectToString(label));
-	
-	if cpySwitch == nil then
-		local obj = g_mainView:FindGO("SkillShortCutSwitch");
-		LogDebug(GameObjectToString(obj));
-		cpySwitch = GameObject.Instantiate(obj);
-	end;
-	cpySwitch:SetActive(false);
-
-	if cpySwitchIcon == nil then	
-		local obj = g_mainView:FindGO("SwitchIcon");
-		LogDebug(GameObjectToString(obj));
-		cpySwitchIcon = GameObject.Instantiate(obj);
-	end;
-	cpySwitchIcon:SetActive(false);
-	
-	local obj = g_mainView:FindGO("SkillBord");
-	LogDebug(GameObjectToString(obj));
-	
-	if cpyCancelTransformBtn == nil then	
-		local obj = g_mainView:FindGO("cancelTransformBtn");
-		LogDebug(GameObjectToString(obj));
-		cpyCancelTransformBtn = GameObject.Instantiate(obj);
---		cpytestButton:SetActive(true);
-	end;
-	tempVector3:Set(0.05,0.40,0);
-	local p = uiCamera:ViewportToWorldPoint(tempVector3);
-	cpyCancelTransformBtn.transform.localScale = Vector3(1,0.5,1);
-	cpyCancelTransformBtn.transform.position = p;
-	UIUtil.FindGO("Icon", cpyCancelTransformBtn):SetActive(false);
-	UIUtil.FindGO("Bg", cpyCancelTransformBtn):SetActive(true);
-	cpyCancelTransformBtn:SetActive(true);
-
-	if EnsureMyButtom("ShortCutSkill_") then
-		myButton["ShortCutSkill_"]:SetActive(false);
-		local sprite = GameObjectUtil.Instance:DeepFindChild(myButton["ShortCutSkill_"], "Icon"):GetComponent(UISprite)
-		LogDebug(GameObjectToString(sprite));
-		LogDebug(MyTostring(sprite.material));
-		LogDebug(MyTostring(sprite.material.mainTexture));
-		local tabs = GameObjectUtil.Instance:GetAllComponentsInChildren(myButton["ShortCutSkill_"], UILabel, false) or {};
-		LogDebug(MyTostring(tabs));
-		LogDebug(MyTostring(tabs[1].trueTypeFont));
-		
-		
-	end;
-	local tabs = GameObjectUtil.Instance:GetAllComponentsInChildren(cpytestButton, MonoBehaviour, false) or {};
-	LogDebug(MyTostring(tabs));
-	local label = UIUtil.FindAllComponents(cpytestButton, UILabel, false) -- cpytestButton:GetComponent(UILabel);
-	label[1].text = "Reload";
-	label[1].fontSize = 30;
-	
-	LogDebug(MyTostring(label[1]));
-	LogDebug(MyTostring(label[1].trueTypeFont));
-	
---	LogDebug(MyTostring(cpytestButton));
-	--local objs = cpytestButton:GetRootGameObjects();
-	--local skillBord = g_mainView:FindGO("SkillBord");
-	--LogDebug(MyTostring(objs));
-	--LogDebug(MyTostring(skillBord.transform.parent.gameObject));	--Anchor_DownRight
-	
+	--LogDebug(GameObjectToString(uiCamera));
+    
+	--local obj = g_mainView:FindGO("SkillBord");
+	--LogDebug(GameObjectToString(obj));
+    local top_right = g_mainView:FindGO("Anchor_TopRight");
+    --LogDebug(GameObjectToString(top_right,"",true));
+--[[    
+    if EnsureMyButtom("RewardButton") then
+		myButton["RewardButton"]:SetActive(false);
+        UIUtil.FindGO("Sprite",myButton["RewardButton"]):SetActive(false);
+        local label = UIUtil.FindGO("Label",myButton["RewardButton"]);
+        LogDebug(MyTostring(label.transform.localPosition));
+        label.transform.localPosition = Vector3(0,0,0);
+        myButton["RewardButton"].transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.05,0.4,0));
+	end;]]
+    
+    if CreateMyButton("Reload") then
+        local button = myButton["Reload"];
+        button.transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.05,0.70,0));
+        button:SetActive(true);        
+        g_mainView:AddClickEvent(button, function (g)
+            if ROM_Reload() then
+                UIUtil.FloatMsgByText("Reload Success");
+            end;
+        end);        
+    end;
+    if CreateMyButton("Test") then
+        LogDebug("Test");
+        local button = myButton["Test"];
+        button.transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.05,0.63,0));
+        button:SetActive(true);        
+        g_mainView:AddClickEvent(button, function (g)
+            ROM_Test(g);
+        end);        
+    end;
+    if CreateMyButton("Test1") then
+        LogDebug("Test1");
+        local button = myButton["Test1"];
+        button.transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.05,0.56,0));
+        button:SetActive(true);        
+        g_mainView:AddClickEvent(button, function (g)
+            ROM_Auto(g);
+            --UIUtil.FloatMsgByText("Test1");
+        end);        
+        --LogDebug(MyTostring(button.transform.parent));
+        --LogDebug(MyTostring(button.transform.parent.parent));
+    end;	
 end;
 
 function OnMiniMapClick(self)
 	--myTick:stop();
 	--myTick:start();
-	if Game.Myself.ai.autoAI_Rom == nil then
-		Game.Myself.ai.autoAI_Rom = AutoAI_Rom.new();
-		Game.Myself.ai.idleAIManager:PushAI(Game.Myself.ai.autoAI_Rom);
-		LogDebug("set AutoAI_Rom");
-	else
-		local index = TableUtil.FindKeyByValue(Game.Myself.ai.idleAIManager.ais,Game.Myself.ai.autoAI_Rom);
-		Game.Myself.ai.autoAI_Rom = AutoAI_Rom.new();
-		Game.Myself.ai.idleAIManager.ais[index] = Game.Myself.ai.autoAI_Rom;
-		LogDebug("set new AutoAI_Rom");
-	end;
+
 	--ListField(Game.Myself.ai);
 	--ListField(g_MainView);	--class
 	--ListField(g_mainView);	--instance
@@ -386,6 +370,107 @@ function OnMiniMapClick(self)
 	toggle = toggle + 1;
 	
 	LogDebug("" .. toggle .. " " .. (toggle%2));
+end;
+
+myMonsterList = {10001,10002,10003};
+mySkillList = {145001};
+
+function ROM_Test(g)
+    UIUtil.FloatMsgByText("Test");
+    --LogDebug("npcGroupMap");
+    --ListField(NSceneNpcProxy.Instance.npcGroupMap,"",{}," ");
+    --LogDebug("npcMap");
+    --ListField(NSceneNpcProxy.Instance.npcMap,"",{}," ");
+    --LogDebug("userMap");
+    --ListField(NSceneNpcProxy.Instance.userMap,"",{}," ");
+    --ListField(NSceneNpcProxy.Instance.npcGroupMap[10001]);
+    --local npc = NSceneNpcProxy.Instance:FindNearestNpc(Game.Myself:GetPosition(), 10001);
+    --local npc = ROM_FindNearestMonster(myMonsterList);
+    local npc = ROM_FindNearestMonsterEx();
+    --LogDebug(MyTostring(npc));
+    --ListField(npc);
+    if npc ~= nil then
+        Game.Myself:Client_LockTarget(npc);
+        Game.Myself:Client_MoveTo(npc:GetPosition(),true);	-- ignore mesg seem to work      
+    else
+        LogDebug("Tragte not found");
+    end;
+    --ListField(MyTostring(SkillProxy.Instance.equipedSkillsArrays[SkillProxy.AutoSkillsIndex]));
+    --ListField(SkillProxy.Instance.equipedSkillsArrays[SkillProxy.AutoSkillsIndex],"",{}," ");
+    --ListField(SkillProxy.Instance.learnedSkills,"",{},"  ");
+    --local lstAttkSkill = SkillProxy.Instance.learnedSkills[10];
+    --tableForEach(lstAttkSkill, function(i, v)
+            --local skill = v;
+            --LogDebug(MyTostring(skill.id) .. " " );
+            --local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skill:GetID());
+            --LogDebug("id=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType);
+            --ListField(skillInfo);
+    --end);
+    --Game.Myself:Client_UseSkill(10001, npc,nil,nil,true);
+    --DumpLearnSkill();
+    --DumpMonsters();
+    local skills = ROM_GetActiveSkill();
+    tableForEach(skills,function(i,v)
+        LogDebug(SkillToString(v));
+    end);
+    
+    --local mons = ROM_GetAllMonster();
+    --tableForEach(mons,function(i,v)
+    --    LogDebug(MonsterToString(v));
+    --end);
+end;
+
+function ROM_Auto()
+	if Game.Myself.ai.autoAI_Rom == nil then
+		Game.Myself.ai.autoAI_Rom = AutoAI_Rom.new();
+		Game.Myself.ai.idleAIManager:PushAI(Game.Myself.ai.autoAI_Rom);
+		LogDebug("set AutoAI_Rom");
+	else
+		local index = TableUtil.FindKeyByValue(Game.Myself.ai.idleAIManager.ais,Game.Myself.ai.autoAI_Rom);
+        local old = Game.Myself.ai.autoAI_Rom;
+		Game.Myself.ai.autoAI_Rom = AutoAI_Rom.new();
+		Game.Myself.ai.idleAIManager.ais[index] = Game.Myself.ai.autoAI_Rom;
+        Game.Myself.ai.autoAI_Rom:Enable(old:IsEnable());
+--		LogDebug("set new AutoAI_Rom");
+	end;
+    if Game.Myself.ai.autoAI_Rom:IsEnable() then
+        Game.Myself.ai.autoAI_Rom:Enable(false);
+    else
+        Game.Myself.ai.autoAI_Rom:Enable(true);
+    end;
+    UIUtil.FloatMsgByText("Auto " .. tostring(Game.Myself.ai.autoAI_Rom:IsEnable()));
+end;
+
+function ROM_GetAllMonster()
+    local ret = {};
+    local lst = NSceneNpcProxy.Instance.npcMap;
+    tableForEach(lst, function(i, v)
+        local mons = v;
+        tableForEach(mons, function(i, v)
+            local mon = v;
+            if mon.data.staticData.Type == "Monster" then
+                table.insert(ret, mon);
+            end;
+        end);
+    end);    
+    return ret;
+end;
+
+function ROM_GetActiveSkill()
+    local ret = {};
+    local lstSkill = SkillProxy.Instance.learnedSkills;
+    tableForEach(lstSkill, function(i, v)
+        local skills = v;
+        tableForEach(skills, function(i, v)
+            local skill = v;
+            local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skill.id);
+            if skillInfo.staticData.SkillType == "Attack" then  -- "Heal"
+                table.insert(ret, skill);
+            end;
+            --LogDebug(SkillToString(skill));
+        end);
+    end);    
+    return ret;
 end;
 
 LogDebug("ROM Loaded 1.03");
