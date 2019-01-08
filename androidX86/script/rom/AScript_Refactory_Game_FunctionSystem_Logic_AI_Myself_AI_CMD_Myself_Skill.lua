@@ -10,8 +10,8 @@ function AI_CMD_Myself_Skill_Run.Start(self, time, deltaTime, creature, targetCr
 	local skill = creature.skill
 
 	--KKK
-	Debug.Log("KKK AI_CMD_Myself_Skill_Run.Start " .. skill.info:GetSpeakName(creature) .. " ID=" .. skill:GetSkillID());
-	if 12001 == skill:GetSkillID() then
+	Debug.Log("KKK AI_CMD_Myself_Skill_Run.Start [" .. skill.info:GetSpeakName(creature) .. "] ID=" .. skill:GetSkillID());
+	if 12001 == skill:GetSkillID() or "Thump!!" == skill.info:GetSpeakName(creature) then
 		Debug.Log("Reload Start");
 		ROM_Reload();
 		Debug.Log("Reload End");

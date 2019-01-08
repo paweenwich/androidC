@@ -253,6 +253,12 @@ function SkillToString(s)
     return "ID=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType;
 end;
 
+function SkillToStringByID(id)
+    local skillInfo = Game.LogicManager_Skill:GetSkillInfo(id);
+    return "ID=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType;
+end;
+
+
 
 
 function DumpLearnSkill()
@@ -304,7 +310,17 @@ if class ~= nil then
 
 	function AutoAI_Rom:Prepare(idleElapsed, time, deltaTime, creature)
         if self.enable then
-            local npc = ROM_FindNearestMonsterEx(myMonsterList);
+            for i= 1, #myAIRules do
+                local rule = myAIRules[i];
+                --LogDebug("" .. i .. " " .. MyTostring(rule));
+                if rule.func ~= nil and rule.func(rule) then
+                    return true;
+                end;
+            end;        
+            -- nothing to do
+            return false;
+        end;
+--[[            local npc = ROM_FindNearestMonsterEx(myMonsterList);
             if npc ~= nil then
 --              LogDebug("AutoAI_Rom:Prepare() true");   
                 self.target = npc;
@@ -312,42 +328,77 @@ if class ~= nil then
                 --Game.Myself:Client_MoveTo(npc:GetPosition(),true);	-- ignore mesg seem to work                
                 return true
             end;
-        end;
-        --LogDebug("AutoAI_Rom:Prepare() false");        
+        --LogDebug("AutoAI_Rom:Prepare() false");        ]]
         return false
 	end
 
 	function AutoAI_Rom:Start(idleElapsed, time, deltaTime, creature)
 	    LogDebug("AutoAI_Rom:Start()");
+--[[        local myStatus= ROM_GetMyStatus();
         if self.target ~= nil then
             local npc = self.target;
-            --local npc = NSceneNpcProxy.Instance:FindNearestNpc(Game.Myself:GetPosition(), 10001);
-            --Game.Myself:Client_LockTarget(npc);
-    --[[        local lstAttkSkill = SkillProxy.Instance.learnedSkills[10];
-            tableForEach(lstAttkSkill, function(i, v)
-                    local skill = v;
-                    --LogDebug(MyTostring(skill.id) .. " " .. );
-                    local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skill:GetID());
-                    LogDebug("id=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType);
-                    --ListField(skillInfo);
-            end);]]
-            Game.Myself:Client_UseSkill(145001, npc,nil,nil,true);
-            Game.Myself:Client_UseSkill(143001, npc,nil,nil,true);
-        end;
+            local buffSkillID = 146005;
+            if ROM_HasBuffFromSkillID(buffSkillID) == false then
+                local skillNeeded = ROM_GetSkillNeeded(buffSkillID);
+                if skillNeeded.sp < myStatus.sp then
+                    Game.Myself:Client_UseSkill(buffSkillID, npc,nil,nil,true);
+                    return;
+                end;
+            end;
+            local skillID = 145009;
+            local skillNeeded = ROM_GetSkillNeeded(skillID);
+            if skillNeeded.sp < myStatus.sp then
+                Game.Myself:Client_UseSkill(skillID, npc,nil,nil,true);
+            else
+                -- 01/08/19 15:48:34 ID=10020001 name=[Play Dead] type=FakeDead
+                Game.Myself:Client_UseSkill(10020001, nil, nil,nil,true);
+                LogDebug("AutoAI_Rom:Start() Not enough SP " .. myStatus.sp .. "<" .. skillNeeded.sp);
+            end;
+            --Game.Myself:Client_UseSkill(143001, npc,nil,nil,true);
+        end;]]
 	end
 
 	function AutoAI_Rom:End(idleElapsed, time, deltaTime, creature)
         self.target = nil;
-	    LogDebug("AutoAI_Rom:End()");
+	    --LogDebug("AutoAI_Rom:End()");
 	end
 
 	function AutoAI_Rom:Update(idleElapsed, time, deltaTime, creature)
-	    LogDebug("AutoAI_Rom:Update()");
+	    --LogDebug("AutoAI_Rom:Update()");
 		return false
 	end
 
 end;
 
+function ROM_GetMyStatus()
+    local props = Game.Myself.data.props;
+    local hp = props.Hp:GetValue();
+    local maxhp = props.MaxHp:GetValue();
+    local frachp = hp/maxhp;
+    local sp = props.Sp:GetValue();
+    local maxSp = props.MaxSp:GetValue();
+    local fracsp = sp/maxSp;
+    return {
+        hp=hp,
+        maxhp=maxhp,
+        frachp=frachp,
+        sp=sp,
+        maxSp=maxSp,
+        fracsp=fracsp,
+    };
+end;
+
+function ROM_GetSkillNeeded(skillID)
+    local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skillID);
+    local spCost = skillInfo:GetSP(Game.Myself);
+    local hpCost = skillInfo:GetHP(Game.Myself);
+    local delayCD = skillInfo:GetDelayCD(Game.Myself);
+    --local CD = skillInfo:GetCD(Game.Myself);
+    local CD = skillInfo:GetLogicRealCD(Game.Myself);
+    return {
+        hp=hpCost or 0,sp=spCost or 0,delayCD=delayCD or 0,CD=CD or 0
+    };
+end;
 
 function ROM_FindNearestMonster(monlist)
     local minDist = 100000;
@@ -370,17 +421,21 @@ function ROM_FindNearestMonster(monlist)
 end;
 
 function ROM_FindNearestMonsterEx(monlist)
+    monlist = monlist or {};
     local mons = ROM_GetAllMonster();
     local minDist = 100000;
     local retNpc = nil;
     local myPos = Game.Myself:GetPosition();
+    --m.data.staticData.id 
     tableForEach(mons,function(i,v)
         local npc = v;
-        local distance = LuaVector3.Distance(myPos, npc:GetPosition());
-        --LogDebug("ID=" .. v .. " dist=" .. tostring(distance));
-        if distance < minDist then
-            retNpc = npc;
-            minDist = distance;
+        if #monlist == 0 or TableUtil.HasValue(monlist,npc.data.staticData.id) then
+            local distance = LuaVector3.Distance(myPos, npc:GetPosition());
+            --LogDebug("ID=" .. v .. " dist=" .. tostring(distance));
+            if distance < minDist then
+                retNpc = npc;
+                minDist = distance;
+            end;
         end;
     end);
     return retNpc;

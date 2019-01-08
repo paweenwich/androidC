@@ -372,26 +372,97 @@ function OnMiniMapClick(self)
 	LogDebug("" .. toggle .. " " .. (toggle%2));
 end;
 
-myMonsterList = {10001,10002,10003};
-mySkillList = {145001};
+function ROM_SkillTarget(tab)
+    local skillID = tab.id;
+    local myStatus= ROM_GetMyStatus();
+    local skillNeeded = ROM_GetSkillNeeded(skillID);
+    if skillNeeded.sp < myStatus.sp then
+        local npc = ROM_FindNearestMonsterEx(myMonsterList);
+        if npc ~= nil then
+            LogDebug("ROM_SkillTarget: " .. MonsterToString(npc));
+            Game.Myself:Client_UseSkill(skillID, npc,nil,nil,true);
+            return true;
+        else
+            LogDebug("ROM_SkillTarget: Monster not found");
+        end;
+    else
+        LogDebug("ROM_SkillTarget: Not enough SP");
+    end;
+    return false;
+end;
+function ROM_FakeDead(tab)
+    local skillID = tab.id;
+    local myStatus= ROM_GetMyStatus();
+    if myStatus.fracsp < 0.2 or myStatus.frachp < 0.2 then
+        LogDebug("ROM_FakeDead: " .. MyTostring(myStatus));
+        Game.Myself:Client_UseSkill(skillID, nil, nil,nil,true);
+        return true;
+    end;
+    return false;
+end;
+function ROM_BuffNoTarget(tab)
+    local skillID = tab.id;
+    local myStatus= ROM_GetMyStatus();
+    local skillNeeded = ROM_GetSkillNeeded(skillID);
+    if skillNeeded.sp < myStatus.sp then
+        if ROM_HasBuffFromSkillID(skillID) == false then
+            LogDebug("ROM_BuffNoTarget: " .. SkillToStringByID(skillID));
+            Game.Myself:Client_UseSkill(skillID, Game.Myself ,nil,nil,true);
+            return true;
+        end;
+    else
+        LogDebug("ROM_BuffNoTarget: Not enough SP");
+    end;
+    return false;
+end;
+
+
+myMonsterList = {
+--[[
+    10005,    --Thief Bug      
+    10006,    --Spore   
+]]    
+    10007,  --Familiar
+    40013,  --Thief Bug Egg
+    110002, --Huge Thief Bug
+};
+
+myAIRules = {
+    {id=10020001, func=ROM_FakeDead},    --fake dead
+    {id=146005, func=ROM_BuffNoTarget},  -- bless    
+    {id=145009, func=ROM_SkillTarget},  -- holy
+};
 
 function ROM_Test(g)
-    UIUtil.FloatMsgByText("Test");
-    --LogDebug("npcGroupMap");
-    --ListField(NSceneNpcProxy.Instance.npcGroupMap,"",{}," ");
-    --LogDebug("npcMap");
-    --ListField(NSceneNpcProxy.Instance.npcMap,"",{}," ");
-    --LogDebug("userMap");
-    --ListField(NSceneNpcProxy.Instance.userMap,"",{}," ");
-    --ListField(NSceneNpcProxy.Instance.npcGroupMap[10001]);
-    --local npc = NSceneNpcProxy.Instance:FindNearestNpc(Game.Myself:GetPosition(), 10001);
-    --local npc = ROM_FindNearestMonster(myMonsterList);
-    local npc = ROM_FindNearestMonsterEx();
+    for i= 1, #myAIRules do
+        local rule = myAIRules[i];
+        LogDebug("" .. i .. " " .. MyTostring(rule));
+        if rule.func ~= nil and rule.func(rule) then
+            LogDebug("Break");
+            break;
+        end;
+    end;
+    UIUtil.FloatMsgByText("Test Done");
+    if true then
+        return;
+    end;
+
+    local npc = ROM_FindNearestMonsterEx(myMonsterList);
     --LogDebug(MyTostring(npc));
     --ListField(npc);
     if npc ~= nil then
-        Game.Myself:Client_LockTarget(npc);
-        Game.Myself:Client_MoveTo(npc:GetPosition(),true);	-- ignore mesg seem to work      
+        --Game.Myself:Client_LockTarget(npc);
+        --Game.Myself:Client_MoveTo(npc:GetPosition(),true);	-- ignore mesg seem to work   
+        --01/08/19 16:20:05 ID=146005 name=[Blessing] type=Buff
+        --01/08/19 16:20:05 ID=144003 name=[Heal] type=Heal        
+        local skillID = 146005;
+        if ROM_HasBuffFromSkillID(skillID) == true then
+            UIUtil.FloatMsgByText("Has buff");   
+        else
+            Game.Myself:Client_UseSkill(skillID, nil,nil,nil,true);
+        end
+        LogDebug(MyTostring(ROM_GetSkillNeeded(skillID)));
+        
     else
         LogDebug("Tragte not found");
     end;
@@ -409,15 +480,27 @@ function ROM_Test(g)
     --Game.Myself:Client_UseSkill(10001, npc,nil,nil,true);
     --DumpLearnSkill();
     --DumpMonsters();
-    local skills = ROM_GetActiveSkill();
+    --local skills = ROM_GetActiveSkill();
+    local skills = ROM_GetLearnSkill();
     tableForEach(skills,function(i,v)
         LogDebug(SkillToString(v));
     end);
     
-    --local mons = ROM_GetAllMonster();
-    --tableForEach(mons,function(i,v)
-    --    LogDebug(MonsterToString(v));
-    --end);
+    local mons = ROM_GetAllMonster();
+    tableForEach(mons,function(i,v)
+        LogDebug(MonsterToString(v));
+    end);
+    
+    --ListField(Game.Myself.ai.idleAIManager.ais,"",{},"  ");
+    --ListField(Game.Myself.data.props,"",{}," ");
+    LogDebug(MyTostring(ROM_GetMyStatus()));
+    UIUtil.FloatMsgByText("Test");    
+end;
+
+function ROM_HasBuffFromSkillID(skillID)
+    local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skillID);
+    local buffs = skillInfo:GetSelfBuffs(Game.Myself);
+    return Game.Myself:HasBuffs(buffs);
 end;
 
 function ROM_Auto()
@@ -441,6 +524,8 @@ function ROM_Auto()
     UIUtil.FloatMsgByText("Auto " .. tostring(Game.Myself.ai.autoAI_Rom:IsEnable()));
 end;
 
+
+
 function ROM_GetAllMonster()
     local ret = {};
     local lst = NSceneNpcProxy.Instance.npcMap;
@@ -457,6 +542,11 @@ function ROM_GetAllMonster()
 end;
 
 function ROM_GetActiveSkill()
+    return ROM_GetLearnSkill({"Attack","Heal","Buff","FakeDead"});
+end;
+
+function ROM_GetLearnSkill(filter)
+    filter = filter or {};
     local ret = {};
     local lstSkill = SkillProxy.Instance.learnedSkills;
     tableForEach(lstSkill, function(i, v)
@@ -464,7 +554,8 @@ function ROM_GetActiveSkill()
         tableForEach(skills, function(i, v)
             local skill = v;
             local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skill.id);
-            if skillInfo.staticData.SkillType == "Attack" then  -- "Heal"
+            if #filter == 0 or TableUtil.HasValue(filter,skillInfo.staticData.SkillType) then
+            --if skillInfo.staticData.SkillType == "Attack" then  -- "Heal"
                 table.insert(ret, skill);
             end;
             --LogDebug(SkillToString(skill));
@@ -472,6 +563,7 @@ function ROM_GetActiveSkill()
     end);    
     return ret;
 end;
+
 
 LogDebug("ROM Loaded 1.03");
 
