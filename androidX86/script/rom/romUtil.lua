@@ -292,6 +292,8 @@ if class ~= nil then
 
 	function AutoAI_Rom:ctor()
         self.enable = false;
+		self.UpdateInterval = 0.0;
+		self.nextUpdateTime = 0
 		LogDebug("AutoAI_Rom:ctor()");
 	end
     
@@ -306,10 +308,17 @@ if class ~= nil then
 
 	function AutoAI_Rom:Clear(idleElapsed, time, deltaTime, creature)
 		LogDebug("AutoAI_Rom:Clear()");
+		self.nextUpdateTime = 0
 	end
 
 	function AutoAI_Rom:Prepare(idleElapsed, time, deltaTime, creature)
+		--LogDebug("AutoAI_Rom:Prepare()");
         if self.enable then
+			if time < self.nextUpdateTime then
+				return true
+			end
+			LogDebug("AutoAI_Rom:Prepare() " .. (time - self.nextUpdateTime) .. " " .. self.UpdateInterval);
+			self.nextUpdateTime = time + self.UpdateInterval		
             for i= 1, #myAIRules do
                 local rule = myAIRules[i];
                 --LogDebug("" .. i .. " " .. MyTostring(rule));
@@ -318,17 +327,7 @@ if class ~= nil then
                 end;
             end;        
             -- nothing to do
-            return false;
         end;
---[[            local npc = ROM_FindNearestMonsterEx(myMonsterList);
-            if npc ~= nil then
---              LogDebug("AutoAI_Rom:Prepare() true");   
-                self.target = npc;
-                Game.Myself:Client_LockTarget(npc);
-                --Game.Myself:Client_MoveTo(npc:GetPosition(),true);	-- ignore mesg seem to work                
-                return true
-            end;
-        --LogDebug("AutoAI_Rom:Prepare() false");        ]]
         return false
 	end
 
@@ -364,7 +363,11 @@ if class ~= nil then
 	end
 
 	function AutoAI_Rom:Update(idleElapsed, time, deltaTime, creature)
-	    --LogDebug("AutoAI_Rom:Update()");
+		if time < self.nextUpdateTime then
+			return true
+		end
+		LogDebug("AutoAI_Rom:Update() " .. (time - self.nextUpdateTime));
+		self.nextUpdateTime = time + self.UpdateInterval		
 		return false
 	end
 

@@ -328,17 +328,14 @@ if g_mainView ~= nil then
             ROM_Test(g);
         end);        
     end;
-    if CreateMyButton("Test1") then
-        LogDebug("Test1");
-        local button = myButton["Test1"];
+    if CreateMyButton("Auto") then
+        LogDebug("Auto");
+        local button = myButton["Auto"];
         button.transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.05,0.56,0));
         button:SetActive(true);        
         g_mainView:AddClickEvent(button, function (g)
             ROM_Auto(g);
-            --UIUtil.FloatMsgByText("Test1");
         end);        
-        --LogDebug(MyTostring(button.transform.parent));
-        --LogDebug(MyTostring(button.transform.parent.parent));
     end;	
 end;
 
@@ -377,7 +374,13 @@ function ROM_SkillTarget(tab)
     local myStatus= ROM_GetMyStatus();
     local skillNeeded = ROM_GetSkillNeeded(skillID);
     if skillNeeded.sp < myStatus.sp then
-        local npc = ROM_FindNearestMonsterEx(myMonsterList);
+		local npc = Game.Myself:GetLockTarget();
+		if npc == nil then
+			LogDebug("ROM_SkillTarget: ROM_FindNearestMonsterEx");
+			npc = ROM_FindNearestMonsterEx(myMonsterList);
+		else
+			LogDebug("ROM_SkillTarget: use locktarget");
+		end;
         if npc ~= nil then
             LogDebug("ROM_SkillTarget: " .. MonsterToString(npc));
             Game.Myself:Client_UseSkill(skillID, npc,nil,nil,true);
@@ -391,13 +394,19 @@ function ROM_SkillTarget(tab)
     return false;
 end;
 function ROM_FakeDead(tab)
+	local frachp = tab.frachp or 0.2;
+	local fracsp = tab.fracsp or 0.2;
     local skillID = tab.id;
     local myStatus= ROM_GetMyStatus();
-    if myStatus.fracsp < 0.2 or myStatus.frachp < 0.2 then
-        LogDebug("ROM_FakeDead: " .. MyTostring(myStatus));
-        Game.Myself:Client_UseSkill(skillID, nil, nil,nil,true);
-        return true;
-    end;
+	if Game.Myself:GetLockTarget() == nil then
+		if myStatus.fracsp < fracsp or myStatus.frachp < frachp then
+			LogDebug("ROM_FakeDead: " .. MyTostring(myStatus));
+			Game.Myself:Client_UseSkill(skillID, nil, nil,nil,true);
+			return true;
+		end;
+	else		
+		LogDebug("ROM_FakeDead: has lock target");
+	end;
     return false;
 end;
 function ROM_BuffNoTarget(tab)
@@ -422,18 +431,44 @@ myMonsterList = {
     10005,    --Thief Bug      
     10006,    --Spore   
 ]]    
-    10007,  --Familiar
-    40013,  --Thief Bug Egg
-    110002, --Huge Thief Bug
+--    10007,  --Familiar
+--    40013,  --Thief Bug Egg
+--    110002, --Huge Thief Bug
+	10020, -- name=Pirate Skeleton Type=Monster
+--	10017, -- name=Hydra Type=Monster
+--  10021, -- name=Poison Spore Type=Monster
 };
 
 myAIRules = {
-    {id=10020001, func=ROM_FakeDead},    --fake dead
+    {id=10020001, func=ROM_FakeDead, fracsp=0.2},    --fake dead
     {id=146005, func=ROM_BuffNoTarget},  -- bless    
-    {id=145009, func=ROM_SkillTarget},  -- holy
+    {id=145010, func=ROM_SkillTarget},  -- holy
 };
 
 function ROM_Test(g)
+    local skills = ROM_GetLearnSkill();
+    tableForEach(skills,function(i,v)
+        LogDebug(SkillToString(v));
+    end);
+    
+    local mons = ROM_GetAllMonster();
+    tableForEach(mons,function(i,v)
+        LogDebug(MonsterToString(v));
+    end);
+	
+
+	local lockedTarget = Game.Myself:GetLockTarget();
+	if lockedTarget ~= nil then
+		LogDebug(MonsterToString(lockedTarget));
+	else
+		LogDebug("nil");
+	end;
+    UIUtil.FloatMsgByText("Test Done");	
+    if true then
+        return;
+    end;
+	
+
     for i= 1, #myAIRules do
         local rule = myAIRules[i];
         LogDebug("" .. i .. " " .. MyTostring(rule));
@@ -441,10 +476,6 @@ function ROM_Test(g)
             LogDebug("Break");
             break;
         end;
-    end;
-    UIUtil.FloatMsgByText("Test Done");
-    if true then
-        return;
     end;
 
     local npc = ROM_FindNearestMonsterEx(myMonsterList);
@@ -481,15 +512,6 @@ function ROM_Test(g)
     --DumpLearnSkill();
     --DumpMonsters();
     --local skills = ROM_GetActiveSkill();
-    local skills = ROM_GetLearnSkill();
-    tableForEach(skills,function(i,v)
-        LogDebug(SkillToString(v));
-    end);
-    
-    local mons = ROM_GetAllMonster();
-    tableForEach(mons,function(i,v)
-        LogDebug(MonsterToString(v));
-    end);
     
     --ListField(Game.Myself.ai.idleAIManager.ais,"",{},"  ");
     --ListField(Game.Myself.data.props,"",{}," ");
