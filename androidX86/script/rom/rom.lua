@@ -281,6 +281,8 @@ function CreateMyButton(text,pos,onclick)
         --LogDebug(MyTostring(label.transform.localPosition));
         label.transform.localPosition = Vector3(0,0,0);
         label:GetComponent(UILabel).text = text;
+        label:GetComponent(UILabel).effectColor = ColorUtil.NGUILabelBlueBlack;
+        label:GetComponent(UILabel).effectStyle = UILabel.Effect.None;
         --ret.transform:SetParent(templateButton.transform.parent);
         if pos~= nil then
             ret.transform.position = uiCamera:ViewportToWorldPoint(pos);
@@ -333,6 +335,12 @@ if g_mainView ~= nil then
         local button = myButton["Auto"];
         button.transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.05,0.56,0));
         button:SetActive(true);        
+        
+        local label = UIUtil.FindGO("Label",button);
+        local uiLabel = label:GetComponent(UILabel);
+        --uiLabel.effectColor = ColorUtil.NGUIWhite; --ColorUtil.Red;
+        --uiLabel.effectStyle = UILabel.Effect.None;
+        --LogDebug(MyTostring(uiLabel.effectStyle));
         g_mainView:AddClickEvent(button, function (g)
             ROM_Auto(g);
         end);        
@@ -370,7 +378,9 @@ function OnMiniMapClick(self)
 end;
 
 function ROM_SkillTarget(tab)
-    local skillID = tab.id;
+    local skillInfo = ROM_GetMySkillInfoByName(tab.name);
+    if skillInfo == nil then return false end;
+    local skillID = skillInfo.staticData.id;
     local myStatus= ROM_GetMyStatus();
     local skillNeeded = ROM_GetSkillNeeded(skillID);
     if skillNeeded.sp < myStatus.sp then
@@ -394,9 +404,13 @@ function ROM_SkillTarget(tab)
     return false;
 end;
 function ROM_FakeDead(tab)
+    local skillInfo = ROM_GetMySkillInfoByName(tab.name);
+    if skillInfo == nil then return false end;
+    local skillID = skillInfo.staticData.id;
+
 	local frachp = tab.frachp or 0.2;
 	local fracsp = tab.fracsp or 0.2;
-    local skillID = tab.id;
+    --local skillID = tab.id;
     local myStatus= ROM_GetMyStatus();
 	if Game.Myself:GetLockTarget() == nil then
 		if myStatus.fracsp < fracsp or myStatus.frachp < frachp then
@@ -410,7 +424,11 @@ function ROM_FakeDead(tab)
     return false;
 end;
 function ROM_BuffNoTarget(tab)
-    local skillID = tab.id;
+    local skillInfo = ROM_GetMySkillInfoByName(tab.name);
+    if skillInfo == nil then return false end;
+    local skillID = skillInfo.staticData.id;
+
+    --local skillID = tab.id;
     local myStatus= ROM_GetMyStatus();
     local skillNeeded = ROM_GetSkillNeeded(skillID);
     if skillNeeded.sp < myStatus.sp then
@@ -437,66 +455,95 @@ myMonsterList = {
 	10020, -- name=Pirate Skeleton Type=Monster
 --	10017, -- name=Hydra Type=Monster
 --  10021, -- name=Poison Spore Type=Monster
+--  10019, -- name=Whisper Type=Monster
+    10022, -- name=Skeleton Type=Monster
+--  40003, -- name=Yellow Plant Type=Monster
+--  10024, -- name=Thara Frog Type=Monster
+--  10025, -- name=Marina Type=Monster
+--  10023, -- name=Vadon Type=Monster
+};
+
+myMonsterRules = {
+    {func= ROM_FindStaticMonster},  -- priority to static monster
+    {func= ROM_FindNearestMonsterEx, param=myMonsterList},  -- selected monster
+--    {func= ROM_FindNearestMonsterEx, param=nil},            -- all monster
 };
 
 myAIRules = {
-    {id=10020001, func=ROM_FakeDead, fracsp=0.2},    --fake dead
-    {id=146005, func=ROM_BuffNoTarget},  -- bless    
-    {id=145010, func=ROM_SkillTarget},  -- holy
+    {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
+    {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
+    {name="Holy Light Strike", func=ROM_SkillTarget},  -- holy
 };
 
+
 function ROM_Test(g)
+    LogDebug("NPC");
+    local mons = ROM_GetAllNPC();
+    tableForEach(mons,function(i,v)
+        LogDebug(MonsterToString(v));
+    end);
+    LogDebug("Monster");
+    local mons = ROM_GetAllMonster();
+    tableForEach(mons,function(i,v)
+        LogDebug(MonsterToString(v));
+    end);
+    
+    local npcList = Game.MapManager:GetNPCPointArray();
+    tableForEach(npcList, function(i, v)
+        if(v and v.ID and v.position)then
+            local npcData = Table_Npc[v.ID];
+            if npcData then
+                LogDebug(MyTostring(npcData));
+            end;
+        end;
+    end);
+    local mainViewMiniMap = g_mainView.viewMap["MainViewMiniMap"];
+    --ListField(mainViewMiniMap,"",{},"  ");
+    LogDebug("bigmapWindow=" .. #mainViewMiniMap.bigmapWindow.monsterMap .. " minimapWindow=" .. #mainViewMiniMap.minimapWindow.monsterMap);
+    local mons = ROM_GetAllMonsterFromNSceneNpcProxy();
+    LogDebug("NSceneNpcProxy.Instance.npcMap=" .. #mons .. " monsterDataMap=" .. #mainViewMiniMap.monsterDataMap);
+    local monsterIdMap = FunctionMonster.Me():FilterMonster(false);
+    local monsterIdMap2 = FunctionMonster.Me():FilterMonster(true);
+    LogDebug("monsterIdMap=" .. #monsterIdMap .. " monsterIdMap2=" .. #monsterIdMap2);
+    ListField(monsterIdMap,"",{}," ");
+    
+    --LogDebug(MyTostring(MiniMapData));
+    --ListField(npcList,"",{},"  ");
+    
+    UIUtil.FloatMsgByText("Test Done");	
+    if true then
+        return;
+    end;
+
+    LogDebug("Skill");
     local skills = ROM_GetLearnSkill();
     tableForEach(skills,function(i,v)
         LogDebug(SkillToString(v));
     end);
     
-    local mons = ROM_GetAllMonster();
-    tableForEach(mons,function(i,v)
-        LogDebug(MonsterToString(v));
-    end);
-	
 
-	local lockedTarget = Game.Myself:GetLockTarget();
-	if lockedTarget ~= nil then
-		LogDebug(MonsterToString(lockedTarget));
-	else
-		LogDebug("nil");
-	end;
-    UIUtil.FloatMsgByText("Test Done");	
-    if true then
-        return;
-    end;
-	
-
-    for i= 1, #myAIRules do
-        local rule = myAIRules[i];
-        LogDebug("" .. i .. " " .. MyTostring(rule));
-        if rule.func ~= nil and rule.func(rule) then
-            LogDebug("Break");
-            break;
-        end;
-    end;
-
-    local npc = ROM_FindNearestMonsterEx(myMonsterList);
+    --local npc = ROM_FindNearestMonsterEx(myMonsterList);
+    local npc = ROM_FindBestMonster();
     --LogDebug(MyTostring(npc));
     --ListField(npc);
     if npc ~= nil then
-        --Game.Myself:Client_LockTarget(npc);
+        Game.Myself:Client_LockTarget(npc);
         --Game.Myself:Client_MoveTo(npc:GetPosition(),true);	-- ignore mesg seem to work   
         --01/08/19 16:20:05 ID=146005 name=[Blessing] type=Buff
         --01/08/19 16:20:05 ID=144003 name=[Heal] type=Heal        
+--[[        
         local skillID = 146005;
         if ROM_HasBuffFromSkillID(skillID) == true then
             UIUtil.FloatMsgByText("Has buff");   
         else
             Game.Myself:Client_UseSkill(skillID, nil,nil,nil,true);
         end
-        LogDebug(MyTostring(ROM_GetSkillNeeded(skillID)));
+        LogDebug(MyTostring(ROM_GetSkillNeeded(skillID)));]]
         
     else
-        LogDebug("Tragte not found");
+        LogDebug("Target not found");
     end;
+    
     --ListField(MyTostring(SkillProxy.Instance.equipedSkillsArrays[SkillProxy.AutoSkillsIndex]));
     --ListField(SkillProxy.Instance.equipedSkillsArrays[SkillProxy.AutoSkillsIndex],"",{}," ");
     --ListField(SkillProxy.Instance.learnedSkills,"",{},"  ");
@@ -526,6 +573,11 @@ function ROM_HasBuffFromSkillID(skillID)
 end;
 
 function ROM_Auto()
+    local button = myButton["Auto"];
+    local label = UIUtil.FindGO("Label",button);
+    local uiLabel = label:GetComponent(UILabel);
+    --uiLabel.effectColor = ColorUtil.NGUIWhite; --ColorUtil.Red;
+    --LogDebug(MyTostring(uiLabel.effectColor));
 	if Game.Myself.ai.autoAI_Rom == nil then
 		Game.Myself.ai.autoAI_Rom = AutoAI_Rom.new();
 		Game.Myself.ai.idleAIManager:PushAI(Game.Myself.ai.autoAI_Rom);
@@ -540,52 +592,14 @@ function ROM_Auto()
 	end;
     if Game.Myself.ai.autoAI_Rom:IsEnable() then
         Game.Myself.ai.autoAI_Rom:Enable(false);
+        uiLabel.effectStyle = UILabel.Effect.None;
+        --uiLabel.effectColor = ColorUtil.NGUILabelBlueBlack;
     else
         Game.Myself.ai.autoAI_Rom:Enable(true);
+        uiLabel.effectColor = ColorUtil.NGUILabelRed;
+        uiLabel.effectStyle = UILabel.Effect.Outline;
     end;
     UIUtil.FloatMsgByText("Auto " .. tostring(Game.Myself.ai.autoAI_Rom:IsEnable()));
 end;
-
-
-
-function ROM_GetAllMonster()
-    local ret = {};
-    local lst = NSceneNpcProxy.Instance.npcMap;
-    tableForEach(lst, function(i, v)
-        local mons = v;
-        tableForEach(mons, function(i, v)
-            local mon = v;
-            if mon.data.staticData.Type == "Monster" then
-                table.insert(ret, mon);
-            end;
-        end);
-    end);    
-    return ret;
-end;
-
-function ROM_GetActiveSkill()
-    return ROM_GetLearnSkill({"Attack","Heal","Buff","FakeDead"});
-end;
-
-function ROM_GetLearnSkill(filter)
-    filter = filter or {};
-    local ret = {};
-    local lstSkill = SkillProxy.Instance.learnedSkills;
-    tableForEach(lstSkill, function(i, v)
-        local skills = v;
-        tableForEach(skills, function(i, v)
-            local skill = v;
-            local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skill.id);
-            if #filter == 0 or TableUtil.HasValue(filter,skillInfo.staticData.SkillType) then
-            --if skillInfo.staticData.SkillType == "Attack" then  -- "Heal"
-                table.insert(ret, skill);
-            end;
-            --LogDebug(SkillToString(skill));
-        end);
-    end);    
-    return ret;
-end;
-
-
 LogDebug("ROM Loaded 1.03");
 

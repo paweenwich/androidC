@@ -275,3 +275,40 @@ Game.me()   //Game_Game.lua
     self.guiSystemManager = GUISystemManager.new()
     self.gcSystemManager = GCSystemManager.new()
 
+SkillCMD
+-- self.args = {
+-- 	[1] = skillID, -- int
+-- 	[2] = targetCreatureGUID, -- long
+-- 	[3] = targetPosition, LuaVector3 or nil
+-- 	[4] = ignoreNavMesh, -- bool or nil
+-- 	[5] = forceTargetCreature, -- bool or nil
+-- 	[6] = allowResearch, -- bool or nil
+-- 	[7] = ignoreLaunchRange, -- bool or nil
+-- }
+SkillCMD_Run -> AI_CMD_Myself_Skill_Run
+AScript_Refactory_Game_FunctionSystem_Logic_AI_Myself_AI_CMD_Myself_Skill_TargetCreature.lua 
+  -  AScript_Refactory_Game_FunctionSystem_Logic_AI_Myself_AI_CMD_Myself_Skill
+
+SkillCMD -> AI_CMD_Myself_Skill_Run
+
+Target
+return AI_CMD_Myself_Skill_Run.Start(
+		self, time, deltaTime, creature, 
+		targetCreature, 
+		targetCreature:GetPosition(),
+		self.args[7])
+No target
+	return AI_CMD_Myself_Skill_Run.Start(self, time, deltaTime, creature, nil, nil, self.args[7])
+
+Target point
+return AI_CMD_Myself_Skill_Run.Start(
+		self, time, deltaTime, creature, 
+		nil, 
+		self.args[3],
+		self.args[7])
+
+AI_CMD_Myself_Skill
+
+
+Login Screen
+    D/Hook    (11075): Save /data/local/tmp/loadbufferx/AScript_FrameWork_GUI_view_UIBlackScreen success

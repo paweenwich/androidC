@@ -28,6 +28,7 @@ rom:
 	adb push script/rom/rom.lua /data/local/tmp/script
 	adb push script/rom/romUtil.lua /data/local/tmp/script
 	adb push script/rom/test.lua /data/local/tmp/script
+	adb shell '/data/local/tmp/tracerx86 -tslua /data/local/tmp/script/rom.lua'
 
 clean:
 	@rm -rf obj libs

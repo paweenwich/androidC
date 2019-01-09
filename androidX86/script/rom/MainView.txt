@@ -18550,3 +18550,1237 @@
 01/05/19 15:37:56 disPatherEvt table: 0xb8757de0
 01/05/19 15:37:56 viewdata table: 0x6efa6090
 01/05/19 15:37:56 chatMsgPage table: 0x6d4a1500
+
+
+
+
+01/09/19 16:25:57 container table: 0xb8396c80
+01/09/19 16:25:57  showViews table: 0x6f9ec4c0
+01/09/19 16:25:57  menuPage table: 0x6fd3d9f0
+01/09/19 16:25:57   container table: 0xb8396c80 >
+01/09/19 16:25:57   mainButtonDatas table: 0x6fcd68b0 >
+01/09/19 16:25:57   inMatchLabel=Label (UILabel)
+01/09/19 16:25:57   activityCtl table: 0x700692f0 >
+01/09/19 16:25:57   matchInfoIcon=Sprite (UISprite)
+01/09/19 16:25:57   moreGrid=Grid (UIGrid)
+01/09/19 16:25:57   matchInfo_cancelButton=CancelMatchButton (UnityEngine.GameOb
+ject)
+01/09/19 16:25:57   GuildVoice=GuildVoice (UnityEngine.GameObject)
+01/09/19 16:25:57   ActivityNode=ActivityNode (UnityEngine.GameObject)
+01/09/19 16:25:57   tempBagWarning=Warning (UnityEngine.GameObject)
+01/09/19 16:25:57   topRFuncGrid=TopRightFunc (UIGrid)
+01/09/19 16:25:57   viewdata table: 0xb8955270 >
+01/09/19 16:25:57   ButtonGrid_UIGrid=ButtonGrid (UIGrid)
+01/09/19 16:25:57   TeamVoiceSprite_UISprite=Sprite (UISprite)
+01/09/19 16:25:57   rewardBtn=RewardButton (UnityEngine.GameObject)
+01/09/19 16:25:57   matchInfoButton=MatchInfoButton (UnityEngine.GameObject)
+01/09/19 16:25:57   tutorMatchInfoBtn=TutorMatchInfoBtn (UnityEngine.GameObject)
+
+01/09/19 16:25:57   tempBagButton=TempBagButton (UnityEngine.GameObject)
+01/09/19 16:25:57   matchInfo_gotoButton=GotoButton (UnityEngine.GameObject)
+01/09/19 16:25:57   matchInfo_cancelBord_Bg=Bg (UISprite)
+01/09/19 16:25:57   GuildVoiceSprite_UISprite=Sprite (UISprite)
+01/09/19 16:25:57   gameObject=MainView (UnityEngine.GameObject)
+01/09/19 16:25:57   matchInfo_cancelBord=CancelBord (UnityEngine.GameObject)
+01/09/19 16:25:57   moreBord=MoreBord (UnityEngine.GameObject)
+01/09/19 16:25:57   bagNum=BagNum (UILabel)
+01/09/19 16:25:57   topRFuncGrid2=TopRightFunc2 (UIGrid)
+01/09/19 16:25:57   class table: 0x72184b20 >
+01/09/19 16:25:57   glandStatusButton=GlandStatusButton (UnityEngine.GameObject)
+
+01/09/19 16:25:57   bagBtn=BagButton (UnityEngine.GameObject)
+01/09/19 16:25:57   activityDatas table: 0x70069650 >
+01/09/19 16:25:57   TopRightFunc=TopRightFunc (UnityEngine.GameObject)
+01/09/19 16:25:57   menuCtl table: 0x6fcd6450 >
+01/09/19 16:25:57   ButtonGrid=ButtonGrid (UnityEngine.GameObject)
+01/09/19 16:25:57   autoBattleButton=AutoBattleButton (UnityEngine.GameObject)
+01/09/19 16:25:57   DoujinshiButton=DoujinshiButton (UnityEngine.GameObject)
+01/09/19 16:25:57   TeamVoice=TeamVoice (UnityEngine.GameObject)
+01/09/19 16:25:57   tempAlbumButton=TempAlbumButton (UnityEngine.GameObject)
+01/09/19 16:25:57   effectCache table: 0x6fe25010 >
+01/09/19 16:25:57   trans=MainView (UnityEngine.Transform)
+01/09/19 16:25:57   moreBtn=MoreButton (UnityEngine.GameObject)
+01/09/19 16:25:57  viewName=MainView
+01/09/19 16:25:57  disPatherEvt table: 0xb8396eb0
+01/09/19 16:25:57  raidMsgRoot=RaidMsgPos (UnityEngine.GameObject)
+01/09/19 16:25:57  topFuncs=TopRightFunc (UnityEngine.GameObject)
+01/09/19 16:25:57  chatMsgPage table: 0x6fb60850
+01/09/19 16:25:57   chatGridTween=ChatGrid (TweenPosition)
+01/09/19 16:25:57   fadeBtnSp=FadeBtn (UISprite)
+01/09/19 16:25:57   buttonGridTween=ButtonGrid (TweenPosition)
+01/09/19 16:25:57   chatSimplifyView table: 0x6fb1a940 >
+01/09/19 16:25:57   chatGridTweenValue table: 0x6fb615a0 >
+01/09/19 16:25:57   guildSpeech=GuildSpeech (UISprite)
+01/09/19 16:25:57   gameObject=MainView (UnityEngine.GameObject)
+01/09/19 16:25:57   mainViewChat=MainViewChat (UnityEngine.GameObject)
+01/09/19 16:25:57   isGuildSpeech=false
+01/09/19 16:25:57   worldMsgTweenValue table: 0x6fd27060 >
+01/09/19 16:25:57   isTeamSpeech=false
+01/09/19 16:25:57   worldMsgCollider=WorldMsg (UnityEngine.BoxCollider)
+01/09/19 16:25:57   class table: 0x70c2ada0 >
+01/09/19 16:25:57   tweenLevel=2
+01/09/19 16:25:57   buttonGridTweenValue table: 0x6fb67d60 >
+01/09/19 16:25:57   viewMap table: 0x6fb1a910 >
+01/09/19 16:25:57   fadeBtnTweenValue table: 0x6fd270c0 >
+01/09/19 16:25:57   teamSpeech=TeamSpeech (UISprite)
+01/09/19 16:25:57   trans=MainView (UnityEngine.Transform)
+01/09/19 16:25:57   viewdata table: 0xb8955270 >
+01/09/19 16:25:57   container table: 0xb8396c80 >
+01/09/19 16:25:57   speechRecognizer=SpeechRecognizer (RO.SpeechRecognizer)
+01/09/19 16:25:57   worldMsgTween=WorldMsg (TweenHeight)
+01/09/19 16:25:57   effectCache table: 0x6fb60970 >
+01/09/19 16:25:57   scale=0.8
+01/09/19 16:25:57   fadeBtnTween=FadeBtn (TweenPosition)
+01/09/19 16:25:57  gameObject=MainView (UnityEngine.GameObject)
+01/09/19 16:25:57  mapBord=MapBord (UnityEngine.GameObject)
+01/09/19 16:25:57  interests table: 0x6fe1fc30
+01/09/19 16:25:57   1=SkillEvent_SkillUpdate
+01/09/19 16:25:57   2=MyselfEvent_MyProfessionChange
+01/09/19 16:25:57   3=ItemEvent_ItemUpdate
+01/09/19 16:25:57   4=MyselfEvent_ZenyChange
+01/09/19 16:25:57   5=MyselfEvent_SyncBuffs
+01/09/19 16:25:57   6=MyselfEvent_SelectTargetChange
+01/09/19 16:25:57   7=SkillEvent_SkillUnlockPos
+01/09/19 16:25:57   8=SkillEvent_SkillStartEvent
+01/09/19 16:25:57   9=SkillEvent_SkillWaitNextUse
+01/09/19 16:25:57   10=SkillEvent_SkillCancelWaitNextUse
+01/09/19 16:25:57   11=SkillEvent_SkillSelectPhaseStateChange
+01/09/19 16:25:57   12=MyselfEvent_TransformChange
+01/09/19 16:25:57   13=ServiceEvent_SkillDynamicSkillCmd
+01/09/19 16:25:57   14=ServiceEvent_SkillUpdateDynamicSkillCmd
+01/09/19 16:25:57   15=TeamEvent_MemberEnterTeam
+01/09/19 16:25:57   16=TeamEvent_MemberExitTeam
+01/09/19 16:25:57   17=TriggerEvent_Enter_GDFightForArea
+01/09/19 16:25:57   18=TriggerEvent_Leave_GDFightForArea
+01/09/19 16:25:57   19=TriggerEvent_Remove_GDFightForArea
+01/09/19 16:25:57   20=MyselfEvent_BaseExpChange
+01/09/19 16:25:57   21=MyselfEvent_JobExpChange
+01/09/19 16:25:57   22=MyselfEvent_ZoneIdChange
+01/09/19 16:25:57   23=PVP_MVPFightLaunch
+01/09/19 16:25:57   24=PVP_MVPFightShutDown
+01/09/19 16:25:57   25=ServiceEvent_SceneFoodFoodInfoNtf
+01/09/19 16:25:57   26=ServiceEvent_SceneFoodUpdateFoodInfo
+01/09/19 16:25:57   27=LoadSceneEvent_FinishLoad
+01/09/19 16:25:57   28=MyselfEvent_AddBuffs
+01/09/19 16:25:57   29=MyselfEvent_RemoveBuffs
+01/09/19 16:25:57   30=MyselfEvent_AddWeakDialog
+01/09/19 16:25:57   31=PVP_PoringFightLaunch
+01/09/19 16:25:57   32=PVP_PoringFightShutdown
+01/09/19 16:25:57   33=ServiceEvent_LoginUserCmdLoginResultUserCmd
+01/09/19 16:25:57   34=BoothEvent_ShowMiniBooth
+01/09/19 16:25:57   35=ServiceEvent_NUserBoothReqUserCmd
+01/09/19 16:25:57   36=ServiceUserProxy.RecvLogin
+01/09/19 16:25:57   37=MainViewEvent_EmojiViewShow
+01/09/19 16:25:57   38=ServiceEvent_InfiniteTowerTeamTowerSummaryCmd
+01/09/19 16:25:57   39=MyselfEvent_DeathStatus
+01/09/19 16:25:57   40=MyselfEvent_ReliveStatus
+01/09/19 16:25:57   41=ServiceEvent_InfiniteTowerEnterTower
+01/09/19 16:25:57   42=ServiceEvent_InfiniteTowerTowerInfoCmd
+01/09/19 16:25:57   43=ServiceEvent_SessionMailQueryAllMail
+01/09/19 16:25:57   44=ServiceEvent_SessionMailMailUpdate
+01/09/19 16:25:57   45=ServiceEvent_SceneManualUpdateSolvedPhotoManualCmd
+01/09/19 16:25:57   46=UIMenuEvent_UnRegisitButton
+01/09/19 16:25:57   47=ItemEvent_TempBagUpdate
+01/09/19 16:25:57   48=TempItemEvent_TempWarnning
+01/09/19 16:25:57   49=ServiceEvent_ItemPackSlotNtfItemCmd
+01/09/19 16:25:57   50=MainViewEvent_MenuActivityOpen
+01/09/19 16:25:57   51=MainViewEvent_MenuActivityClose
+01/09/19 16:25:57   52=ServiceEvent_MatchCCmdNtfMatchInfoCCmd
+01/09/19 16:25:57   53=MainViewEvent_UpdateMatchBtn
+01/09/19 16:25:57   54=ServiceEvent_GuildCmdGvgOpenFireGuildCmd
+01/09/19 16:25:57   55=GVGEvent_GVG_FinalFightLaunch
+01/09/19 16:25:57   56=GVGEvent_GVG_FinalFightShutDown
+01/09/19 16:25:57   57=MainViewEvent_UpdateTutorMatchBtn
+01/09/19 16:25:57   58=ServiceEvent_ChatCmdQueryRealtimeVoiceIDCmd
+01/09/19 16:25:57   59=ServiceEvent_SessionTeamExitTeam
+01/09/19 16:25:57   60=ServiceEvent_GuildCmdExitGuildGuildCmd
+01/09/19 16:25:57   61=TriggerEvent_AddTrigger
+01/09/19 16:25:57   62=TriggerEvent_RemoveTrigger
+01/09/19 16:25:57   63=QuestEvent_QuestEnterArea
+01/09/19 16:25:57   64=QuestEvent_QuestExitArea
+01/09/19 16:25:57   65=ItemEvent_BetterEquipAdd
+01/09/19 16:25:57   66=QuickUseProxy.CommonUseEvent
+01/09/19 16:25:57   67=SkillEvent_SkillWithUseTimesChanged
+01/09/19 16:25:57   68=ItemEvent_ItemUseTip
+01/09/19 16:25:57   69=PetEvent_AddCatchPetBord
+01/09/19 16:25:57   70=PetEvent_RemoveCatchPetBord
+01/09/19 16:25:57   71=ServiceEvent_SessionTeamEnterTeam
+01/09/19 16:25:57   72=ServiceEvent_SessionTeamTeamMemberUpdate
+01/09/19 16:25:57   73=ServiceEvent_SessionTeamMemberDataUpdate
+01/09/19 16:25:57   74=ServiceEvent_SessionTeamExchangeLeader
+01/09/19 16:25:57   75=TeamEvent_MemberOffline
+01/09/19 16:25:57   76=ServiceEvent_SessionTeamQuickEnter
+01/09/19 16:25:57   77=ServiceEvent_NUserBeFollowUserCmd
+01/09/19 16:25:57   78=CreatureEvent_Name_Change
+01/09/19 16:25:57   79=MyselfEvent_MyDataChange
+01/09/19 16:25:57   80=ServiceEvent_NUserQueryUserInfoUserCmd
+01/09/19 16:25:57   81=MyselfEvent_MyPropChange
+01/09/19 16:25:57   82=SceneCreatureEvent_PropHpChange
+01/09/19 16:25:57   83=ServiceEvent_ScenePetPetInfoUpdatePetCmd
+01/09/19 16:25:57   84=ServiceEvent_ScenePetPetInfoPetCmd
+01/09/19 16:25:57   85=ServiceEvent_ScenePetPetOffPetCmd
+01/09/19 16:25:57   86=ServiceEvent_SceneBeingBeingInfoQuery
+01/09/19 16:25:57   87=ServiceEvent_SceneBeingBeingInfoUpdate
+01/09/19 16:25:57   88=ServiceEvent_SceneBeingBeingOffCmd
+01/09/19 16:25:57   89=GuideEvent_ShowBubble
+01/09/19 16:25:57   90=MyselfEvent_ResetHpShortCut
+01/09/19 16:25:57   91=ItemEvent_EquipUpdate
+01/09/19 16:25:57   92=Altman_Launch
+01/09/19 16:25:57   93=Altman_Shutdown
+01/09/19 16:25:57   94=MyselfEvent_TargetPositionChange
+01/09/19 16:25:57   95=MyselfEvent_PlaceTo
+01/09/19 16:25:57   96=ServiceEvent_SceneGoToUserCmd
+01/09/19 16:25:57   97=GuideEvent_MiniMapAnim
+01/09/19 16:25:57   98=MiniMapEvent_ExitPointStateChange
+01/09/19 16:25:57   99=MiniMapEvent_ExitPointReInit
+01/09/19 16:25:57   100=ServiceEvent_SessionTeamMemberPosUpdate
+01/09/19 16:25:57   101=TeamEvent_MemberChangeMap
+01/09/19 16:25:57   102=ServiceEvent_BossCmdBossPosUserCmd
+01/09/19 16:25:57   103 table: 0x6f56fe90 >
+01/09/19 16:25:57   104=AdventureDataEvent_SceneItemsUpdate
+01/09/19 16:25:57   105=SceneGlobalEvent_Map2DChanged
+01/09/19 16:25:57   106=ServiceEvent_SceneSealUpdateSeal
+01/09/19 16:25:57   107=ServiceEvent_SceneSealQuerySeal
+01/09/19 16:25:57   108=ServiceEvent_QuestQuestList
+01/09/19 16:25:57   109=ServiceEvent_QuestQuestUpdate
+01/09/19 16:25:57   110=ServiceEvent_QuestQuestStepUpdate
+01/09/19 16:25:57   111=SystemUnLockEvent.NUserNewMenu
+01/09/19 16:25:57   112=ServiceEvent_NUserVarUpdate
+01/09/19 16:25:57   113=QuestEvent_RemoveGuildQuestList
+01/09/19 16:25:57   114=MainViewEvent_AddQuestFocus
+01/09/19 16:25:57   115=MainViewEvent_RemoveQuestFocus
+01/09/19 16:25:57   116=MiniMapEvent_ShowMiniMapDirEffect
+01/09/19 16:25:57   117=ServiceEvent_NUserNtfVisibleNpcUserCmd
+01/09/19 16:25:57   118=SceneEvent_SceneAddRoles
+01/09/19 16:25:57   119=SceneEvent_SceneRemoveRoles
+01/09/19 16:25:57   120=ServiceEvent_NUserTreeListUserCmd
+01/09/19 16:25:57   121=ServiceEvent_ActivityCmdBCatUFOPosActCmd
+01/09/19 16:25:57   122=MiniMapEvent_CreatureScenicChange
+01/09/19 16:25:57   123=MiniMapEvent_CreatureScenicAdd
+01/09/19 16:25:57   124=MiniMapEvent_CreatureScenicRemove
+01/09/19 16:25:57   125=GuideEvent_MapGuide_Change
+01/09/19 16:25:57   126=ServiceEvent_FuBenCmdGvgMetalDieFubenCmd
+01/09/19 16:25:57   127=ServiceEvent_FuBenCmdSuperGvgSyncFubenCmd
+01/09/19 16:25:57   128=ServiceEvent_FuBenCmdGvgTowerUpdateFubenCmd
+01/09/19 16:25:57   129=ServiceEvent_FuBenCmdFubenStepSyncCmd
+01/09/19 16:25:57   130=ServiceEvent_FuBenCmdFuBenClearInfoCmd
+01/09/19 16:25:57   131=ServiceEvent_NUserQueryTraceList
+01/09/19 16:25:57   132=MainViewEvent_AddItemTrace
+01/09/19 16:25:57   133=MainViewEvent_CancelItemTrace
+01/09/19 16:25:57   134=ServiceEvent_ChatCmdChatRetCmd
+01/09/19 16:25:57   135=ChatRoomEvent_SystemMessage
+01/09/19 16:25:57   136=ServiceEvent_ConnNetDelay
+01/09/19 16:25:57   137=ServiceEvent_ChatCmdQueryVoiceUserCmd
+01/09/19 16:25:57   138=ServiceEvent_GuildCmdEnterGuildGuildCmd
+01/09/19 16:25:57   139=ChatRoomEvent_ChangeChannel
+01/09/19 16:25:57   140=PVPEvent_PVPDungeonLaunch
+01/09/19 16:25:57   141=PVPEvent_PVPDungeonShutDown
+01/09/19 16:25:57   142=GVGEvent_GVGDungeonLaunch
+01/09/19 16:25:57   143=GVGEvent_GVGDungeonShutDown
+01/09/19 16:25:57   144=ServiceEvent_FuBenCmdGuildFireInfoFubenCmd
+01/09/19 16:25:57   145=ServiceEvent_MatchCCmdNtfFightStatCCmd
+01/09/19 16:25:57   146=ServiceEvent_PveCardUpdateProcessPveCardCmd
+01/09/19 16:25:57   147=ServiceEvent_PveCardSyncProcessPveCardCmd
+01/09/19 16:25:57   148=ServiceEvent_PveCardFinishPlayCardCmd
+01/09/19 16:25:57   149=PVE_CardLaunch
+01/09/19 16:25:57   150=PVE_CardShutdown
+01/09/19 16:25:57   151=ServiceEvent_QuestQueryOtherData
+01/09/19 16:25:57   152=ServiceEvent_PlayerMapChange
+01/09/19 16:25:57   153=QuestEvent_QuestDelete
+01/09/19 16:25:57   154=MyselfEvent_DeathBegin
+01/09/19 16:25:57   155=ServiceEvent_FuBenCmdTrackFuBenUserCmd
+01/09/19 16:25:57   156=QuestEvent_ProcessChange
+01/09/19 16:25:57   157=QuestEvent_RemoveHelpQuest
+01/09/19 16:25:57   158=QuestEvent_UpdateAnnounceQuestList
+01/09/19 16:25:57   159=QuestEvent_UpdateGuildQuestList
+01/09/19 16:25:57   160=ServiceEvent_FuBenCmdGuildFireMetalHpFubenCmd
+01/09/19 16:25:57   161=ServiceEvent_FuBenCmdGuildFireDangerFubenCmd
+01/09/19 16:25:57   162=ServiceEvent_FuBenCmdGuildFireStopFubenCmd
+01/09/19 16:25:57   163=ServiceEvent_FuBenCmdGuildFireNewDefFubenCmd
+01/09/19 16:25:57   164=ServiceEvent_FuBenCmdGuildFireRestartFubenCmd
+01/09/19 16:25:57   165=ServiceEvent_FuBenCmdGvgDataSyncCmd
+01/09/19 16:25:57   166=ServiceEvent_FuBenCmdGvgDataUpdateCmd
+01/09/19 16:25:57   167=GVGEvent_ShowNewAchievemnetEffect
+01/09/19 16:25:57   168=ServiceEvent_MatchCCmdNtfRankChangeCCmd
+01/09/19 16:25:57   169=ServiceEvent_FuBenCmdSyncMvpInfoFubenCmd
+01/09/19 16:25:57   170=ServiceEvent_FuBenCmdUpdateUserNumFubenCmd
+01/09/19 16:25:57   171=ServiceEvent_FuBenCmdBossDieFubenCmd
+01/09/19 16:25:57   172=ServiceEvent_ActivityCmdStartActCmd
+01/09/19 16:25:57   173=ServiceEvent_ActivityCmdStopActCmd
+01/09/19 16:25:57   174=ServiceEvent_TeamRaidCmdTeamRaidAltmanShowCmd
+01/09/19 16:25:57   175=ServiceEvent_SessionSocialityOperActivityNtfSocialCmd
+01/09/19 16:25:57   176=ActivityTextureManager_ActivityPicCompleteCallbackMsg
+01/09/19 16:25:57   177=SceneEvent_SceneAddNpcs
+01/09/19 16:25:57   178=SceneEvent_SceneRemoveNpcs
+01/09/19 16:25:57   179=GuideEvent_ShowAutoFightBubble
+01/09/19 16:25:57   180=ServiceEvent_ActivityCmdStartGlobalActCmd
+01/09/19 16:25:57   181=ServiceEvent_SessionSocialitySocialUpdate
+01/09/19 16:25:57   182=ServiceEvent_SessionSocialitySocialDataUpdate
+01/09/19 16:25:57   183=RecallEvent_Select
+01/09/19 16:25:57   184=ServiceEvent_AuctionCCmdNtfAuctionStateCCmd
+01/09/19 16:25:57   185=ServiceEvent_AuctionCCmdNtfCurAuctionInfoCCmd
+01/09/19 16:25:57   186=ServiceEvent_AuctionCCmdAuctionDialogCCmd
+01/09/19 16:25:57   187=ServiceEvent_AuctionCCmdNtfOverTakePriceCCmd
+01/09/19 16:25:57   188=UIEvent_EnterView
+01/09/19 16:25:57   189=UIEvent_ExitView
+01/09/19 16:25:57   190=MainViewEvent_ShowOrHide
+01/09/19 16:25:57   191=MainViewEvent_ActiveShortCutBord
+01/09/19 16:25:57  index=0
+01/09/19 16:25:57  class table: 0x6dd35930
+01/09/19 16:25:57   ViewType table: 0xbee68ee0 >
+01/09/19 16:25:57   __index table: 0x6dd35930 >
+01/09/19 16:25:57   super table: 0x6dc44da0 >
+01/09/19 16:25:57  showskill=false
+01/09/19 16:25:57  Anchor_DownLeft=Anchor_DownLeft (UnityEngine.GameObject)
+01/09/19 16:25:57  viewMap table: 0xb8396ce0
+01/09/19 16:25:57   MainViewAuctionPage table: 0x6f9eb230 >
+01/09/19 16:25:57   MainViewMiniMap table: 0x6fc7f500 >
+01/09/19 16:25:57   MainViewRecallPage table: 0x6f9eb090 >
+01/09/19 16:25:57   MainviewActivityPage table: 0x6fae8b00 >
+01/09/19 16:25:57   MainUseEquipPopup table: 0x6cf49de0 >
+01/09/19 16:25:57   menu table: 0x6fd3d9f0 >
+01/09/19 16:25:57   MainViewAutoAimMonster table: 0x6fae90a0 >
+01/09/19 16:25:57   TraceInfoBord table: 0x6fb12750 >
+01/09/19 16:25:57   MainViewChatMsgPage table: 0x6fb60850 >
+01/09/19 16:25:57   MainviewRaidTaskPage table: 0x6fb5e800 >
+01/09/19 16:25:57   MainViewAddTrace table: 0x700657e0 >
+01/09/19 16:25:57   infoPage table: 0x6fe20590 >
+01/09/19 16:25:57   TeamPage table: 0x70065a40 >
+01/09/19 16:25:57   skillShortCutPage table: 0x714364f0 >
+01/09/19 16:25:57   MainViewItemPage table: 0x7003a180 >
+01/09/19 16:25:57   HeadPage table: 0x70066770 >
+01/09/19 16:25:57  moreBord=MoreBord (UnityEngine.GameObject)
+01/09/19 16:25:57  mainBord=MainBord (UnityEngine.GameObject)
+01/09/19 16:25:57  ListenerEvtMap table: 0x6fb35220
+01/09/19 16:25:57   MyselfEvent_PlaceTo table: 0x6fb5da60 >
+01/09/19 16:25:57   ServiceEvent_QuestQuestStepUpdate table: 0x6fb5df70 >
+01/09/19 16:25:57   MiniMapEvent_CreatureScenicChange table: 0x6fb5e3f0 >
+01/09/19 16:25:57   ServiceEvent_ConnNetDelay table: 0x6fd26ef0 >
+01/09/19 16:25:57   ServiceEvent_NUserNtfVisibleNpcUserCmd table: 0x6fb5e1a0 >
+01/09/19 16:25:57   MainViewEvent_AddQuestFocus table: 0x6fb5e0b0 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdGvgDataUpdateCmd table: 0xba6ae040 >
+01/09/19 16:25:57   ServiceUserProxy.RecvLogin table: 0x6fd26920 >
+01/09/19 16:25:57   ServiceEvent_GuildCmdGvgOpenFireGuildCmd table: 0x711572a0 >
+
+01/09/19 16:25:57   ServiceEvent_AuctionCCmdAuctionDialogCCmd table: 0x6f9eb500
+>
+01/09/19 16:25:57   SkillEvent_SkillStartEvent table: 0x6fe200b0 >
+01/09/19 16:25:57   ItemEvent_ItemUpdate table: 0x6fe1fd60 >
+01/09/19 16:25:57   ServiceEvent_AuctionCCmdNtfAuctionStateCCmd table: 0x6f9eb46
+0 >
+01/09/19 16:25:57   ServiceEvent_SessionMailQueryAllMail table: 0x6fb26d40 >
+01/09/19 16:25:57   PVP_PoringFightLaunch table: 0x6fd26d10 >
+01/09/19 16:25:57   TeamEvent_MemberEnterTeam table: 0x6fe203b0 >
+01/09/19 16:25:57   MyselfEvent_AddBuffs table: 0x6fd26c20 >
+01/09/19 16:25:57   MainViewEvent_UpdateTutorMatchBtn table: 0x72a5ce30 >
+01/09/19 16:25:57   ServiceEvent_SceneManualUpdateSolvedPhotoManualCmd table: 0x
+700df0c0 >
+01/09/19 16:25:57   SceneEvent_SceneRemoveNpcs table: 0x6d2aec90 >
+01/09/19 16:25:57   MainViewEvent_EmojiViewShow table: 0x70069e30 >
+01/09/19 16:25:57   ServiceEvent_ChatCmdQueryVoiceUserCmd table: 0x6fd26f40 >
+01/09/19 16:25:57   ServiceEvent_ActivityCmdBCatUFOPosActCmd table: 0x6fb5e3a0 >
+
+01/09/19 16:25:57   QuestEvent_QuestExitArea table: 0x70064980 >
+01/09/19 16:25:57   ServiceEvent_NUserQueryUserInfoUserCmd table: 0x70037e90 >
+01/09/19 16:25:57   GVGEvent_GVG_FinalFightShutDown table: 0x72a5ce00 >
+01/09/19 16:25:57   ServiceEvent_QuestQuestUpdate table: 0x6fb5df20 >
+01/09/19 16:25:57   MyselfEvent_MyDataChange table: 0x70037e60 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdGvgDataSyncCmd table: 0x6faf8900 >
+01/09/19 16:25:57   GVGEvent_GVG_FinalFightLaunch table: 0x72a5cd30 >
+01/09/19 16:25:57   ServiceEvent_QuestQuestList table: 0x6fb5ded0 >
+01/09/19 16:25:57   MiniMapEvent_ExitPointReInit table: 0x6fb5dbc0 >
+01/09/19 16:25:57   UIEvent_EnterView table: 0x6f9ec550 >
+01/09/19 16:25:57   MyselfEvent_BaseExpChange table: 0x6fd269a0 >
+01/09/19 16:25:57   ServiceEvent_SceneBeingBeingInfoQuery table: 0x70038010 >
+01/09/19 16:25:57   ServiceEvent_TeamRaidCmdTeamRaidAltmanShowCmd table: 0x6fae8
+ab0 >
+01/09/19 16:25:57   GVGEvent_GVGDungeonLaunch table: 0xba6aa450 >
+01/09/19 16:25:57   ServiceEvent_SessionTeamMemberDataUpdate table: 0x70066590 >
+
+01/09/19 16:25:57   ServiceEvent_SkillDynamicSkillCmd table: 0x6fe20310 >
+01/09/19 16:25:57   MyselfEvent_MyPropChange table: 0x70037ec0 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdGuildFireNewDefFubenCmd table: 0xba6ae0
+d0 >
+01/09/19 16:25:57   ServiceEvent_SceneSealUpdateSeal table: 0x6fb5de30 >
+01/09/19 16:25:57   ServiceEvent_PlayerMapChange table: 0x6fb0f790 >
+01/09/19 16:25:57   SkillEvent_SkillSelectPhaseStateChange table: 0x6fe20270 >
+01/09/19 16:25:57   TriggerEvent_RemoveTrigger table: 0x700648e0 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdSuperGvgSyncFubenCmd table: 0x6fb5e5f0
+>
+01/09/19 16:25:57   ServiceEvent_MatchCCmdNtfMatchInfoCCmd table: 0x710b0690 >
+01/09/19 16:25:57   ServiceEvent_InfiniteTowerTeamTowerSummaryCmd table: 0x70069
+e80 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdFuBenClearInfoCmd table: 0x6fb606b0 >
+01/09/19 16:25:57   TriggerEvent_Remove_GDFightForArea table: 0x6fe20b20 >
+01/09/19 16:25:57   MyselfEvent_TargetPositionChange table: 0x6fb5da10 >
+01/09/19 16:25:57   ServiceEvent_PveCardUpdateProcessPveCardCmd table: 0x6fb0f37
+0 >
+01/09/19 16:25:57   MyselfEvent_DeathBegin table: 0x6fb0f7f0 >
+01/09/19 16:25:57   SkillEvent_SkillUpdate table: 0x6fe1fc60 >
+01/09/19 16:25:57   ServiceEvent_SessionTeamQuickEnter table: 0x70066680 >
+01/09/19 16:25:57   ServiceEvent_NUserBoothReqUserCmd table: 0x6fd26600 >
+01/09/19 16:25:57   ServiceEvent_SceneBeingBeingInfoUpdate table: 0x70038060 >
+01/09/19 16:25:57   QuickUseProxy.CommonUseEvent table: 0x70065830 >
+01/09/19 16:25:57   PVPEvent_PVPDungeonLaunch table: 0xba6aa3d0 >
+01/09/19 16:25:57   LoadSceneEvent_FinishLoad table: 0x6fd26bd0 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdBossDieFubenCmd table: 0x6fae8110 >
+01/09/19 16:25:57   Altman_Shutdown table: 0x7003a480 >
+01/09/19 16:25:57   ServiceEvent_ChatCmdQueryRealtimeVoiceIDCmd table: 0x7205d94
+0 >
+01/09/19 16:25:57   MyselfEvent_ResetHpShortCut table: 0x7003a320 >
+01/09/19 16:25:57   MyselfEvent_TransformChange table: 0x6fe202c0 >
+01/09/19 16:25:57   MyselfEvent_SelectTargetChange table: 0x6fe20010 >
+01/09/19 16:25:57   QuestEvent_QuestEnterArea table: 0x70064930 >
+01/09/19 16:25:57   MyselfEvent_RemoveBuffs table: 0x6fd26c70 >
+01/09/19 16:25:57   ServiceEvent_SessionTeamExitTeam table: 0x715541f0 >
+01/09/19 16:25:57   ServiceEvent_InfiniteTowerTowerInfoCmd table: 0x70bb89a0 >
+01/09/19 16:25:57   ItemEvent_ItemUseTip table: 0x700658d0 >
+01/09/19 16:25:57   MyselfEvent_DeathStatus table: 0x70069ed0 >
+01/09/19 16:25:57   BoothEvent_ShowMiniBooth table: 0x6fd265d0 >
+01/09/19 16:25:57   TriggerEvent_Enter_GDFightForArea table: 0x6fe20a80 >
+01/09/19 16:25:57   QuestEvent_RemoveHelpQuest table: 0x6fb0f8c0 >
+01/09/19 16:25:57   MyselfEvent_AddWeakDialog table: 0x6fd26cc0 >
+01/09/19 16:25:57   MainViewEvent_MenuActivityOpen table: 0x71109140 >
+01/09/19 16:25:57   ServiceEvent_SessionTeamEnterTeam table: 0x70066510 >
+01/09/19 16:25:57   ServiceEvent_PveCardFinishPlayCardCmd table: 0x6fb0f3f0 >
+01/09/19 16:25:57   UIEvent_ExitView table: 0x6f9ec5a0 >
+01/09/19 16:25:57   ServiceEvent_AuctionCCmdNtfOverTakePriceCCmd table: 0x6f9eb5
+50 >
+01/09/19 16:25:57   ServiceEvent_ScenePetPetInfoUpdatePetCmd table: 0x70037f20 >
+
+01/09/19 16:25:57   GuideEvent_ShowAutoFightBubble table: 0x6d382c90 >
+01/09/19 16:25:57   RecallEvent_Select table: 0x6f9eb1e0 >
+01/09/19 16:25:57   ServiceEvent_SessionSocialitySocialDataUpdate table: 0x6f9eb
+190 >
+01/09/19 16:25:57   ServiceEvent_SessionSocialitySocialUpdate table: 0x6f9eb140
+>
+01/09/19 16:25:57   ServiceEvent_ActivityCmdStartGlobalActCmd table: 0x6f9eb0f0
+>
+01/09/19 16:25:57   SkillEvent_SkillCancelWaitNextUse table: 0x6fe20220 >
+01/09/19 16:25:57   ServiceEvent_AuctionCCmdNtfCurAuctionInfoCCmd table: 0x6f9eb
+4b0 >
+01/09/19 16:25:57   PVE_CardShutdown table: 0x6fb0f490 >
+01/09/19 16:25:57   ServiceEvent_BossCmdBossPosUserCmd table: 0x6fb5dd30 >
+01/09/19 16:25:57   SceneEvent_SceneAddNpcs table: 0x6d2aec40 >
+01/09/19 16:25:57   ActivityTextureManager_ActivityPicCompleteCallbackMsg table:
+ 0x6fae8c80 >
+01/09/19 16:25:57   PetEvent_AddCatchPetBord table: 0x70065920 >
+01/09/19 16:25:57   ServiceEvent_InfiniteTowerEnterTower table: 0x70069f70 >
+01/09/19 16:25:57   ServiceEvent_ActivityCmdStopActCmd table: 0x6fae8190 >
+01/09/19 16:25:57   ServiceEvent_ActivityCmdStartActCmd table: 0x6fae8140 >
+01/09/19 16:25:57   MyselfEvent_MyProfessionChange table: 0x6fe1fcd0 >
+01/09/19 16:25:57   Altman_Launch table: 0x7003a430 >
+01/09/19 16:25:57   SkillEvent_SkillUnlockPos table: 0x6fe20060 >
+01/09/19 16:25:57   TempItemEvent_TempWarnning table: 0x7006d8a0 >
+01/09/19 16:25:57   GuideEvent_ShowBubble table: 0x7003a2d0 >
+01/09/19 16:25:57   ServiceEvent_GuildCmdExitGuildGuildCmd table: 0x72a5f550 >
+01/09/19 16:25:57   ChatRoomEvent_ChangeChannel table: 0x6fb1a970 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdUpdateUserNumFubenCmd table: 0x6fae80c0
+ >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdSyncMvpInfoFubenCmd table: 0x6fae8070 >
+
+01/09/19 16:25:57   ServiceEvent_SessionTeamExchangeLeader table: 0x700665e0 >
+01/09/19 16:25:57   GuideEvent_MapGuide_Change table: 0x6fb5e4e0 >
+01/09/19 16:25:57   MyselfEvent_ZoneIdChange table: 0x6fd26a40 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdGuildFireRestartFubenCmd table: 0x6faf8
+8d0 >
+01/09/19 16:25:57   ServiceEvent_NUserVarUpdate table: 0x6fb5e010 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdGuildFireStopFubenCmd table: 0x6fafd220
+ >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdGvgMetalDieFubenCmd table: 0x6fb5e5c0 >
+
+01/09/19 16:25:57   ServiceEvent_FuBenCmdGuildFireMetalHpFubenCmd table: 0x6fafd
+1a0 >
+01/09/19 16:25:57   QuestEvent_UpdateGuildQuestList table: 0x6fb0f9a0 >
+01/09/19 16:25:57   QuestEvent_UpdateAnnounceQuestList table: 0x6fb0f910 >
+01/09/19 16:25:57   QuestEvent_ProcessChange table: 0x6fb0f870 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdTrackFuBenUserCmd table: 0x6fb0f820 >
+01/09/19 16:25:57   QuestEvent_QuestDelete table: 0x6fb0f7c0 >
+01/09/19 16:25:57   ServiceEvent_QuestQueryOtherData table: 0x6fb0f720 >
+01/09/19 16:25:57   ChatRoomEvent_SystemMessage table: 0x6fd26ea0 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdFubenStepSyncCmd table: 0x6fb5e9d0 >
+01/09/19 16:25:57   TriggerEvent_AddTrigger table: 0x70064890 >
+01/09/19 16:25:57   PVE_CardLaunch table: 0x6fb0f440 >
+01/09/19 16:25:57   MainViewEvent_ShowOrHide table: 0x6f9ec5f0 >
+01/09/19 16:25:57   ServiceEvent_ScenePetPetOffPetCmd table: 0x70037fc0 >
+01/09/19 16:25:57   ServiceEvent_PveCardSyncProcessPveCardCmd table: 0x6fb0f3a0
+>
+01/09/19 16:25:57   ServiceEvent_SessionSocialityOperActivityNtfSocialCmd table:
+ 0x6fae8c50 >
+01/09/19 16:25:57   AdventureDataEvent_SceneItemsUpdate table: 0x6fb5dd90 >
+01/09/19 16:25:57   ServiceEvent_NUserTreeListUserCmd table: 0x6fb5e290 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdGuildFireInfoFubenCmd table: 0xba6aa4f0
+ >
+01/09/19 16:25:57   MainViewEvent_MenuActivityClose table: 0x71109170 >
+01/09/19 16:25:57   TeamEvent_MemberChangeMap table: 0x6fb5dc60 >
+01/09/19 16:25:57   PVPEvent_PVPDungeonShutDown table: 0xba6aa400 >
+01/09/19 16:25:57   PVP_MVPFightLaunch table: 0x6fd26a90 >
+01/09/19 16:25:57   GVGEvent_GVGDungeonShutDown table: 0xba6aa4a0 >
+01/09/19 16:25:57   ServiceEvent_ChatCmdChatRetCmd table: 0x6fd26e50 >
+01/09/19 16:25:57   MainViewEvent_CancelItemTrace table: 0x6fb607d0 >
+01/09/19 16:25:57   UIMenuEvent_UnRegisitButton table: 0x70bb6810 >
+01/09/19 16:25:57   MainViewEvent_AddItemTrace table: 0x6fb60780 >
+01/09/19 16:25:57   TeamEvent_MemberExitTeam table: 0x6fe20400 >
+01/09/19 16:25:57   MyselfEvent_JobExpChange table: 0x6fd269f0 >
+01/09/19 16:25:57   ServiceEvent_NUserQueryTraceList table: 0x6fb60730 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdGvgTowerUpdateFubenCmd table: 0x6fb5e64
+0 >
+01/09/19 16:25:57   ServiceEvent_NUserBeFollowUserCmd table: 0x700666d0 >
+01/09/19 16:25:57   ServiceEvent_FuBenCmdGuildFireDangerFubenCmd table: 0x6fafd1
+d0 >
+01/09/19 16:25:57   TriggerEvent_Leave_GDFightForArea table: 0x6fe20ad0 >
+01/09/19 16:25:57   ServiceEvent_MatchCCmdNtfRankChangeCCmd table: 0x6fae74a0 >
+01/09/19 16:25:57   ServiceEvent_SessionTeamTeamMemberUpdate table: 0x70066560 >
+
+01/09/19 16:25:57   PVP_PoringFightShutdown table: 0x6fd26d60 >
+01/09/19 16:25:57   SceneEvent_SceneAddRoles table: 0x6fb5e1f0 >
+01/09/19 16:25:57   MiniMapEvent_CreatureScenicRemove table: 0x6fb5e490 >
+01/09/19 16:25:57   MiniMapEvent_CreatureScenicAdd table: 0x6fb5e440 >
+01/09/19 16:25:57   MyselfEvent_ZenyChange table: 0x6fe1fe10 >
+01/09/19 16:25:57   QuestEvent_RemoveGuildQuestList table: 0x6fb5e060 >
+01/09/19 16:25:57   MainViewEvent_ActiveShortCutBord table: 0x6f9ec640 >
+01/09/19 16:25:57   GuideEvent_MiniMapAnim table: 0x6fb5db40 >
+01/09/19 16:25:57   ServiceEvent_SceneFoodUpdateFoodInfo table: 0x6fd26b80 >
+01/09/19 16:25:57   SceneGlobalEvent_Map2DChanged table: 0x6fb5dde0 >
+01/09/19 16:25:57   ServiceEvent_SceneGoToUserCmd table: 0x6fb5dab0 >
+01/09/19 16:25:57   PVP_MVPFightShutDown table: 0x6fd26ae0 >
+01/09/19 16:25:57   ServiceEvent_SceneFoodFoodInfoNtf table: 0x6fd26b30 >
+01/09/19 16:25:57   ServiceEvent_SessionTeamMemberPosUpdate table: 0x6fb5dc10 >
+01/09/19 16:25:57   PetEvent_RemoveCatchPetBord table: 0x70065970 >
+01/09/19 16:25:57   MiniMapEvent_ShowMiniMapDirEffect table: 0x6fb5e150 >
+01/09/19 16:25:57   SkillEvent_SkillWithUseTimesChanged table: 0x70065880 >
+01/09/19 16:25:57   MainViewEvent_RemoveQuestFocus table: 0x6fb5e100 >
+01/09/19 16:25:57   ItemEvent_TempBagUpdate table: 0x7006d640 >
+01/09/19 16:25:57   MainViewEvent_UpdateMatchBtn table: 0x710b06c0 >
+01/09/19 16:25:57   ServiceEvent_SkillUpdateDynamicSkillCmd table: 0x6fe20360 >
+01/09/19 16:25:57   TeamEvent_MemberOffline table: 0x70066630 >
+01/09/19 16:25:57   ItemEvent_BetterEquipAdd table: 0x700649d0 >
+01/09/19 16:25:57   SceneEvent_SceneRemoveRoles table: 0x6fb5e240 >
+01/09/19 16:25:57   MyselfEvent_SyncBuffs table: 0x6fe1fe60 >
+01/09/19 16:25:57   ServiceEvent_ScenePetPetInfoPetCmd table: 0x70037f70 >
+01/09/19 16:25:57   ServiceEvent_SceneSealQuerySeal table: 0x6fb5de80 >
+01/09/19 16:25:57   ServiceEvent_ItemPackSlotNtfItemCmd table: 0x7006d7e0 >
+01/09/19 16:25:57   MyselfEvent_ReliveStatus table: 0x70069f20 >
+01/09/19 16:25:57   ServiceEvent_GuildCmdEnterGuildGuildCmd table: 0x6fd27010 >
+01/09/19 16:25:57   MiniMapEvent_ExitPointStateChange table: 0x6fb5db70 >
+01/09/19 16:25:57   ItemEvent_EquipUpdate table: 0x7003a370 >
+01/09/19 16:25:57   GVGEvent_ShowNewAchievemnetEffect table: 0xba6ab440 >
+01/09/19 16:25:57   ServiceEvent_SceneBeingBeingOffCmd table: 0x700380b0 >
+01/09/19 16:25:57   SystemUnLockEvent.NUserNewMenu table: 0x6fb5dfc0 >
+01/09/19 16:25:57   SceneCreatureEvent_PropHpChange table: 0x70037ef0 >
+01/09/19 16:25:57   ServiceEvent_MatchCCmdNtfFightStatCCmd table: 0x6fb0f2a0 >
+01/09/19 16:25:57   ServiceEvent_SessionMailMailUpdate table: 0x70bb6010 >
+01/09/19 16:25:57   CreatureEvent_Name_Change table: 0x70037d90 >
+01/09/19 16:25:57   SkillEvent_SkillWaitNextUse table: 0x6fe20100 >
+01/09/19 16:25:57   ServiceEvent_LoginUserCmdLoginResultUserCmd table: 0x6fd26db
+0 >
+01/09/19 16:25:57  viewdata table: 0xb8955270
+01/09/19 16:25:57   viewname=MainView
+01/09/19 16:25:57  autoAimMonster table: 0x6fae90a0
+01/09/19 16:25:57   autoFightBtn=AutoBattleButton (UnityEngine.GameObject)
+01/09/19 16:25:57   container table: 0xb8396c80 >
+01/09/19 16:25:57   autoFight=Auto (UnityEngine.GameObject)
+01/09/19 16:25:57   itemWrapHelper table: 0x6faeee00 >
+01/09/19 16:25:57   autoFightTip=Label (UILabel)
+01/09/19 16:25:57   bg=Bg (UISprite)
+01/09/19 16:25:57   isShowSweep=false
+01/09/19 16:25:57   closecomp=MainViewAutoAimMonster (RO.CloseWhenClickOtherPlac
+e)
+01/09/19 16:25:57   gameObject=MainView (UnityEngine.GameObject)
+01/09/19 16:25:57   cellctl table: 0x6d2ef650 >
+01/09/19 16:25:57   sweepCheckmark=Checkmark (UnityEngine.GameObject)
+01/09/19 16:25:57   currentId=10022
+01/09/19 16:25:57   autoBattleBtnSps=AutoBattleBg (UISprite)
+01/09/19 16:25:57   protectToggle=ProtectToggle (UIToggle)
+01/09/19 16:25:57   isSweep=false
+01/09/19 16:25:57   disPatherEvt table: 0x6fb30fd0 >
+01/09/19 16:25:57   autoAim=AutoAim (UnityEngine.GameObject)
+01/09/19 16:25:57   viewdata table: 0xb8955270 >
+01/09/19 16:25:57   class table: 0x76ec9b60 >
+01/09/19 16:25:57   trans=MainView (UnityEngine.Transform)
+01/09/19 16:25:57   autoAimMonster=MainViewAutoAimMonster (UnityEngine.GameObjec
+t)
+01/09/19 16:25:57   effectCache table: 0x6fae91c0 >
+01/09/19 16:25:57   sweepBtn=SweepBtn (UnityEngine.GameObject)
+01/09/19 16:25:57   stayToggle=StayToggle (UIToggle)
+01/09/19 16:25:57  RedTipChecks table: 0xbf8c98c0
+01/09/19 16:25:57   1 table: 0x6cf81330 >
+01/09/19 16:25:57   2 table: 0x70039ac0 >
+01/09/19 16:25:57   3 table: 0x70039d30 >
+01/09/19 16:25:57   400 table: 0x7006d040 >
+01/09/19 16:25:57   81 table: 0x70067500 >
+01/09/19 16:25:57   82 table: 0x70067700 >
+01/09/19 16:25:57   19 table: 0x70065da0 >
+01/09/19 16:25:57   5 table: 0x70039f90 >
+01/09/19 16:25:57   70 table: 0x6ff4b8f0 >
+01/09/19 16:25:57   50 table: 0xba6aca40 >
+01/09/19 16:25:57   40 table: 0x700683f0 >
+01/09/19 16:25:57   41 table: 0x70068630 >
+01/09/19 16:25:57   106 table: 0x7006ca60 >
+01/09/19 16:25:57   43 table: 0x70068ab0 >
+01/09/19 16:25:57   80 table: 0x70067270 >
+01/09/19 16:25:57   34 table: 0x70067010 >
+01/09/19 16:25:57   83 table: 0x70067940 >
+01/09/19 16:25:57   42 table: 0x70068870 >
+01/09/19 16:25:57  infoPage table: 0x6fe20590
+01/09/19 16:25:57   map_currentLine=Map_CurrentLine (UILabel)
+01/09/19 16:25:57   jobBg=JobBg (UISprite)
+01/09/19 16:25:57   wifiSymbols table: 0x6fe215f0 >
+01/09/19 16:25:57   eatFoodCount=FoodCount (UILabel)
+01/09/19 16:25:57   objMap_currentLine=Map_WorldLine (UnityEngine.GameObject)
+01/09/19 16:25:57   battery_IsCharge=BatteryChargeSymbol (UnityEngine.GameObject
+)
+01/09/19 16:25:57   trans=MainView (UnityEngine.Transform)
+01/09/19 16:25:57   viewdata table: 0xb8955270 >
+01/09/19 16:25:57   foldSymbol=foldSymbol (UnityEngine.GameObject)
+01/09/19 16:25:57   batterySlider_Foreground=Foreground (UISprite)
+01/09/19 16:25:57   objCurrentLine=WorldLine (UnityEngine.GameObject)
+01/09/19 16:25:57   buffDatas table: 0x6fe21000 >
+01/09/19 16:25:57   weakDialogCell table: 0x71ad7ea0 >
+01/09/19 16:25:57   baseBg=BaseBg (UISprite)
+01/09/19 16:25:57   battlePoint=0
+01/09/19 16:25:57   buffs table: 0x6fd24fa0 >
+01/09/19 16:25:57   roleSlider=BaseExpSlider (UISlider)
+01/09/19 16:25:57   sceneMapName=SceneMapName (UILabel)
+01/09/19 16:25:57   gameObject=MainView (UnityEngine.GameObject)
+01/09/19 16:25:57   fullProgress=FullProgress (UnityEngine.GameObject)
+01/09/19 16:25:57   weakDialogBord=WeakDialogBord (UnityEngine.GameObject)
+01/09/19 16:25:57   jobSlider=JobExpSlider (UISlider)
+01/09/19 16:25:57   fullProgress_Icon=Icon (UISprite)
+01/09/19 16:25:57   batterySlider=BatteryPctSlider (UISlider)
+01/09/19 16:25:57   class table: 0xbbf2a700 >
+01/09/19 16:25:57   sysTimeLab=SysTime (UILabel)
+01/09/19 16:25:57   boothBtn=BoothBtn (UnityEngine.GameObject)
+01/09/19 16:25:57   buffListDatas table: 0x6fe21030 >
+01/09/19 16:25:57   container table: 0xb8396c80 >
+01/09/19 16:25:57   guideList table: 0x6fd24fd0 >
+01/09/19 16:25:57   currentLine=CurrentLine (UILabel)
+01/09/19 16:25:57   autoBattleButton=AutoBattleButton (UnityEngine.GameObject)
+01/09/19 16:25:57   skillAssist=SkillAssist (UnityEngine.GameObject)
+01/09/19 16:25:57   jobSliderSps table: 0x6ff4cd50 >
+01/09/19 16:25:57   buffgrid=BuffGrids (UIGrid)
+01/09/19 16:25:57   effectCache table: 0x6fe206b0 >
+01/09/19 16:25:57   weak_dialog_queue table: 0x6cf49db0 >
+01/09/19 16:25:57   buffCtl table: 0x6fe20c80 >
+01/09/19 16:25:57  effectCache table: 0xb8396d90
+01/09/19 16:25:57  trans=MainView (UnityEngine.Transform)
+01/09/19 16:25:57  uiMediator table: 0x700b94b0
+01/09/19 16:25:57   viewComponent table: 0xb8396c80 >
+01/09/19 16:25:57   class table: 0xbfdc2040 >
+01/09/19 16:25:57   mediatorName=MainView
+01/09/19 16:25:57   facade table: 0x6e7cc950 >
+01/09/19 16:25:57   multitonKey table: 0x6e7cf740 >
+01/09/19 16:25:57 mapName=MapName (UILabel)
+01/09/19 16:25:57 npcRoles table: 0x6fc7f730
+01/09/19 16:25:57 monsterDataMap table: 0x6fc7f760
+01/09/19 16:25:57  1 table: 0x74398b40
+01/09/19 16:25:57   instanceID=1713759
+01/09/19 16:25:57   _parama table: 0x725f0300 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(10.814000, 0.472010, -12.850000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  2 table: 0x62dbd470
+01/09/19 16:25:57   instanceID=1713760
+01/09/19 16:25:57   _parama table: 0x72565fa0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(-4.272069, 0.472010, -37.307667) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  3 table: 0x648099f0
+01/09/19 16:25:57   instanceID=1713761
+01/09/19 16:25:57   _parama table: 0x6f62c8a0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(-5.520000, 0.472010, -36.081001) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  4 table: 0x68aac8d0
+01/09/19 16:25:57   instanceID=1713762
+01/09/19 16:25:57   _parama table: 0x6a9594c0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(14.204000, 0.472010, -29.638000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  5 table: 0xb8fca100
+01/09/19 16:25:57   instanceID=1713763
+01/09/19 16:25:57   _parama table: 0xbd81b370 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(8.968000, 0.472010, -11.798000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  6 table: 0x60a0b720
+01/09/19 16:25:57   instanceID=1713764
+01/09/19 16:25:57   _parama table: 0x5b818830 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(12.438000, 0.472010, -13.471000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  7 table: 0x6ad3be10
+01/09/19 16:25:57   instanceID=1713765
+01/09/19 16:25:57   _parama table: 0x61d28ba0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(4.740000, 0.472010, -29.167999) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  8 table: 0x6cb18dd0
+01/09/19 16:25:57   instanceID=1713766
+01/09/19 16:25:57   _parama table: 0x647ff150 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(-6.704000, 0.472010, -13.662000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  9 table: 0x706cd050
+01/09/19 16:25:57   instanceID=1713767
+01/09/19 16:25:57   _parama table: 0x60a45940 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(6.360000, 0.472010, -29.593000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  10 table: 0x667c6e60
+01/09/19 16:25:57   instanceID=1713768
+01/09/19 16:25:57   _parama table: 0xbae02ec0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(4.538000, 0.472010, -27.214001) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  11 table: 0x5a6986d0
+01/09/19 16:25:57   instanceID=1713769
+01/09/19 16:25:57   _parama table: 0xbfc172a0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(-4.300000, 0.472010, -37.306000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  12 table: 0x6310cf40
+01/09/19 16:25:57   instanceID=1713770
+01/09/19 16:25:57   _parama table: 0x6310d060 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(3.119000, 0.472010, -31.312000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  13 table: 0x657066a0
+01/09/19 16:25:57   instanceID=1713771
+01/09/19 16:25:57   _parama table: 0xbae46ad0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(-7.200000, 0.472010, -13.277000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  14 table: 0x6dd55160
+01/09/19 16:25:57   instanceID=1713772
+01/09/19 16:25:57   _parama table: 0x7b785fa0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(7.221000, 0.472010, -10.440000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  15 table: 0x663afba0
+01/09/19 16:25:57   instanceID=1713773
+01/09/19 16:25:57   _parama table: 0x71952aa0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(-3.200000, 0.472010, -26.666000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  16 table: 0x6e994130
+01/09/19 16:25:57   instanceID=1713774
+01/09/19 16:25:57   _parama table: 0xbde52600 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(-1.711890, 0.472010, -33.668442) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  17 table: 0xbd72ec80
+01/09/19 16:25:57   instanceID=1713775
+01/09/19 16:25:57   _parama table: 0x643725a0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(12.545000, 0.472010, -10.936000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  18 table: 0x6f2533c0
+01/09/19 16:25:57   instanceID=1713776
+01/09/19 16:25:57   _parama table: 0x668f9a30 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(5.399000, 0.472010, -28.347000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  19 table: 0x60f2ad00
+01/09/19 16:25:57   instanceID=1713777
+01/09/19 16:25:57   _parama table: 0x6924fd80 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(11.531000, 0.472010, -13.073000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  20 table: 0x670b2ef0
+01/09/19 16:25:57   instanceID=1713778
+01/09/19 16:25:57   _parama table: 0x68808070 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(6.840000, 0.472010, -25.705999) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  21 table: 0x6e8e6700
+01/09/19 16:25:57   instanceID=1713779
+01/09/19 16:25:57   _parama table: 0x707f2d20 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(9.296000, 0.472010, -11.642000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  22 table: 0xbdd6eba0
+01/09/19 16:25:57   instanceID=1713780
+01/09/19 16:25:57   _parama table: 0x6842c4c0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(-5.000000, 0.472010, -16.865999) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  23 table: 0xbb2c4810
+01/09/19 16:25:57   instanceID=1713781
+01/09/19 16:25:57   _parama table: 0xbdf0e0c0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(8.172000, 0.472010, -11.533000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  24 table: 0xbd7c2870
+01/09/19 16:25:57   instanceID=1713782
+01/09/19 16:25:57   _parama table: 0x61dabff0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(4.288314, 0.472010, -32.281429) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  25 table: 0x68bcbe80
+01/09/19 16:25:57   instanceID=1713783
+01/09/19 16:25:57   _parama table: 0x5ca436e0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(2.573000, 0.472010, -11.945000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  26 table: 0x70f3e560
+01/09/19 16:25:57   instanceID=1713784
+01/09/19 16:25:57   _parama table: 0x685e19d0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(4.971000, 0.472010, -19.281000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  27 table: 0x612e78c0
+01/09/19 16:25:57   instanceID=1713785
+01/09/19 16:25:57   _parama table: 0x612e79e0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(10.791000, 0.472010, -11.793000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  28 table: 0xbdcd6580
+01/09/19 16:25:57   instanceID=1713786
+01/09/19 16:25:57   _parama table: 0x61708f90 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(3.411000, 0.472010, -30.988001) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  29 table: 0x70a4c4a0
+01/09/19 16:25:57   instanceID=1713787
+01/09/19 16:25:57   _parama table: 0x667ca060 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(-3.498000, 0.472010, -16.614000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  30 table: 0x65e5a080
+01/09/19 16:25:57   instanceID=1713788
+01/09/19 16:25:57   _parama table: 0x6ae7c5f0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(-0.983000, 0.472010, -33.353001) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  31 table: 0x689dec30
+01/09/19 16:25:57   instanceID=1713789
+01/09/19 16:25:57   _parama table: 0x658db0a0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(-2.673000, 0.472010, -28.635000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  32 table: 0x667380d0
+01/09/19 16:25:57   instanceID=1713790
+01/09/19 16:25:57   _parama table: 0x65f18dd0 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(-0.120000, 0.472010, -26.510000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  33 table: 0x70907e90
+01/09/19 16:25:57   instanceID=1713791
+01/09/19 16:25:57   _parama table: 0x62f47d00 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(5.802000, 0.472010, -12.990000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  34 table: 0x60de6290
+01/09/19 16:25:57   instanceID=1713792
+01/09/19 16:25:57   _parama table: 0x5f4ddc30 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(0.583000, 0.472010, -29.962000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57  35 table: 0x61700be0
+01/09/19 16:25:57   instanceID=1713793
+01/09/19 16:25:57   _parama table: 0x6bc4e160 >
+01/09/19 16:25:57   class table: 0xbb27da50 >
+01/09/19 16:25:57   pos LuaVector3(2.744000, 0.472010, -12.096000) >
+01/09/19 16:25:57   _dataAsArray=false
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57 gvgDroiyanMap table: 0x6fc7f8e0
+01/09/19 16:25:57 frontMapInfo=MapFrontInfo (UnityEngine.GameObject)
+01/09/19 16:25:57 mapBord=MapBord (UnityEngine.GameObject)
+01/09/19 16:25:57 UseFlyButtonInfo table: 0x6fc7f940
+01/09/19 16:25:57  itemID=5024
+01/09/19 16:25:57  msgID=25439
+01/09/19 16:25:57  icon=Icon (UISprite)
+01/09/19 16:25:57  msgDoNotHaveID=25444
+01/09/19 16:25:57  base=UseFlyWingsButton (UISprite)
+01/09/19 16:25:57 miniMapButton=MiniMapButton (UnityEngine.GameObject)
+01/09/19 16:25:57 bigmapWindow table: 0x6fc7fbc0
+01/09/19 16:25:57  monsterActive=true
+01/09/19 16:25:57  scenicMap table: 0x6fc7ffb0
+01/09/19 16:25:57  servernpc_map table: 0x6fc7fe60
+01/09/19 16:25:57  d_symbolParent=symbolsParent (UnityEngine.Transform)
+01/09/19 16:25:57  playerMap table: 0x6fc80070
+01/09/19 16:25:57  lastMapScale=1
+01/09/19 16:25:57  destTransEffect table: 0xbf35a360
+01/09/19 16:25:57   instanceID=239
+01/09/19 16:25:57   _alive=true
+01/09/19 16:25:57   assetManager table: 0x6d138960 >
+01/09/19 16:25:57   id=1
+01/09/19 16:25:57   _dataAsArray=true
+01/09/19 16:25:57   deActiveFlag=1
+01/09/19 16:25:57   args table: 0xbf35a3f0 >
+01/09/19 16:25:57   effectManager table: 0x6d0eca90 >
+01/09/19 16:25:57   class table: 0xbfb54750 >
+01/09/19 16:25:57   _weakObserver table: 0x70a65d20 >
+01/09/19 16:25:57  monsterMap table: 0x6fc80010
+01/09/19 16:25:57   1=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   2=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   3=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   4=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   5=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   6=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   7=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   8=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   9=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   10=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   11=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   12=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   13=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   14=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   15=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   16=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   17=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   18=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   19=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   20=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   21=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57   22=map_green (UnityEngine.GameObject)
+01/09/19 16:25:57  mapdata table: 0xbd597d20
+01/09/19 16:25:57   NameZh=Ghost Ship
+01/09/19 16:25:57   NameEn=ghostship2
+01/09/19 16:25:57   Range=4001
+01/09/19 16:25:57   MonsterRatio table: 0xba956990 >
+01/09/19 16:25:57   MapScale=80
+01/09/19 16:25:57   MapUi=7
+01/09/19 16:25:57   IndexRange table: 0xba956990 >
+01/09/19 16:25:57   Position table: 0xbd597da0 >
+01/09/19 16:25:57   ShowInList=1
+01/09/19 16:25:57   LvRange table: 0xbd597d50 >
+01/09/19 16:25:57   EnterCond table: 0xba956990 >
+01/09/19 16:25:57   MapArea=9
+01/09/19 16:25:57   MoneyType=1
+01/09/19 16:25:57   Camera=1
+01/09/19 16:25:57   id=9
+01/09/19 16:25:57   Desc=µ╝éµ│èµùáσ«ÜτÜäΦ»àσÆÆΣ╣ïΦê╣
+01/09/19 16:25:57   Money=800
+01/09/19 16:25:57   IsDangerous=1
+01/09/19 16:25:57   AdventureValue=-1
+01/09/19 16:25:57   SceneAnimation=0
+01/09/19 16:25:57   PVPmap=0
+01/09/19 16:25:57   Mode=1
+01/09/19 16:25:57   CallZh=Ghost Ship
+01/09/19 16:25:57   MapTips=1
+01/09/19 16:25:57   Type=1
+01/09/19 16:25:57  trans=BigMapWindow (UnityEngine.Transform)
+01/09/19 16:25:57  active=false
+01/09/19 16:25:57  exitPointMap table: 0x6fc7fe90
+01/09/19 16:25:57   1=MiniMapSymbol (UnityEngine.GameObject)
+01/09/19 16:25:57   2=MiniMapSymbol (UnityEngine.GameObject)
+01/09/19 16:25:57   3=MiniMapSymbol (UnityEngine.GameObject)
+01/09/19 16:25:57  focusArrowMap table: 0x6fc7ff50
+01/09/19 16:25:57  questMap table: 0x6fc7fef0
+01/09/19 16:25:58   visit105835=3 (UnityEngine.GameObject)
+01/09/19 16:25:58  map2D=Map 2d (RO.Map2D)
+01/09/19 16:25:58  teamMap table: 0x6fc7fec0
+01/09/19 16:25:58  updateFocusArrow=false
+01/09/19 16:25:58  treeMap table: 0x6fc80040
+01/09/19 16:25:58  npcMapDatas table: 0xbf485870
+01/09/19 16:25:58  focusMap table: 0x6fc7ff20
+01/09/19 16:25:58   50100001=50100001 (UnityEngine.GameObject)
+01/09/19 16:25:58  exitMapDatas table: 0xbf485d00
+01/09/19 16:25:58   1 table: 0x66c666b0 >
+01/09/19 16:25:58   2 table: 0xbd4fe420 >
+01/09/19 16:25:58   3 table: 0x68653530 >
+01/09/19 16:25:58  sPanel=Panel_S (UIPanel)
+01/09/19 16:25:58  myTrans=MiniMapSymbol (UnityEngine.Transform)
+01/09/19 16:25:58  npcMap table: 0x6fc7fd40
+01/09/19 16:25:58  needFocusFrameMap table: 0x6fc7ff80
+01/09/19 16:25:58  iMoved=true
+01/09/19 16:25:58  mapTexture=MapTexture (UITexture)
+01/09/19 16:25:58  mapLabel=MapLabel (UnityEngine.GameObject)
+01/09/19 16:25:58  class table: 0xbb7fc730
+01/09/19 16:25:58   __index table: 0xbb7fc730 >
+01/09/19 16:25:58   super table: 0x6e7a3fd0 >
+01/09/19 16:25:58   MiniMapSymbolPath=GUI/v1/cell/MiniMapSymbol
+01/09/19 16:25:58  panelSize table: 0x6fd9c060
+01/09/19 16:25:58   1=435.0
+01/09/19 16:25:58   2=375.0
+01/09/19 16:25:58  mTrans=BigMapWindow (UnityEngine.Transform)
+01/09/19 16:25:58  sealMap table: 0x6fc7ffe0
+01/09/19 16:25:58  dPanel=Panel_D (UIPanel)
+01/09/19 16:25:58  emptyParama table: 0xbf488650
+01/09/19 16:25:58  mapsize table: 0x68628740
+01/09/19 16:25:58   x=375
+01/09/19 16:25:58   y=375
+01/09/19 16:25:58  gameObject=BigMapWindow (UnityEngine.GameObject)
+01/09/19 16:25:58  s_symbolParent=symbolsParent (UnityEngine.Transform)
+01/09/19 16:25:58  tipTransEffect table: 0x6fd9fe10
+01/09/19 16:25:58   instanceID=240
+01/09/19 16:25:58   _alive=true
+01/09/19 16:25:58   assetManager table: 0x6d138960 >
+01/09/19 16:25:58   id=2
+01/09/19 16:25:58   _dataAsArray=true
+01/09/19 16:25:58   deActiveFlag=1
+01/09/19 16:25:58   args table: 0x6fd9fe40 >
+01/09/19 16:25:58   effectManager table: 0x6d0eca90 >
+01/09/19 16:25:58   class table: 0xbfb54750 >
+01/09/19 16:25:58   _weakObserver table: 0x6fda01b0 >
+01/09/19 16:25:58  questFocusDirty=true
+01/09/19 16:25:58  effectCache table: 0x6fc7fd10
+01/09/19 16:25:58  lastMyPos LuaVector3(5.382000, 0.000000, -30.785000)
+01/09/19 16:25:58   1=5.3819999694824
+01/09/19 16:25:58   2=0
+01/09/19 16:25:58   3=-30.784999847412
+01/09/19 16:25:58  gvdDoriyanMap table: 0x6fc80430
+01/09/19 16:25:58 bigMapLab=Label (UILabel)
+01/09/19 16:25:58 nearlyPlayers table: 0x6fc7f700
+01/09/19 16:25:58  1 table: 0x68c7a110
+01/09/19 16:25:58   instanceID=1668845
+01/09/19 16:25:58   _parama table: 0x7155f1f0 >
+01/09/19 16:25:58   class table: 0xbb27da50 >
+01/09/19 16:25:58   id=4305637567
+01/09/19 16:25:58   _dataAsArray=false
+01/09/19 16:25:58   _alive=true
+01/09/19 16:25:58  2 table: 0x6e861ba0
+01/09/19 16:25:58   instanceID=1668846
+01/09/19 16:25:58   _parama table: 0x71112d00 >
+01/09/19 16:25:58   class table: 0xbb27da50 >
+01/09/19 16:25:58   id=4312963293
+01/09/19 16:25:58   _dataAsArray=false
+01/09/19 16:25:58   _alive=true
+01/09/19 16:25:58  3 table: 0x61c6dfd0
+01/09/19 16:25:58   instanceID=1668847
+01/09/19 16:25:58   _parama table: 0x62f6e050 >
+01/09/19 16:25:58   class table: 0xbb27da50 >
+01/09/19 16:25:58   id=4313163186
+01/09/19 16:25:58   _dataAsArray=false
+01/09/19 16:25:58   _alive=true
+01/09/19 16:25:58 trans=MainView (UnityEngine.Transform)
+01/09/19 16:25:58 viewdata table: 0xb8955270
+01/09/19 16:25:58 nearlyBord=NearlyBord (UnityEngine.GameObject)
+01/09/19 16:25:58 npcTog=NPCTog (UIToggle)
+01/09/19 16:25:58 nowNearlyTog=1
+01/09/19 16:25:58 bigmaplarge=false
+01/09/19 16:25:58 mapdata table: 0xbd597d20
+01/09/19 16:25:58 noPlayerTip=PlayerNoneTip (UnityEngine.GameObject)
+01/09/19 16:25:58 mapInited=true
+01/09/19 16:25:58 focusMap table: 0x6fc7f850
+01/09/19 16:25:58  50100001 table: 0x6aec3eb0
+01/09/19 16:25:58   instanceID=1055403
+01/09/19 16:25:58   _parama table: 0x683e1450 >
+01/09/19 16:25:58   class table: 0xbb27da50 >
+01/09/19 16:25:58   id=50100001
+01/09/19 16:25:58   pos LuaVector3(14.299968, 0.472010, -37.109997) >
+01/09/19 16:25:58   _dataAsArray=false
+01/09/19 16:25:58   _alive=true
+01/09/19 16:25:58 showNpcs table: 0x6fc7f8b0
+01/09/19 16:25:58 disPatherEvt table: 0x6fb5e530
+01/09/19 16:25:58 gameObject=MainView (UnityEngine.GameObject)
+01/09/19 16:25:58 bubbleStick=BubbleStick (UIWidget)
+01/09/19 16:25:58 moreBord=MoreBord (UnityEngine.GameObject)
+01/09/19 16:25:58 teamMemberMapDatas table: 0x6fc7f790
+01/09/19 16:25:58 nearlyCreaturesCtl table: 0x6fb86b00
+01/09/19 16:25:58  panel=NearlyScrollView (UIPanel)
+01/09/19 16:25:58  class table: 0x6e798ae0
+01/09/19 16:25:58   __index table: 0x6e798ae0 >
+01/09/19 16:25:58  initParams table: 0x6fb86db0
+01/09/19 16:25:58   1 LuaVector3(0.000000, 211.800003, 0.000000) >
+01/09/19 16:25:58   2 LuaVector3(-38.299999, -19.400000, 0.000000) >
+01/09/19 16:25:58   3 LuaVector2(0.000000, 0.000000) >
+01/09/19 16:25:58  wrap=NearlyGrid (UIWrapContent)
+01/09/19 16:25:58  scrollView=NearlyScrollView (UIScrollView)
+01/09/19 16:25:58  ctls table: 0x6fb7f0d0
+01/09/19 16:25:58   1 table: 0x6fb875d0 >
+01/09/19 16:25:58   2 table: 0x6fb89b20 >
+01/09/19 16:25:58   3 table: 0x6fb72430 >
+01/09/19 16:25:58   4 table: 0x6fb89a70 >
+01/09/19 16:25:58   5 table: 0x6fb76b50 >
+01/09/19 16:25:58   6 table: 0x6fb78fb0 >
+01/09/19 16:25:58   7 table: 0x6fb7ad90 >
+01/09/19 16:25:58   8 table: 0x6fb7d1d0 >
+01/09/19 16:25:58   9 table: 0x6fb74870 >
+01/09/19 16:25:58   10 table: 0x6fb8cfe0 >
+01/09/19 16:25:58   11 table: 0x6fb8edd0 >
+01/09/19 16:25:58   12 table: 0x6fb90db0 >
+01/09/19 16:25:58   13 table: 0x6fd24220 >
+01/09/19 16:25:58   14 table: 0x6fb70ed0 >
+01/09/19 16:25:58   15 table: 0x6fb6efe0 >
+01/09/19 16:25:58   0 table: 0x6fb7fe10 >
+01/09/19 16:25:58  dir=1
+01/09/19 16:25:58  cellName=NearlyCreatureCell
+01/09/19 16:25:58  realnum=16
+01/09/19 16:25:58  datas table: 0x6fc7f700
+01/09/19 16:25:58  pfbNum=16
+01/09/19 16:25:58  viewLength=460.0
+01/09/19 16:25:58  control table: 0xb841e860
+01/09/19 16:25:58   super table: 0x6e7a3030 >
+01/09/19 16:25:58   __index table: 0xb841e860 >
+01/09/19 16:25:58 nearlyButton_Symbol=Arrow (UISprite)
+01/09/19 16:25:58 class table: 0xbb2b06a0
+01/09/19 16:25:58  super table: 0x6dc400b0
+01/09/19 16:25:58   __index table: 0x6dc400b0 >
+01/09/19 16:25:58   super table: 0x6e7a3fd0 >
+01/09/19 16:25:58  __index table: 0xbb2b06a0
+01/09/19 16:25:58 bigMapButton=BigMapButton (UnityEngine.GameObject)
+01/09/19 16:25:58 playerTog=PlayerTog (UIToggle)
+01/09/19 16:25:58 gvgFinalFightTip=GvgFinalFightTip (UnityEngine.GameObject)
+01/09/19 16:25:58 minimapWindow table: 0x6fb83600
+01/09/19 16:25:58  monsterActive=true
+01/09/19 16:25:58  scenicMap table: 0x6fb83930
+01/09/19 16:25:58  servernpc_map table: 0x6fb83770
+01/09/19 16:25:58  d_symbolParent=symbolsParent (UnityEngine.Transform)
+01/09/19 16:25:58  playerMap table: 0x6fb83c10
+01/09/19 16:25:58  destTransEffect table: 0x6fb847c0
+01/09/19 16:25:58   instanceID=241
+01/09/19 16:25:58   _alive=true
+01/09/19 16:25:58   assetManager table: 0x6d138960 >
+01/09/19 16:25:58   id=3
+01/09/19 16:25:58   _dataAsArray=true
+01/09/19 16:25:58   deActiveFlag=1
+01/09/19 16:25:58   args table: 0x6fb84700 >
+01/09/19 16:25:58   effectManager table: 0x6d0eca90 >
+01/09/19 16:25:58   class table: 0xbfb54750 >
+01/09/19 16:25:58   _weakObserver table: 0x6fb84a30 >
+01/09/19 16:25:58  monsterMap table: 0x6fb83bb0
+01/09/19 16:25:58   1=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   2=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   3=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   4=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   5=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   6=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   7=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   8=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   9=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   10=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   11=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   12=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   13=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   14=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   15=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   16=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   17=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   18=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   19=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   20=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   21=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   22=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   23=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   24=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   25=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   26=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   27=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   28=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   29=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   30=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   31=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   32=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   33=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   34=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58   35=map_green (UnityEngine.GameObject)
+01/09/19 16:25:58  mapdata table: 0xbd597d20
+01/09/19 16:25:58  trans=MiniMapWindow (UnityEngine.Transform)
+01/09/19 16:25:58  active=true
+01/09/19 16:25:58  exitPointMap table: 0x6fb83840
+01/09/19 16:25:58   1=MiniMapSymbol (UnityEngine.GameObject)
+01/09/19 16:25:58   2=MiniMapSymbol (UnityEngine.GameObject)
+01/09/19 16:25:58   3=MiniMapSymbol (UnityEngine.GameObject)
+01/09/19 16:25:58  focusArrowMap table: 0x6fb838d0
+01/09/19 16:25:58  questMap table: 0x6fb839b0
+01/09/19 16:25:58   visit105835=3 (UnityEngine.GameObject)
+01/09/19 16:25:58  map2D=Map 2d (RO.Map2D)
+01/09/19 16:25:58  teamMap table: 0x6fb83870
+01/09/19 16:25:58  sPanel=Panel_S (UIPanel)
+01/09/19 16:25:58  updateFocusArrow=true
+01/09/19 16:25:58  lastMapScale=1
+01/09/19 16:25:58  treeMap table: 0x6fb83be0
+01/09/19 16:25:58  npcMapDatas table: 0xbf47d990
+01/09/19 16:25:58  focusMap table: 0x6fb838a0
+01/09/19 16:25:58   50100001=50100001 (UnityEngine.GameObject)
+01/09/19 16:25:58  exitMapDatas table: 0xbf482980
+01/09/19 16:25:58   1 table: 0x712dc4d0 >
+01/09/19 16:25:58   2 table: 0xbeeb7660 >
+01/09/19 16:25:58   3 table: 0x68527a30 >
+01/09/19 16:25:58  mapsize table: 0x66492440
+01/09/19 16:25:58   x=206
+01/09/19 16:25:58   y=206
+01/09/19 16:25:58  gameObject=MiniMapWindow (UnityEngine.GameObject)
+01/09/19 16:25:58  npcMap table: 0x6fb83740
+01/09/19 16:25:58  needFocusFrameMap table: 0x6fb83900
+01/09/19 16:25:58  iMoved=false
+01/09/19 16:25:58  mapTexture=MapTexture (UITexture)
+01/09/19 16:25:58  myTrans=MiniMapSymbol (UnityEngine.Transform)
+01/09/19 16:25:58  class table: 0xbb7fc730
+01/09/19 16:25:58  panelSize table: 0x6fb83af0
+01/09/19 16:25:58   1=145.0
+01/09/19 16:25:58   2=145.0
+01/09/19 16:25:58  mapLabel=MapLabel (UnityEngine.GameObject)
+01/09/19 16:25:58  sealMap table: 0x6fb83960
+01/09/19 16:25:58  dPanel=Panel_D (UIPanel)
+01/09/19 16:25:58  emptyParama table: 0xbf4855e0
+01/09/19 16:25:58  mTrans=MiniMapWindow (UnityEngine.Transform)
+01/09/19 16:25:58  questFocusDirty=false
+01/09/19 16:25:58  s_symbolParent=symbolsParent (UnityEngine.Transform)
+01/09/19 16:25:58  tipTransEffect table: 0x6fb84d40
+01/09/19 16:25:58   instanceID=242
+01/09/19 16:25:58   _alive=true
+01/09/19 16:25:58   assetManager table: 0x6d138960 >
+01/09/19 16:25:58   id=4
+01/09/19 16:25:58   _dataAsArray=true
+01/09/19 16:25:58   deActiveFlag=1
+01/09/19 16:25:58   args table: 0x6fb84db0 >
+01/09/19 16:25:58   effectManager table: 0x6d0eca90 >
+01/09/19 16:25:58   class table: 0xbfb54750 >
+01/09/19 16:25:58   _weakObserver table: 0x6fb85230 >
+01/09/19 16:25:58  updateEventOwner table: 0x6fc7f500
+01/09/19 16:25:58  effectCache table: 0x6fb83710
+01/09/19 16:25:58  lastMyPos LuaVector3(3.137902, 0.000000, -31.768150)
+01/09/19 16:25:58   1=3.1379020214081
+01/09/19 16:25:58   2=0
+01/09/19 16:25:58   3=-31.76815032959
+01/09/19 16:25:58  gvdDoriyanMap table: 0x6fb839e0
+01/09/19 16:25:58 nearlyPlayerTipStick=NearlyPlayerTipStick (UIWidget)
+01/09/19 16:25:58 spotDatas table: 0x6fc7f7c0
+01/09/19 16:25:58 enlargeSprite=EnLargeButton (UISprite)
+01/09/19 16:25:58 UseButterflyButtonInfo table: 0x6fc7f910
+01/09/19 16:25:58  itemID=50001
+01/09/19 16:25:58  msgID=25440
+01/09/19 16:25:58  icon=Icon (UISprite)
+01/09/19 16:25:58  msgDoNotHaveID=25444
+01/09/19 16:25:58  base=UseButterflyWingsButton (UISprite)
+01/09/19 16:25:58 sealDatasMap table: 0x6fc7f7f0
+01/09/19 16:25:58 playerMap table: 0x6fc7f880
+01/09/19 16:25:58 effectCache table: 0x6fc7f6a0
+01/09/19 16:25:58 questShowDatas table: 0x6fc7f6d0
+01/09/19 16:25:58  visit105835 table: 0x6dd26420
+01/09/19 16:25:58   instanceID=1708909
+01/09/19 16:25:58   _parama table: 0x60e00b70 >
+01/09/19 16:25:58   class table: 0xbb27da50 >
+01/09/19 16:25:58   pos LuaVector3(16.908934, 0.516300, -31.850443) >
+01/09/19 16:25:58   id=visit105835
+01/09/19 16:25:58   _dataAsArray=false
+01/09/19 16:25:58   _alive=true
+01/09/19 16:25:58 treeMapDatasMap table: 0x6fc7f820

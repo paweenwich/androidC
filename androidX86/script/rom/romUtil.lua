@@ -250,11 +250,16 @@ end;
 
 function SkillToString(s)
     local skillInfo = Game.LogicManager_Skill:GetSkillInfo(s.id);
-    return "ID=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType;
+    --return "ID=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType;
+    return SkillInfoToString(skillInfo);
 end;
 
 function SkillToStringByID(id)
     local skillInfo = Game.LogicManager_Skill:GetSkillInfo(id);
+    return SkillInfoToString(skillInfo);
+end;
+
+function SkillInfoToString(skillInfo)
     return "ID=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType;
 end;
 
@@ -326,35 +331,15 @@ if class ~= nil then
                     return true;
                 end;
             end;        
+            LogDebug("AutoAI_Rom:Prepare() nothing to do");
             -- nothing to do
+            self.nextUpdateTime = time + 1.0;
         end;
         return false
 	end
 
 	function AutoAI_Rom:Start(idleElapsed, time, deltaTime, creature)
 	    LogDebug("AutoAI_Rom:Start()");
---[[        local myStatus= ROM_GetMyStatus();
-        if self.target ~= nil then
-            local npc = self.target;
-            local buffSkillID = 146005;
-            if ROM_HasBuffFromSkillID(buffSkillID) == false then
-                local skillNeeded = ROM_GetSkillNeeded(buffSkillID);
-                if skillNeeded.sp < myStatus.sp then
-                    Game.Myself:Client_UseSkill(buffSkillID, npc,nil,nil,true);
-                    return;
-                end;
-            end;
-            local skillID = 145009;
-            local skillNeeded = ROM_GetSkillNeeded(skillID);
-            if skillNeeded.sp < myStatus.sp then
-                Game.Myself:Client_UseSkill(skillID, npc,nil,nil,true);
-            else
-                -- 01/08/19 15:48:34 ID=10020001 name=[Play Dead] type=FakeDead
-                Game.Myself:Client_UseSkill(10020001, nil, nil,nil,true);
-                LogDebug("AutoAI_Rom:Start() Not enough SP " .. myStatus.sp .. "<" .. skillNeeded.sp);
-            end;
-            --Game.Myself:Client_UseSkill(143001, npc,nil,nil,true);
-        end;]]
 	end
 
 	function AutoAI_Rom:End(idleElapsed, time, deltaTime, creature)
@@ -403,46 +388,184 @@ function ROM_GetSkillNeeded(skillID)
     };
 end;
 
-function ROM_FindNearestMonster(monlist)
-    local minDist = 100000;
-    local retNpc = nil;
-    local myPos = Game.Myself:GetPosition();
-    tableForEach(monlist,function(i,v)
-        local npc = NSceneNpcProxy.Instance:FindNearestNpc(myPos, v);
-        if npc ~= nil then
-            local distance = LuaVector3.Distance(myPos, npc:GetPosition());
-            LogDebug("ID=" .. v .. " dist=" .. tostring(distance));
-            if distance < minDist then
-                retNpc = npc;
-                minDist = distance;
-            end;
-        else
-            LogDebug("ID=" .. v .. " not found");
-        end;
-    end);
-    return retNpc;
-end;
-
 function ROM_FindNearestMonsterEx(monlist)
     monlist = monlist or {};
-    local mons = ROM_GetAllMonster();
+    local filterFunc = function(mon)
+        return #monlist == 0 or TableUtil.HasValue(monlist,mon.data.staticData.id)
+    end;
+    local mons = ROM_GetAllMonster(filterFunc);
+    return ROM_GetNearestMonFromList(mons);
+end;
+
+function ROM_GetNearestMonFromList(mons)
     local minDist = 100000;
     local retNpc = nil;
     local myPos = Game.Myself:GetPosition();
     --m.data.staticData.id 
     tableForEach(mons,function(i,v)
         local npc = v;
-        if #monlist == 0 or TableUtil.HasValue(monlist,npc.data.staticData.id) then
-            local distance = LuaVector3.Distance(myPos, npc:GetPosition());
-            --LogDebug("ID=" .. v .. " dist=" .. tostring(distance));
-            if distance < minDist then
-                retNpc = npc;
-                minDist = distance;
-            end;
+        local distance = LuaVector3.Distance(myPos, npc:GetPosition());
+        --LogDebug("ID=" .. v .. " dist=" .. tostring(distance));
+        if distance < minDist then
+            retNpc = npc;
+            minDist = distance;
         end;
     end);
+    if retNpc ~= nil then
+        LogDebug("ROM_GetNearestMonFromList: found " .. MonsterToString(retNpc) .. " " .. minDist);
+    end;
     return retNpc;
 end;
 
+function ROM_GetAllNPC()
+    filterFunc = filterFunc or function(mon) return true; end
+    local ret = {};
+    local lst = NSceneNpcProxy.Instance.npcMap;
+    tableForEach(lst, function(i, v)
+        local mons = v;
+        tableForEach(mons, function(i, v)
+            local mon = v;
+            if mon.data.staticData.Type ~= "Monster" then
+                if filterFunc(mon) then
+                    table.insert(ret, mon);
+                end;
+            end;
+        end);
+    end);    
+    return ret;
+end;
+
+function ROM_GetAllMonster(filterFunc)
+    filterFunc = filterFunc or function(mon) return true; end
+    local ret = {};
+    local lst = NSceneNpcProxy.Instance.npcMap;
+    tableForEach(lst, function(i, v)
+        local mons = v;
+        tableForEach(mons, function(i, v)
+            local mon = v;
+            if mon.data.staticData.Type == "Monster" then
+                if filterFunc(mon) then
+                    table.insert(ret, mon);
+                end;
+            end;
+        end);
+    end);    
+    return ret;
+end;
+
+function ROM_GetAllMonsterFromNSceneNpcProxy()
+    filterFunc = filterFunc or function(mon) return true; end
+    local ret = {};
+    local lst = NSceneNpcProxy.Instance.npcMap;
+    tableForEach(lst, function(i, v)
+        local mons = v;
+        tableForEach(mons, function(i, v)
+            local mon = v;
+            if filterFunc(mon) then
+                table.insert(ret, mon);
+            end;
+        end);
+    end);    
+    return ret;
+end;
+
+function ROM_GetLearnSkill(filter)
+    filter = filter or {};
+    local ret = {};
+    local lstSkill = SkillProxy.Instance.learnedSkills;
+    tableForEach(lstSkill, function(i, v)
+        local skills = v;
+        tableForEach(skills, function(i, v)
+            local skill = v;
+            local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skill.id);
+            if #filter == 0 or TableUtil.HasValue(filter,skillInfo.staticData.SkillType) then
+            --if skillInfo.staticData.SkillType == "Attack" then  -- "Heal"
+                table.insert(ret, skill);
+            end;
+            --LogDebug(SkillToString(skill));
+        end);
+    end);    
+    return ret;
+end;
+
+function ROM_GetActiveSkill()
+    return ROM_GetLearnSkill({"Attack","Heal","Buff","FakeDead"});
+end;
+
+function ROM_GetMySkillInfoByName(name)
+    local skills = ROM_GetActiveSkill();
+    for i=1,#skills do
+        local skill = skills[i];
+        local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skill.id);
+        local skillName = skillInfo.staticData.NameZh;
+        --LogDebug(skillName .. " vs " .. name);
+        if string.match(skillName, name) then	
+            return skillInfo;
+        end;
+    end;
+    return nil;
+end;
+
+function ROM_FindStaticMonster(tab)
+    local filterFunc = function(mon)
+        return (mon.data.staticData.id >= 40000 and mon.data.staticData.id < 50000) or (mon.data.staticData.id >= 100000); 
+    end;
+    local mons = ROM_GetAllMonster(filterFunc);   
+    local mon = ROM_GetNearestMonFromList(mons);
+    if mon ~= nil then
+        LogDebug("ROM_FindStaticMonster: found " .. MonsterToString(mon));
+    end;
+    return mon;
+end;
+
+function ROM_FindBestMonster()
+    for i= 1, #myMonsterRules do
+        local rule = myMonsterRules[i];
+        --LogDebug(MyTostring(rule));
+        if rule.func ~= nil then
+            local param = rule.param or rule;
+            local npc = rule.func(param);
+            if npc ~= nil then
+                return npc;
+            end;
+        end;
+    end;     
+    return nil;
+end;
+
+if FunctionMonster ~= nil then
+    function FunctionMonster:FilterMonster(ignoreSkill)
+        LogDebug("FunctionMonster:FilterMonster()");
+        TableUtility.ArrayClear(self.monsterList)
+
+        local userMap = NSceneNpcProxy.Instance.userMap
+
+        local hasLearnMvp,hasLearnMini = true, true;
+        --if(ignoreSkill ~= true)then
+        --    hasLearnMvp = SkillProxy.Instance:HasLearnedSkill(GameConfig.Expression_SearchSkill.searchmvpskill)
+        --    hasLearnMini = SkillProxy.Instance:HasLearnedSkill(GameConfig.Expression_SearchSkill.searchminiskill)
+        --end
+
+        for _,monster in pairs(userMap)do
+            if monster.data and monster.data:IsMonster() then
+                if(monster.data.staticData.Type == "MVP")then
+                    LogDebug("MVP found" .. MonsterToString(monster));
+                    if(hasLearnMvp)then
+                        table.insert(self.monsterList, monster.data.id)
+                    end
+                elseif(monster.data.staticData.Type == "MINI")then
+                    LogDebug("MINI found" .. MonsterToString(monster));
+                    if(hasLearnMini)then
+                        table.insert(self.monsterList, monster.data.id)
+                    end
+                else
+                    table.insert(self.monsterList, monster.data.id)
+                end
+            end
+        end
+
+        return self.monsterList
+    end
+end;
 
 
