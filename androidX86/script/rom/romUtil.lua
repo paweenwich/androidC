@@ -10,6 +10,15 @@ function tableForEach(t, f)
         for i, v in pairs(t) do f(i,v) end 
 end 
 
+function tableIsEmpty(t)
+    for _,_ in pairs(t) do
+        return false
+    end
+    return true
+end
+
+
+
 function GameObjectToString(go,tab,visible)
 	tab = tab or "";
 	if go == nil then return "NULL"; end;
@@ -88,8 +97,12 @@ function ListField(obj,tab,tableHash,targetTab)
 					if tab == targetTab then
 						LogDebug(tab .. key .. " " .. tostring(v) .. " >");			
 					else
-						LogDebug(tab .. key .. " " .. tostring(v));							
-						ListField(v,tab .. " ",tableHash,targetTab);
+                        if tableIsEmpty(v) == false then
+                            LogDebug(tab .. key .. " " .. tostring(v));							
+                            ListField(v,tab .. " ",tableHash,targetTab);
+                        else
+                            LogDebug(tab .. key .. " " .. tostring(v) .. " {}");							
+                        end;
 					end;
 				else
 					LogDebug(tab .. key .. "=" .. tostring(v));
@@ -291,6 +304,209 @@ function DumpMonsters()
     end);    
 end;
 
+if class ~= nil then
+    if MyBot == nil then
+        MyBot = class("MyBot");
+    end;
+    MyBot.version = "1.0";
+    function MyBot:ctor()
+		LogDebug("MyBot:ctor()");
+	end
+    function MyBot:OnHPChange(evt)
+        LogDebug("MyBot.OnHPChange " .. MyTostring(evt));
+    end;
+    function MyBot:OnSPChange(evt)
+        LogDebug("MyBot.OnSPChange " .. MyTostring(evt));
+    end;
+    function MyBot:OnMyselfPlaceTo(evt)
+        LogDebug("MyBot.OnMyselfPlaceTo data=" .. MyTostring(evt.data));
+    end;
+    function MyBot:OnMyselfLeaveScene(evt)
+        LogDebug("MyBot.OnMyselfLeaveScene " .. MyTostring(evt));
+    end;
+    function MyBot:UsedSkillCheck(evt)
+        LogDebug("MyBot.UsedSkillCheck " .. MyTostring(evt));
+    end;
+    function MyBot:PartnerUpdateCheck(evt)
+        LogDebug("MyBot.PartnerUpdateCheck " .. MyTostring(evt));
+    end;
+    function MyBot:BuffUpdateCheck(evt)
+        LogDebug("MyBot.BuffUpdateCheck " .. MyTostring(evt));
+    end;
+    function MyBot:PropChangeCheck(evt)
+        LogDebug("MyBot.PropChangeCheck " .. MyTostring(evt));
+    end;
+    function MyBot:MeSceneUIClear(evt)
+        LogDebug("MyBot.MeSceneUIClear " .. MyTostring(evt));
+    end;
+    function MyBot:handleMissionCommand(evt)
+        LogDebug("MyBot.handleMissionCommand " .. MyTostring(evt));
+    end;
+    function MyBot:HandlePetHpChange(evt)
+        LogDebug("MyBot.HandlePetHpChange " .. MyTostring(evt));
+    end;
+    function MyBot:OnSelectTargetChange(evt)
+        LogDebug("MyBot.OnSelectTargetChange " .. MyTostring(evt));
+    end;
+    function MyBot:MyDataChange(evt)
+        LogDebug("MyBot.MyDataChange " .. MyTostring(evt));
+    end;
+    function MyBot:LevelUp(evt)
+        LogDebug("MyBot.LevelUp " .. MyTostring(evt));
+    end;
+    function MyBot:JobExpChange(evt)
+        LogDebug("MyBot.JobExpChange " .. MyTostring(evt));
+    end;
+    function MyBot:BaseExpChange(evt)
+        LogDebug("MyBot.BaseExpChange " .. MyTostring(evt));
+    end;
+    function MyBot:ZenyChange(evt)
+        LogDebug("MyBot.ZenyChange " .. MyTostring(evt));
+    end;
+    function MyBot:HitTargets(evt)
+        LogDebug("MyBot.HitTargets " .. MyTostring(evt));
+    end;
+    function MyBot:BeHited(evt)
+        LogDebug("MyBot.BeHited " .. MyTostring(evt));
+    end;
+    function MyBot:BeHited(evt)
+        LogDebug("MyBot.BeHited " .. MyTostring(evt));
+    end;
+    
+    function MyBot:GetEvents()
+        local ret = {
+            {event=MyselfEvent.HpChange,"HpChange"},
+            {event=MyselfEvent.SpChange,"SpChange"},
+            {event=MyselfEvent.PlaceTo,"PlaceTo"},
+        };
+        return ret;
+    end;
+    function MyBot:UnHookEvents()
+        tableForEach(EventManager.Me().handlers,function(index,tab)
+            tableForEach(tab,function(_,o)
+                while (TableUtil.Remove(o.owners,self) ~= 0)  do
+                end;
+            end);
+        end);
+        LogDebug("MyBot.UnHookEvents");
+    end;
+    function MyBot:HookEvents()
+        if EventManager ~= nil then
+            self:UnHookEvents();
+            EventManager.Me():AddEventListener(MyselfEvent.HpChange,self.OnHPChange,self);
+            EventManager.Me():AddEventListener(MyselfEvent.SpChange,self.OnSPChange,self);
+            EventManager.Me():AddEventListener(MyselfEvent.PlaceTo, self.OnMyselfPlaceTo, self);
+            EventManager.Me():AddEventListener(MyselfEvent.LeaveScene, self.OnMyselfLeaveScene, self);
+            EventManager.Me():AddEventListener(MyselfEvent.SelectTargetChange, self.OnSelectTargetChange, self);
+            EventManager.Me():AddEventListener(MyselfEvent.UsedSkill,self.UsedSkillCheck,self);
+            EventManager.Me():AddEventListener(MyselfEvent.PartnerChange,self.PartnerUpdateCheck,self);
+            EventManager.Me():AddEventListener(MyselfEvent.BuffChange,self.BuffUpdateCheck,self);
+            EventManager.Me():AddEventListener(MyselfEvent.MyPropChange,self.PropChangeCheck,self);
+            EventManager.Me():AddEventListener(MyselfEvent.MyDataChange,self.MyDataChange,self);
+            EventManager.Me():AddEventListener(MyselfEvent.MyAttrChange,self.MyAttrChange,self);
+            
+            EventManager.Me():AddEventListener(MyselfEvent.LevelUp,self.LevelUp,self);
+            EventManager.Me():AddEventListener(MyselfEvent.JobExpChange,self.JobExpChange,self);
+            EventManager.Me():AddEventListener(MyselfEvent.BaseExpChange,self.BaseExpChange,self);
+            EventManager.Me():AddEventListener(MyselfEvent.ZenyChange,self.ZenyChange,self);
+            EventManager.Me():AddEventListener(MyselfEvent.HitTargets,self.HitTargets,self);
+            EventManager.Me():AddEventListener(MyselfEvent.BeHited,self.BeHited,self);
+            
+            EventManager.Me():AddEventListener(MyselfEvent.MyselfSceneUIClear,self.MeSceneUIClear,self);
+            EventManager.Me():AddEventListener(MyselfEvent.MissionCommandChanged,self.handleMissionCommand,self);
+            EventManager.Me():AddEventListener(MyselfEvent.Pet_HpChange, self.HandlePetHpChange, self);
+            LogDebug("MyBot.HookEvent");
+        end;
+    end;
+    if myBot == nil or myBot.version ~= MyBot.version then
+        if myBot ~= nil then
+            myBot:UnHookEvents();
+        end;
+        myBot = MyBot.new();
+        LogDebug("MyBot.new()");
+    end;
+    myBot:HookEvents();
+end;
+
+--[[
+MyselfEvent= {
+	Inited = "MyselfEvent_Inited",
+	PlaceTo = "MyselfEvent_PlaceTo",
+	LeaveScene = "MyselfEvent_LeaveScene",
+	SelectTargetChange = "MyselfEvent_SelectTargetChange",
+	SelectTargetClassChange = "MyselfEvent_SelectTargetClassChange",
+	--属性值发生变化，攻击力啦，生命值啦
+	MyPropChange = "MyselfEvent_MyPropChange",
+	--数据发生变化，等级，经验
+	MyDataChange = "MyselfEvent_MyDataChange",
+	--属性值、数据变化的通知
+	MyAttrChange = "MyselfEvent_MyAttrChange",
+	MyProfessionChange = "MyselfEvent_MyProfessionChange",
+	ScaleChange = "MyselfEvent_ScaleChange",
+	AskUseSkill = "MyselfEvent_AskUseSkill",
+	CancelAskUseSkill = "MyselfEvent_CancelAskUseSkill",
+	LevelUp = "MyselfEvent_LevelUp",
+	JobExpChange = "MyselfEvent_JobExpChange",
+	BaseExpChange = "MyselfEvent_BaseExpChange",
+	ZenyChange = "MyselfEvent_ZenyChange",
+	ContributeChange = "MyselfEvent_ContributeChange",
+	BattlePointChange = "MyselfEvent_BattlePointChange",
+	MusicInfoChange = "MyselfEvent_MusicInfoChange",
+	ResetHpShortCut = "MyselfEvent_ResetHpShortCut",
+	MyRoleChange = "MyselfEvent_MyRoleChange",
+	ChangeDress = "MyselfEvent_ChangeDress",
+	--击npc怪物通知
+	HitTargets = "MyselfEvent_HitTargets",
+	BeHited = "MyselfEvent_BeHited",
+	-- 访问目标通知
+	AccessTarget = "MyselfEvent_AccessTarget",
+	AccessSealNpc = "MyselfEvent_AccessSealNpc",
+	-- 玩家手动控制通知
+	ManualControlled = "MyselfEvent_ManualControlled",
+	SyncBuffs = "MyselfEvent_SyncBuffs",
+	AddBuffs = "MyselfEvent_AddBuffs",
+	RemoveBuffs = "MyselfEvent_RemoveBuffs",
+	DeathBegin = "MyselfEvent_DeathBegin",
+	DeathEnd = "MyselfEvent_DeathEnd",
+	ReliveStatus = "MyselfEvent_ReliveStatus",
+	DeathStatus = "MyselfEvent_DeathStatus",
+	LeaveCarrier = "MyselfEvent_LeaveCarrier",
+	SkillPointChange = "MyselfEvent_SkillPointChange",
+	SpChange = "MyselfEvent_SpChange",
+	HpChange = "MyselfEvent_HpChange",
+	EnableUseSkillStateChange = "MyselfEvent_EnableUseSkillStateChange",
+	UsedSkill = "MyselfEvent_UsedSkill",
+	ChangeJobReady = "MyselfEvent_ChangeJobReady",
+	ChangeJobBegin = "MyselfEvent_ChangeJobBegin",
+	ChangeJobEnd = "MyselfEvent_ChangeJobEnd",
+	PartnerChange = "MyselfEvent_PartnerChange",
+	MyselfSceneUIClear = "MyselfSceneUIClear",
+	TransformChange = "MyselfEvent_TransformChange",
+	UpdateAttrEffect = "MyselfEvent_UpdateAttrEffect",
+	AddWeakDialog = "MyselfEvent_AddWeakDialog",
+
+	--skill
+	SkillGuideBegin = "MyselfEvent_SkillGuideBegin",
+	SkillGuideEnd = "MyselfEvent_SkillGuideEnd",
+
+	--new
+	TargetPositionChange = "MyselfEvent_TargetPositionChange",
+
+	ZoneIdChange = "MyselfEvent_ZoneIdChange",
+
+	MissionCommandChanged = "MyselfEvent_MissionCommandChanged",
+	SceneGoToUserCmdHanded = "MyselfEvent_SceneGoToUserCmd",
+	BuffChange = "MyselfEvent_BuffChange",
+
+	CookerLvChange = "MyselfEvent_CookerLvChange",
+	TasterLvChange = "MyselfEvent_TasterLvChange",
+	Pet_HpChange = "MyselfEvent_Pet_HpChange",
+	ServantFavorChange = "MyselfEvent_ServantFavorChange",
+
+	TwinActionStart = "MyselfEvent_TwinActionStart",
+}
+]]
+
 
 if class ~= nil then
 	AutoAI_Rom = class("AutoAI_Rom")
@@ -355,7 +571,7 @@ if class ~= nil then
 		self.nextUpdateTime = time + self.UpdateInterval		
 		return false
 	end
-
+    
 end;
 
 function ROM_GetMyStatus()
@@ -510,10 +726,22 @@ function ROM_FindStaticMonster(tab)
     local filterFunc = function(mon)
         return (mon.data.staticData.id >= 40000 and mon.data.staticData.id < 50000) or (mon.data.staticData.id >= 100000); 
     end;
+    return ROM_FindMonByFilter(filterFunc,"ROM_FindMiniBoss");
+end;
+
+function ROM_FindMiniBoss(tab)
+    local filterFunc = function(mon)
+        return mon.data.staticData.Type == "Mini";
+    end;
+    return ROM_FindMonByFilter(filterFunc,"ROM_FindMiniBoss");
+end;
+
+function ROM_FindMonByFilter(filterFunc,str)
+    str = str or "ROM_FindMonByFilter";
     local mons = ROM_GetAllMonster(filterFunc);   
     local mon = ROM_GetNearestMonFromList(mons);
     if mon ~= nil then
-        LogDebug("ROM_FindStaticMonster: found " .. MonsterToString(mon));
+        LogDebug(str .. ": found " .. MonsterToString(mon));
     end;
     return mon;
 end;
@@ -533,21 +761,19 @@ function ROM_FindBestMonster()
     return nil;
 end;
 
+function ROM_GetMonsterLockTarget()
+    local mon = Game.Myself:GetLockTarget();
+    if mon~= nil then
+        if mon.data.staticData.Type == "Monster" then
+            return mon;
+        end;
+    end;
+    return nil;
+end;
+
 if FunctionMonster ~= nil then
     function FunctionMonster:FilterMonster(ignoreSkill)
-        LogDebug("FunctionMonster:FilterMonster() " .. MyTostring(ROM_GetMyStatus()));
-		local myStatus= ROM_GetMyStatus();
-		if myStatus.fracsp > 0.98 and myStatus.frachp > 0.98 then
-			LogDebug("FunctionMonster:FilterMonster() IsEnough");
-			if Game.Myself:IsFakeDead() then
-				LogDebug("FunctionMonster:FilterMonster() IsFakeDead");
-				local skillInfo = ROM_GetMySkillInfoByName("Play Dead");
-				if(SkillProxy.Instance:SkillCanBeUsedByID(skillInfo.staticData.id)) then
-					LogDebug("FunctionMonster:FilterMonster() WakeUP");
-					FunctionSkill.Me():TryUseSkill(skillInfo.staticData.id);
-				end
-			end;
-		end;
+        --LogDebug("FunctionMonster:FilterMonster()");
         TableUtility.ArrayClear(self.monsterList)
 
         local userMap = NSceneNpcProxy.Instance.userMap
