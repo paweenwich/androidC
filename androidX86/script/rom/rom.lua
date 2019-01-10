@@ -415,8 +415,13 @@ function ROM_FakeDead(tab)
 	if Game.Myself:GetLockTarget() == nil then
 		if myStatus.fracsp < fracsp or myStatus.frachp < frachp then
 			LogDebug("ROM_FakeDead: " .. MyTostring(myStatus));
-			Game.Myself:Client_UseSkill(skillID, nil, nil,nil,true);
-			return true;
+			--Game.Myself:Client_UseSkill(skillID, nil, nil,nil,true);
+			if(SkillProxy.Instance:SkillCanBeUsedByID(skillID)) then
+				FunctionSkill.Me():TryUseSkill(skillID);
+				return true;
+			else
+				LogDebug("ROM_FakeDead: can not use");
+			end;
 		end;
 	else		
 		LogDebug("ROM_FakeDead: has lock target");
@@ -509,6 +514,16 @@ function ROM_Test(g)
     
     --LogDebug(MyTostring(MiniMapData));
     --ListField(npcList,"",{},"  ");
+	if Game.Myself:IsFakeDead() then
+		UIUtil.FloatMsgByText("On Fake Dead");	
+	end;
+	local skillInfo = ROM_GetMySkillInfoByName("Play Dead");
+	LogDebug(SkillInfoToString(skillInfo));
+	if(SkillProxy.Instance:SkillCanBeUsedByID(skillInfo.staticData.id)) then
+		FunctionSkill.Me():TryUseSkill(skillInfo.staticData.id);
+	else
+		UIUtil.FloatMsgByText("Can not use skill");	
+	end
     
     UIUtil.FloatMsgByText("Test Done");	
     if true then

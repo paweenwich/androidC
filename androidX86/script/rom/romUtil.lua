@@ -535,7 +535,19 @@ end;
 
 if FunctionMonster ~= nil then
     function FunctionMonster:FilterMonster(ignoreSkill)
-        LogDebug("FunctionMonster:FilterMonster()");
+        LogDebug("FunctionMonster:FilterMonster() " .. MyTostring(ROM_GetMyStatus()));
+		local myStatus= ROM_GetMyStatus();
+		if myStatus.fracsp > 0.98 and myStatus.frachp > 0.98 then
+			LogDebug("FunctionMonster:FilterMonster() IsEnough");
+			if Game.Myself:IsFakeDead() then
+				LogDebug("FunctionMonster:FilterMonster() IsFakeDead");
+				local skillInfo = ROM_GetMySkillInfoByName("Play Dead");
+				if(SkillProxy.Instance:SkillCanBeUsedByID(skillInfo.staticData.id)) then
+					LogDebug("FunctionMonster:FilterMonster() WakeUP");
+					FunctionSkill.Me():TryUseSkill(skillInfo.staticData.id);
+				end
+			end;
+		end;
         TableUtility.ArrayClear(self.monsterList)
 
         local userMap = NSceneNpcProxy.Instance.userMap
