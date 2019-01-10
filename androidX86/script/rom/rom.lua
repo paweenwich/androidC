@@ -94,10 +94,6 @@ if NCreature ~= nil then
     
 end;
 
---function onHPChange(param)
---    LogDebug("onHPChange");
---end;
-
 if EventManager~=nil and MyselfEvent ~= nil then
 --    EventManager.Me():RemoveEventListener(MyselfEvent.HpChange,onHPChange,nil);
 --    EventManager.Me():AddEventListener(MyselfEvent.HpChange,onHPChange,nil);
@@ -149,21 +145,22 @@ if MyTick == nil and class ~= nil then
     MyTick = class("MyTick");   
 end;
 if MyTick ~= nil then
-	MyTick.version = "1.0";
+	MyTick.version = "1.01";
 	function MyTick:ctor()
 		self.version = MyTick.version;
 		LogDebug("MyTick:ctor()");
 	end
 
 	function MyTick:Tick()
-		LogDebug("MyTick:Tick() " .. tostring(self) .." " .. self.version .. " *");
+		LogDebug("MyTick:Tick() " .. tostring(self) .." " .. self.version );
 	end;
 
 	function MyTick:start()
 		if ROM_IsObjectInit(TimeTickManager) then
 			LogDebug("MyTick:start() " .. self.version);
 			self.timeTick = TimeTickManager.Me():CreateTick(0,2000,self.Tick,self);
-			LogDebug(MyTostring(self.timeTick));
+            --EventManager.Me():AddEventListener(MyselfEvent.HpChange,self.onHPChange,self);
+			--LogDebug(MyTostring(self.timeTick));
 		end;
 	end;
 
@@ -171,14 +168,22 @@ if MyTick ~= nil then
 		if ROM_IsObjectInit(TimeTickManager) then
 			LogDebug("MyTick:stop()");
 			TimeTickManager.Me():ClearTick(self);
+            self.timeTick = nil;
+            --EventManager.Me():RemoveEventListener(MyselfEvent.HpChange,self.onHPChange,self);            
 		end;
 	end;
-
+    
+    function MyTick:isStart()
+        return self.timeTick  ~= nil;
+    end;
+    
 	if myTick == nil or myTick.version ~= MyTick.version then
         LogDebug("Create MyTick");
 		myTick = MyTick.new();
 	end;
 end;
+
+
 --LogDebug("myTick=" .. tostring(myTick) .. " " .. tostring(myTick.version));
 --myTick.stop();
 --myTick.start();
@@ -345,6 +350,16 @@ if g_mainView ~= nil then
             ROM_Auto(g);
         end);        
     end;	
+    if CreateMyButton("Tick") then
+        LogDebug("Tick");
+        local button = myButton["Tick"];
+        button.transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.05,0.49,0));
+        button:SetActive(true);        
+        g_mainView:AddClickEvent(button, function (g)
+            ROM_MyTick(g);
+        end);        
+    end;	
+    
 end;
 
 function OnMiniMapClick(self)
@@ -384,7 +399,7 @@ function ROM_SkillTarget(tab)
     local myStatus= ROM_GetMyStatus();
     local skillNeeded = ROM_GetSkillNeeded(skillID);
     if skillNeeded.sp < myStatus.sp then
-		local npc = Game.Myself:GetLockTarget();
+		local npc = ROM_GetMonsterLockTarget();
 		if npc == nil then
 			LogDebug("ROM_SkillTarget: ROM_FindNearestMonsterEx");
 			npc = ROM_FindNearestMonsterEx(myMonsterList);
@@ -412,7 +427,7 @@ function ROM_FakeDead(tab)
 	local fracsp = tab.fracsp or 0.2;
     --local skillID = tab.id;
     local myStatus= ROM_GetMyStatus();
-	if Game.Myself:GetLockTarget() == nil then
+	if ROM_GetMonsterLockTarget() == nil then
 		if myStatus.fracsp < fracsp or myStatus.frachp < frachp then
 			LogDebug("ROM_FakeDead: " .. MyTostring(myStatus));
 			Game.Myself:Client_UseSkill(skillID, nil, nil,nil,true);
@@ -464,6 +479,7 @@ myMonsterList = {
 };
 
 myMonsterRules = {
+    {func= ROM_FindMiniBoss}, -- priority to miniboss
     {func= ROM_FindStaticMonster},  -- priority to static monster
     {func= ROM_FindNearestMonsterEx, param=myMonsterList},  -- selected monster
 --    {func= ROM_FindNearestMonsterEx, param=nil},            -- all monster
@@ -499,17 +515,10 @@ function ROM_Test(g)
     end);
     local mainViewMiniMap = g_mainView.viewMap["MainViewMiniMap"];
     --ListField(mainViewMiniMap,"",{},"  ");
-    LogDebug("bigmapWindow=" .. #mainViewMiniMap.bigmapWindow.monsterMap .. " minimapWindow=" .. #mainViewMiniMap.minimapWindow.monsterMap);
-    local mons = ROM_GetAllMonsterFromNSceneNpcProxy();
-    LogDebug("NSceneNpcProxy.Instance.npcMap=" .. #mons .. " monsterDataMap=" .. #mainViewMiniMap.monsterDataMap);
-    local monsterIdMap = FunctionMonster.Me():FilterMonster(false);
-    local monsterIdMap2 = FunctionMonster.Me():FilterMonster(true);
-    LogDebug("monsterIdMap=" .. #monsterIdMap .. " monsterIdMap2=" .. #monsterIdMap2);
-    ListField(monsterIdMap,"",{}," ");
-    
-    --LogDebug(MyTostring(MiniMapData));
-    --ListField(npcList,"",{},"  ");
-    
+    --ListField(FunctionCDCommand.me,"-",{},"      ");
+    --ListField(FunctionCDCommand.me.cmdMap,"-",{},"      ");
+    --ListField(EventManager.Me().handlers,"",{},"  ");
+    ListField(GameFacade.Instance,"",{},"  ");
     UIUtil.FloatMsgByText("Test Done");	
     if true then
         return;
@@ -570,6 +579,22 @@ function ROM_HasBuffFromSkillID(skillID)
     local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skillID);
     local buffs = skillInfo:GetSelfBuffs(Game.Myself);
     return Game.Myself:HasBuffs(buffs);
+end;
+
+function ROM_MyTick()
+    local button = myButton["Tick"];
+    local label = UIUtil.FindGO("Label",button);
+    local uiLabel = label:GetComponent(UILabel);
+    if myTick ~= nil then   
+        if myTick:isStart() then
+            myTick:stop();
+            uiLabel.effectStyle = UILabel.Effect.None;
+        else
+            myTick:start();
+            uiLabel.effectColor = ColorUtil.NGUILabelRed;
+            uiLabel.effectStyle = UILabel.Effect.Outline;
+        end
+    end;
 end;
 
 function ROM_Auto()
