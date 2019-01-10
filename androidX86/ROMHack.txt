@@ -9,7 +9,6 @@ pull whilecard file, need cygwin (tr and xargs
 adb shell 'ls /data/local/tmp/loadbufferx/*.lua' | tr -d '\r' | xargs -n1 adb pull
 adb logcat testso:* *:s
 adb logcat -c
-adb shell 'ls /data/local/tmp/loadbufferx/*' | tr -d '\r' | xargs -n1 adb pull
 adb shell "while true; do cat; sleep 1; done < /sdcard/myfile.log"
 
 To Dump Assembly-CSharp
