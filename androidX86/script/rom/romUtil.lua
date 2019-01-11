@@ -91,6 +91,7 @@ function ListField(obj,tab,tableHash,targetTab)
 				end;
 				-- skip function
 				if(type(v) == 'function') then
+					LogDebug(tab .. "func " .. key .. "=" .. tostring(v));
 					return;
 				end;
 				if(type(v) == 'table') then
@@ -98,7 +99,7 @@ function ListField(obj,tab,tableHash,targetTab)
 						LogDebug(tab .. key .. " " .. tostring(v) .. " >");			
 					else
                         if tableIsEmpty(v) == false then
-                            LogDebug(tab .. key .. " " .. tostring(v));							
+                            LogDebug(tab .. key .. " (" .. tostring(v) .. ")");							
                             ListField(v,tab .. " ",tableHash,targetTab);
                         else
                             LogDebug(tab .. key .. " " .. tostring(v) .. " {}");							
@@ -107,7 +108,9 @@ function ListField(obj,tab,tableHash,targetTab)
 				else
 					LogDebug(tab .. key .. "=" .. tostring(v));
 				end;
+				return;
 			end;
+			LogDebug(tab .. tostring(i) .. "=" .. tostring(v));
         end)
     else
         LogDebug(tostring(obj));
@@ -372,6 +375,9 @@ if class ~= nil then
     function MyBot:BeHited(evt)
         LogDebug("MyBot.BeHited " .. MyTostring(evt));
     end;
+    function MyBot:PlaceTo2(evt)
+        LogDebug("MyBot.PlaceTo2 " .. MyTostring(evt));
+    end;
     
     function MyBot:GetEvents()
         local ret = {
@@ -555,7 +561,7 @@ if class ~= nil then
 	end
 
 	function AutoAI_Rom:Start(idleElapsed, time, deltaTime, creature)
-	    LogDebug("AutoAI_Rom:Start()");
+	    --LogDebug("AutoAI_Rom:Start()");
 	end
 
 	function AutoAI_Rom:End(idleElapsed, time, deltaTime, creature)
@@ -567,7 +573,7 @@ if class ~= nil then
 		if time < self.nextUpdateTime then
 			return true
 		end
-		LogDebug("AutoAI_Rom:Update() " .. (time - self.nextUpdateTime));
+		--LogDebug("AutoAI_Rom:Update() " .. (time - self.nextUpdateTime));
 		self.nextUpdateTime = time + self.UpdateInterval		
 		return false
 	end

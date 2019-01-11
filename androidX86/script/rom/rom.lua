@@ -523,7 +523,24 @@ function ROM_Test(g)
     --ListField(FunctionCDCommand.me,"-",{},"      ");
     --ListField(FunctionCDCommand.me.cmdMap,"-",{},"      ");
     --ListField(EventManager.Me().handlers,"",{},"  ");
-    ListField(GameFacade.Instance,"",{},"  ");
+    --ListField(GameFacade.Instance,"",{},"    ");
+	if mainViewMiniMap.container.AddPageListenEvt ~= nil then
+		--self.container:AddPageListenEvt(self, evt, func)
+		LogDebug("AddPageListenEvt found");
+		--mainViewMiniMap.container.AddPageListenEvt(myBot,MyselfEvent.PlaceTo,myBot.PlaceTo2);
+		--ListField(mainViewMiniMap.container.ListenerEvtMap,"",{},"    ");
+		--ListField(mainViewMiniMap.container,"",{}," ");
+		--LogDebug(tostring(g_mainView));
+		--LogDebug(tostring(mainViewMiniMap.container));
+		UIUtil.WarnPopup("Title","Text",
+			function(obj) 
+				LogDebug("OK" .. tostring(obj));ListField(obj,"",{}," ");
+			end,
+			function(obj) 
+				LogDebug("Cancel" .. tostring(obj));ListField(obj,"",{}," ");
+			end,
+			g_mainView,"OK","Cancel");
+	end;
     UIUtil.FloatMsgByText("Test Done");	
     if true then
         return;

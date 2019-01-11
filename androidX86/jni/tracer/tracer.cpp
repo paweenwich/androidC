@@ -1004,6 +1004,7 @@ void decryptDes()
     MONO_API(handle,void,desDKey,(void *,int,void *));
     MONO_API(handle,int,IsDesCode,(void *,int));
     
+    /*
     //loadbufferx/AScript.org.puremvc.lua.multicore.patterns.facade.Facade
     std::vector<unsigned char> buffer = ReadFile("/data/local/tmp/loadbufferx/AScript.org.puremvc.lua.multicore.patterns.facade.Facade");
     printf("%d\n",buffer.size());
@@ -1024,7 +1025,7 @@ void decryptDes()
                 //DumpHex(stdout,&decryptBuffer[0],outSize);
                 //break;
     }    
-    return;
+    return;*/
     
     std::string path = "/data/local/tmp/loadbufferx";
     std::vector<std::string> files = DirectoryListFile(path);
@@ -1033,7 +1034,7 @@ void decryptDes()
         strcpy(fileName,files[i].c_str());
         if(strcmp(fileName,".")==0) continue;
         if(strcmp(fileName,"..")==0) continue;
-        if(strstr(fileName,".lua")!=NULL) continue;
+        //if(strstr(fileName,".lua")!=NULL) continue;
         std::string inFileName = path + "/" + files[i];
         std::vector<unsigned char> buffer = ReadFile(inFileName.c_str());
         int isDesCode = IsDesCode(&buffer[0],buffer.size());
