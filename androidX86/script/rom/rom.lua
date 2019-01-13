@@ -19,6 +19,8 @@ function LogDebug(data)
 	end;
 end;
 
+logDebug = LogDebug
+
 function ReadFile(path)
     local f = io.open(path)
     local s = f:read("*a")
@@ -44,7 +46,7 @@ function ROM_DoFile(fileName)
 end;
 
 ROM_DoFile("/data/local/tmp/script/romUtil.lua");
-
+ROM_DoFile("/data/local/tmp/script/hookSendNotification.lua");
 function ROM_Reload()
 	return ROM_DoFile("/data/local/tmp/script/rom.lua");
 end;
@@ -152,7 +154,8 @@ if MyTick ~= nil then
 	end
 
 	function MyTick:Tick()
-		LogDebug("MyTick:Tick() " .. tostring(self) .." " .. self.version );
+		local isInWantedQuestActivity = QuestProxy.Instance:isInWantedQuestInActivity()
+		LogDebug("MyTick:Tick() " .. tostring(self) .." " .. self.version .. ' ' .. tostring(isInWantedQuestActivity));
 	end;
 
 	function MyTick:start()
@@ -359,7 +362,15 @@ if g_mainView ~= nil then
             ROM_MyTick(g);
         end);        
     end;	
-    
+    if CreateMyButton("Dlg") then
+        LogDebug("Dlg");
+        local button = myButton["Dlg"];
+        button.transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.05,0.42,0));
+        button:SetActive(true);        
+        g_mainView:AddClickEvent(button, function (g)
+            ROM_MyDlg(g);
+        end);        
+    end;	
 end;
 
 function OnMiniMapClick(self)
@@ -401,10 +412,11 @@ function ROM_SkillTarget(tab)
     if skillNeeded.sp < myStatus.sp then
 		local npc = ROM_GetMonsterLockTarget();
 		if npc == nil then
-			LogDebug("ROM_SkillTarget: ROM_FindNearestMonsterEx");
-			npc = ROM_FindNearestMonsterEx(myMonsterList);
+			LogDebug("ROM_SkillTarget: ROM_FindBestMonster");
+			--npc = ROM_FindNearestMonsterEx(myMonsterList);
+			npc = ROM_FindBestMonster();
 		else
-			LogDebug("ROM_SkillTarget: use locktarget");
+			--LogDebug("ROM_SkillTarget: use locktarget");
 		end;
         if npc ~= nil then
             LogDebug("ROM_SkillTarget: " .. MonsterToString(npc));
@@ -439,7 +451,7 @@ function ROM_FakeDead(tab)
 			end;
 		end;
 	else		
-		LogDebug("ROM_FakeDead: has lock target");
+		--LogDebug("ROM_FakeDead: has lock target");
 	end;
     return false;
 end;
@@ -475,11 +487,11 @@ myMonsterList = {
 	10020, -- name=Pirate Skeleton Type=Monster
 --	10017, -- name=Hydra Type=Monster
 --  10021, -- name=Poison Spore Type=Monster
---  10019, -- name=Whisper Type=Monster
+--	10019, -- name=Whisper Type=Monster
     10022, -- name=Skeleton Type=Monster
 --  40003, -- name=Yellow Plant Type=Monster
 --  10024, -- name=Thara Frog Type=Monster
---  10025, -- name=Marina Type=Monster
+	10025, -- name=Marina Type=Monster
 --  10023, -- name=Vadon Type=Monster
 };
 
@@ -500,9 +512,38 @@ myAIRules = {
 function ROM_Test(g)
     LogDebug("NPC");
     local mons = ROM_GetAllNPC();
-    tableForEach(mons,function(i,v)
+    --tableForEach(mons,function(i,v)
+	for monIndex = 1,#mons do
+		local v = mons[monIndex];
         LogDebug(MonsterToString(v));
-    end);
+		--local conf = NpcMonsterUtility.GetConfig(v.data.staticData.id);
+		--LogDebug(MyTostring(conf));
+		--ListField(conf,"",{}," ");
+		local npcData = v.data.staticData;
+		local npcfunc = npcData.NpcFunction;
+		LogDebug(MyTostring(npcfunc));
+		for i=1,#npcfunc do
+			local single = npcfunc[i];
+			if(single.type)then
+				local funcCfg = Table_NpcFunction and Table_NpcFunction[single.type];
+				if(funcCfg and funcCfg.Type)then
+					LogDebug(" funcCfg.Type " .. MyTostring(funcCfg.Type));
+					local configFunc = FunctionVisitNpc.SNpcFuncMap[funcCfg.Type]
+					LogDebug(" configFunc " .. MyTostring(configFunc));
+					--if(configFunc and configFunc(npcfunc, target, events))then
+					--	return;
+					--end
+				end
+			end
+		end
+		
+		local defaultDialogId = FunctionVisitNpc.GetDefaultDialog(v);
+		LogDebug(" npcData.DefaultDialog " .. MyTostring(npcData.DefaultDialog));
+		LogDebug(" defaultDialogId " .. MyTostring(defaultDialogId));
+		local needRequireNpcFunc = npcData.NeedRequireNpcFunction;
+		LogDebug(" needRequireNpcFunc " .. MyTostring(needRequireNpcFunc));
+    --end);
+	end;
     LogDebug("Monster");
     local mons = ROM_GetAllMonster();
     tableForEach(mons,function(i,v)
@@ -510,37 +551,64 @@ function ROM_Test(g)
     end);
     
     local npcList = Game.MapManager:GetNPCPointArray();
+	LogDebug("npcList=" .. #npcList);
     tableForEach(npcList, function(i, v)
         if(v and v.ID and v.position)then
             local npcData = Table_Npc[v.ID];
-            if npcData then
+            if npcData  then
                 LogDebug(MyTostring(npcData));
             end;
         end;
     end);
+	
+	--local exitPoints =  Game.MapManager:GetExitPointMap();
+	local exitPoints =  Game.MapManager:GetExitPointArray();	
+	
+	LogDebug("exitPoints=" .. #npcList);
+    tableForEach(exitPoints, function(i, v)
+        --if(v and v.ID and v.position)then
+        --    local npcData = Table_Npc[v.ID];
+        --    if npcData  then
+                LogDebug("" .. i .. " " .. MyTostring(v));
+        --    end;
+        --end;
+    end);
+	
+	
     local mainViewMiniMap = g_mainView.viewMap["MainViewMiniMap"];
     --ListField(mainViewMiniMap,"",{},"  ");
     --ListField(FunctionCDCommand.me,"-",{},"      ");
     --ListField(FunctionCDCommand.me.cmdMap,"-",{},"      ");
     --ListField(EventManager.Me().handlers,"",{},"  ");
     --ListField(GameFacade.Instance,"",{},"    ");
-	if mainViewMiniMap.container.AddPageListenEvt ~= nil then
-		--self.container:AddPageListenEvt(self, evt, func)
-		LogDebug("AddPageListenEvt found");
 		--mainViewMiniMap.container.AddPageListenEvt(myBot,MyselfEvent.PlaceTo,myBot.PlaceTo2);
 		--ListField(mainViewMiniMap.container.ListenerEvtMap,"",{},"    ");
 		--ListField(mainViewMiniMap.container,"",{}," ");
 		--LogDebug(tostring(g_mainView));
 		--LogDebug(tostring(mainViewMiniMap.container));
-		UIUtil.WarnPopup("Title","Text",
-			function(obj) 
-				LogDebug("OK" .. tostring(obj));ListField(obj,"",{}," ");
-			end,
-			function(obj) 
-				LogDebug("Cancel" .. tostring(obj));ListField(obj,"",{}," ");
-			end,
-			g_mainView,"OK","Cancel");
-	end;
+		
+		-- stop AI include battle
+		--Game.Myself:Client_PauseIdleAI();
+		--Game.Myself:Client_ResumeIdleAI();
+
+		-- rotate camera
+		--g_mainView:CameraRotateToMe(true);
+		--g_mainView:CameraReset();	
+	LogDebug('----------- questList -------------');
+	--EQUESTLIST_ACCEPT = 1
+	--EQUESTLIST_CANACCEPT = 4
+	--EQUESTLIST_COMPLETE = 3
+	--EQUESTLIST_SUBMIT = 2
+	LogDebug('----------- EQUESTLIST_ACCEPT -------------');
+	ListField(QuestProxy.Instance.questList[SceneQuest_pb.EQUESTLIST_ACCEPT],"",{},"");
+	LogDebug('----------- EQUESTLIST_SUBMIT -------------');
+	ListField(QuestProxy.Instance.questList[SceneQuest_pb.EQUESTLIST_SUBMIT],"",{}," ");
+	
+	local npcData = Table_Npc[1016];
+	--ListField(npcData,"",{}," ");
+	
+	
+	
     UIUtil.FloatMsgByText("Test Done");	
     if true then
         return;
@@ -611,10 +679,19 @@ function ROM_MyTick()
         if myTick:isStart() then
             myTick:stop();
             uiLabel.effectStyle = UILabel.Effect.None;
+			GameFacade.Instance.sendNotification = GameFacade.Instance._sendNotification;
+			LogDebug("restore = " .. tostring(GameFacade.Instance.sendNotification));
         else
             myTick:start();
             uiLabel.effectColor = ColorUtil.NGUILabelRed;
             uiLabel.effectStyle = UILabel.Effect.Outline;
+			
+			GameFacade.Instance._sendNotification = GameFacade.Instance.sendNotification;
+			GameFacade.Instance.sendNotification = HOOK_SendNotification;
+			LogDebug("org = " .. tostring(GameFacade.Instance._sendNotification));
+			LogDebug("new = " .. tostring(GameFacade.Instance._sendNotification));
+			LogDebug(tostring(GameFacade.Instance.sendNotification));
+			--GameFacade.Instance:sendNotification(UIEvent.ShowUI, viewdata );	
         end
     end;
 end;
@@ -647,6 +724,147 @@ function ROM_Auto()
         uiLabel.effectStyle = UILabel.Effect.Outline;
     end;
     UIUtil.FloatMsgByText("Auto " .. tostring(Game.Myself.ai.autoAI_Rom:IsEnable()));
+end;
+
+function ROM_MyDlg()
+		local viewdata = {
+		viewname = "DialogView",
+		tasks = nil,
+		dialoglist = {"เล่นกันดีๆไท้ได้เหรอ]"},
+	};
+	viewdata.addfunc = {
+		{
+			event = function (npcinfo,param)
+				UIUtil.FloatMsgByText("[" .. tostring(param) .. "]");	
+			end,
+			eventParam = {"haha"},
+			closeDialog = true,
+			NameZh = "Funct1",
+			
+		},
+		{
+			event = function (npcinfo)
+				FunctionNpcFunc.JumpPanel(PanelConfig.ChangeZoneView, npcinfo)
+			end,
+			closeDialog = true,
+			NameZh = ZhString.ChangeZone_ChangeLine
+		},
+		{
+			event = function (npcinfo)
+				if GuildProxy.Instance:IHaveGuild() then
+					local zoneid = GuildProxy.Instance.myGuildData.zoneid
+					ServiceNUserProxy.Instance:CallJumpZoneUserCmd( npcinfo.data.id , zoneid)
+				end
+			end,
+			closeDialog = true,
+			NameZh = ZhString.ChangeZone_BackGuildLine
+		},
+		{
+			event = function (npcinfo)
+				LogDebug("npcinfo=" .. tostring(npcinfo));
+				--FunctionDialogEvent.SetDialogEventEnter( DialogEventType.EquipUpgrade, npcinfo )
+				--GameFacade.Instance:sendNotification(UIEvent.JumpPanel, {view=PanelConfig.AnnounceQuestPanel, viewdata ={wanted = wantedid, npcTarget = target, isNpcFuncView = true}});
+				--FunctionNpcFunc.JumpPanel(PanelConfig.AnnounceQuestPanel, npcinfo)
+				local mapid = SceneProxy.Instance.currentScene.mapID;				
+				local nearestExit = ROM_GetNearestExitPoint();
+				LogDebug("nearestExit=" .. MyTostring(nearestExit) .. " mapid=" .. tostring(mapid));
+				
+				local tempVector3 = LuaVector3.zero;
+
+				tempVector3:Set(nearestExit.position[1],nearestExit.position[2],nearestExit.position[3]);
+				--Game.Myself:Client_MoveTo(tempVector3);
+				--ROM_CommandGOTO(mapid,tempVector3);
+				ROM_CommandVisitMonster(2,10001);
+				--LogDebug("Game.Myself:GetPosition()=" .. MyTostring(Game.Myself:GetPosition()));
+				--LogDebug("nearestExit=" .. MyTostring(tempVector3));
+				--Game.Myself:Client_EnterExitRangeHandler(nearestExit);
+				--tempVector3:Set(nearestExit.position[1]*1000,nearestExit.position[2]*1000,nearestExit.position[3]*1000);
+				--LogDebug("fake myposition=" .. MyTostring(tempVector3));
+				--ServiceNUserProxy.Instance:CallExitPosUserCmd(tempVector3,nearestExit.ID,mapid); 
+				LogDebug("done");
+			end,
+			closeDialog = true,
+			--NameZh = ZhString.FunctionDialogEvent_Upgrade,
+			NameZh="UNK",
+			
+		},
+	};
+	--local dialogInfo ={ DialogUtil.GetDialogData(defaultDialogId) };
+	--ListField(dialogInfo,"",{},"      ");
+	GameFacade.Instance:sendNotification(UIEvent.ShowUI, viewdata);
+end;
+
+function ROM_GetNearestExitPoint()
+	local minDist = 100000;
+    local ret = nil;
+    local myPos = Game.Myself:GetPosition();
+	local exitPoints =  Game.MapManager:GetExitPointArray();	
+	tableForEach(exitPoints, function(i, v)
+		local distance = LuaVector3.Distance(myPos, v.position);
+        if distance < minDist then
+            ret = v;
+            minDist = distance;
+        end;
+	end);
+    return ret;	
+end;
+
+function ROM_CommandVisitMonster(mapID,monID)
+		local oriMonster = Table_MonsterOrigin[ monID] or {};
+		-- this will have mapID which contain that monsters
+		--LogDebug(MyTostring(oriMonster));
+		local oriPos = nil;
+		for i=1,#oriMonster do
+			if(oriMonster[i].mapID == mapID)then
+				oriPos = oriMonster[i].pos;
+			end
+		end
+		if(oriPos)then
+			local cmdArgs = {
+				targetMapID = mapID,
+				npcID = monID,
+				targetPos = TableUtil.Array2Vector3(oriPos),
+			}
+			local cmd = MissionCommandFactory.CreateCommand(cmdArgs, MissionCommandSkill)	
+			if(cmd)then
+				Game.Myself:Client_SetMissionCommand( cmd );
+				--self:PassEvent(WorldMapMenuEvent.StartTrace);
+			end
+		end
+end;
+
+function ROM_CommandVisitNPC(mapID,npcID,npcUID)
+	local cmdArgs = {
+		targetMapID = mapID,
+		npcID = npcID,
+		npcUID = npcUID,
+	}
+	cmd = MissionCommandFactory.CreateCommand(cmdArgs, MissionCommandVisitNpc)	
+	if(cmd)then
+		Game.Myself:Client_SetMissionCommand( cmd );
+	end
+end;
+function ROM_CommandGOTO(mapID,pos)
+	local tempArgs = {};
+	tempArgs.targetMapID = mapID;
+	tempArgs.targetPos = pos;
+	tempArgs.showClickGround = true;
+	tempArgs.allowExitPoint = true;
+	local x,y,z = pos[1],pos[2],pos[3];
+	tempArgs.callback = function(cmd, event)
+		LogDebug("cmd=" .. MyTostring(cmd));
+		LogDebug("event=" .. MyTostring(event));
+		local tempVector3 = LuaVector3.zero;
+		if MissionCommandMove.CallbackEvent.TeleportFailed == event then
+			LogDebug("event=TeleportFailed");
+			tempVector3:Set(x,y,z);
+			Game.Myself:Client_MoveTo( tempVector3 );
+		end
+	end
+	local cmd = MissionCommandFactory.CreateCommand(tempArgs, MissionCommandMove);
+	if(cmd)then
+		Game.Myself:Client_SetMissionCommand( cmd );
+	end
 end;
 LogDebug("ROM Loaded 1.03");
 

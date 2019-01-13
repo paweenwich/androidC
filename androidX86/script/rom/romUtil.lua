@@ -1,3 +1,4 @@
+-- romUtil.lua ----
 function splitByChunk(text, chunkSize)
     local s = {}
     for i=1, #text, chunkSize do
@@ -261,7 +262,15 @@ end;
 
 
 function MonsterToString(m)
-    return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type;
+	local stat = ROM_GetMonStatus(m);
+	--if  m.data.props ~= nil then
+	    local props = m.data.props;
+		local hp = props.Hp:GetValue();
+		return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp;	
+	--else
+	--	return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type;	
+	--end;
+
 end;
 
 function SkillToString(s)
@@ -431,7 +440,7 @@ if class ~= nil then
         myBot = MyBot.new();
         LogDebug("MyBot.new()");
     end;
-    myBot:HookEvents();
+    --myBot:HookEvents();
 end;
 
 --[[
@@ -519,7 +528,7 @@ if class ~= nil then
 
 	function AutoAI_Rom:ctor()
         self.enable = false;
-		self.UpdateInterval = 0.0;
+		self.UpdateInterval = 0;
 		self.nextUpdateTime = 0
 		LogDebug("AutoAI_Rom:ctor()");
 	end
@@ -544,7 +553,7 @@ if class ~= nil then
 			if time < self.nextUpdateTime then
 				return true
 			end
-			LogDebug("AutoAI_Rom:Prepare() " .. (time - self.nextUpdateTime) .. " " .. self.UpdateInterval);
+			--LogDebug("AutoAI_Rom:Prepare() " .. (time - self.nextUpdateTime) .. " " .. self.UpdateInterval);
 			self.nextUpdateTime = time + self.UpdateInterval		
             for i= 1, #myAIRules do
                 local rule = myAIRules[i];
@@ -580,8 +589,8 @@ if class ~= nil then
     
 end;
 
-function ROM_GetMyStatus()
-    local props = Game.Myself.data.props;
+function ROM_GetMonStatus(mon)
+    local props = mon.data.props;
     local hp = props.Hp:GetValue();
     local maxhp = props.MaxHp:GetValue();
     local frachp = hp/maxhp;
@@ -596,6 +605,25 @@ function ROM_GetMyStatus()
         maxSp=maxSp,
         fracsp=fracsp,
     };
+end;
+
+function ROM_GetMyStatus()
+	return ROM_GetMonStatus(Game.Myself);
+--[[    local props = Game.Myself.data.props;
+    local hp = props.Hp:GetValue();
+    local maxhp = props.MaxHp:GetValue();
+    local frachp = hp/maxhp;
+    local sp = props.Sp:GetValue();
+    local maxSp = props.MaxSp:GetValue();
+    local fracsp = sp/maxSp;
+    return {
+        hp=hp,
+        maxhp=maxhp,
+        frachp=frachp,
+        sp=sp,
+        maxSp=maxSp,
+        fracsp=fracsp,
+    };]]
 end;
 
 function ROM_GetSkillNeeded(skillID)
@@ -647,7 +675,8 @@ function ROM_GetAllNPC()
         local mons = v;
         tableForEach(mons, function(i, v)
             local mon = v;
-            if mon.data.staticData.Type ~= "Monster" then
+			if ROM_IsMonster(mon) == false then
+            --if mon.data.staticData.Type ~= "Monster" then
                 if filterFunc(mon) then
                     table.insert(ret, mon);
                 end;
@@ -665,7 +694,8 @@ function ROM_GetAllMonster(filterFunc)
         local mons = v;
         tableForEach(mons, function(i, v)
             local mon = v;
-            if mon.data.staticData.Type == "Monster" then
+			local stat = ROM_GetMonStatus(mon);
+            if ROM_IsMonster(mon) and stat.hp > 0 then
                 if filterFunc(mon) then
                     table.insert(ret, mon);
                 end;
@@ -674,7 +704,7 @@ function ROM_GetAllMonster(filterFunc)
     end);    
     return ret;
 end;
-
+--[[
 function ROM_GetAllMonsterFromNSceneNpcProxy()
     filterFunc = filterFunc or function(mon) return true; end
     local ret = {};
@@ -689,7 +719,7 @@ function ROM_GetAllMonsterFromNSceneNpcProxy()
         end);
     end);    
     return ret;
-end;
+end;]]
 
 function ROM_GetLearnSkill(filter)
     filter = filter or {};
@@ -732,12 +762,13 @@ function ROM_FindStaticMonster(tab)
     local filterFunc = function(mon)
         return (mon.data.staticData.id >= 40000 and mon.data.staticData.id < 50000) or (mon.data.staticData.id >= 100000); 
     end;
-    return ROM_FindMonByFilter(filterFunc,"ROM_FindMiniBoss");
+    return ROM_FindMonByFilter(filterFunc,"ROM_FindStaticMonster");
 end;
 
 function ROM_FindMiniBoss(tab)
     local filterFunc = function(mon)
-        return mon.data.staticData.Type == "Mini";
+		--LogDebug("ROM_FindMiniBoss " ..  MonsterToString(mon));
+        return mon.data.staticData.Type == "MINI";
     end;
     return ROM_FindMonByFilter(filterFunc,"ROM_FindMiniBoss");
 end;
@@ -748,6 +779,8 @@ function ROM_FindMonByFilter(filterFunc,str)
     local mon = ROM_GetNearestMonFromList(mons);
     if mon ~= nil then
         LogDebug(str .. ": found " .. MonsterToString(mon));
+	else
+		--LogDebug(str .. ": not found ");
     end;
     return mon;
 end;
@@ -770,11 +803,28 @@ end;
 function ROM_GetMonsterLockTarget()
     local mon = Game.Myself:GetLockTarget();
     if mon~= nil then
-        if mon.data.staticData.Type == "Monster" then
-            return mon;
-        end;
+		-- possible player here which does not has staticData
+		if ROM_IsMonster(mon) then
+			return mon;
+		end;
+		--[[
+		if mon.data.staticData ~= nil then
+			if mon.data.staticData.Type == "Monster" then
+				return mon;
+			end;
+		end;
+		]]
     end;
     return nil;
+end;
+
+function ROM_IsMonster(mon)
+	if mon.data.staticData ~= nil then
+		if mon.data.staticData.Type == "Monster" or mon.data.staticData.Type == "MINI" or mon.data.staticData.Type == "MVP" then
+			return true;
+		end;
+	end;
+	return false;
 end;
 
 if FunctionMonster ~= nil then
@@ -812,4 +862,21 @@ if FunctionMonster ~= nil then
     end
 end;
 
+--[[
+UIUtil.WarnPopup("Title","Text",
+	function(obj) 
+		LogDebug("OK" .. tostring(obj));--ListField(obj,"",{}," ");
+	end,
+	function(obj) 
+		LogDebug("Cancel" .. tostring(obj));--ListField(obj,"",{}," ");
+	end,
+	g_mainView,"OK","Cancel");
+]]	
+
+--[[
+local msg = {text = "text",title = "title"};
+GameFacade.Instance:sendNotification(UIEvent.CloseUI, {viewname = "PopUp10View"});
+GameFacade.Instance:sendNotification(UIEvent.ShowUI, {viewname = "PopUp10View"});
+GameFacade.Instance:sendNotification(SystemMsgEvent.MenuMsg,msg);
+]]
 
