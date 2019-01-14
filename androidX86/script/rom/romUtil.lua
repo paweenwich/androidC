@@ -62,7 +62,8 @@ function UserDataToString(value)
 	return ret;
 end;
 
-function ListField(obj,tab,tableHash,targetTab)
+function ListField(obj,tab,tableHash,targetTab,ignore)
+    ignore = ignore or {};
     targetTab = targetTab or "       ";
     tab = tab or "";
 	tableHash = tableHash or {};
@@ -77,6 +78,7 @@ function ListField(obj,tab,tableHash,targetTab)
 		--	LogDebug(tab .. "[" .. obj.__cname .. "] " .. tostring(obj));
 		--end;
         tableForEach(obj, function(i, v)
+            
 			if (type(i) == 'userdata') then
 				LogDebug(tab .. "[" .. tostring(i) ..  "] " .. tostring(v));			
 				return;
@@ -90,6 +92,9 @@ function ListField(obj,tab,tableHash,targetTab)
 				if (key == "__cname") or  (key == "__ctype") then
 					return;
 				end;
+                if TableUtil.HasValue(ignore,key) then
+                    return;
+                end;
 				-- skip function
 				if(type(v) == 'function') then
 					LogDebug(tab .. "func " .. key .. "=" .. tostring(v));
@@ -101,7 +106,7 @@ function ListField(obj,tab,tableHash,targetTab)
 					else
                         if tableIsEmpty(v) == false then
                             LogDebug(tab .. key .. " (" .. tostring(v) .. ")");							
-                            ListField(v,tab .. " ",tableHash,targetTab);
+                            ListField(v,tab .. " ",tableHash,targetTab,ignore);
                         else
                             LogDebug(tab .. key .. " " .. tostring(v) .. " {}");							
                         end;
@@ -259,6 +264,17 @@ function DumpSelf(self)
     LogDebug("activeScene " .. MyTostring(activeScene));
 end;
 
+function QuestToString(wq)
+    local listType = "";
+    local wd = wq.wantedData;
+    if wq.questListType == SceneQuest_pb.EQUESTLIST_ACCEPT then listType = "EQUESTLIST_ACCEPT" end;
+    if wq.questListType == SceneQuest_pb.EQUESTLIST_CANACCEPT then listType = "EQUESTLIST_CANACCEPT" end;
+    if wq.questListType == SceneQuest_pb.EQUESTLIST_COMPLETE then listType = "EQUESTLIST_COMPLETE" end;
+    if wq.questListType == SceneQuest_pb.EQUESTLIST_SUBMIT then listType = "EQUESTLIST_SUBMIT" end;
+    local info = QuestDataUtil.parseWantedQuestTranceInfo(wq,wd);
+
+    return "id=" .. wd.id .. " Target=[" .. wd.Target .. "] MapId=" .. wd.MapId .. " NpcId=" .. wd.NpcId .. " questListType=" .. listType .. " Content=" .. wd.Content .. " info=[" .. info .. "]";
+end;
 
 
 function MonsterToString(m)
@@ -667,7 +683,7 @@ function ROM_GetNearestMonFromList(mons)
     return retNpc;
 end;
 
-function ROM_GetAllNPC()
+function ROM_GetAllNPC(filterFunc)
     filterFunc = filterFunc or function(mon) return true; end
     local ret = {};
     local lst = NSceneNpcProxy.Instance.npcMap;

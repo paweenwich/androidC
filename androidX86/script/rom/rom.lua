@@ -1,3 +1,4 @@
+---- rom.lua ------
 if RomFileLogger == nil then
 	RomFileLogger = {};
 	RomFileLogger.f = io.open("/data/local/tmp/rom.log", "a");
@@ -33,9 +34,15 @@ function ROM_DoFile(fileName)
 	local s = ReadFile(fileName);
 	local f = loadstring(s);
     if f~=nil then
-        f();
-		LogDebug("ROM_DoFile success " .. fileName);
-		return true;
+        local status, err =  pcall(f);
+        if status == false then
+            LogDebug(err);
+            return false;
+        else    
+            --f();
+            LogDebug("ROM_DoFile success " .. fileName);
+            return true;
+        end;
     else
         if UIUtil ~= nil then
             UIUtil.FloatMsgByText("ROM_DoFile Fail (loadstring)");		
@@ -608,9 +615,20 @@ function ROM_Test(g)
 	LogDebug('----------- DailyQuestData -------------');
 	ListField(QuestProxy.Instance.DailyQuestData,"",{},"    ");
 	LogDebug('----------- menuDatas	 -------------');
-	ListField(QuestProxy.Instance.menuDatas	,"",{},"  ");
-
-
+	--ListField(QuestProxy.Instance.menuDatas	,"",{},"  ");
+    local state = QuestProxy.Instance:hasGoingWantedQuest();
+    LogDebug('----------- state	 -------------');
+    ListField(state	,"",{},"  ");
+    --local questData = QuestProxy.Instance:getWantedQuestDataByIdAndType(self.data.id,SceneQuest_pb.EQUESTLIST_ACCEPT)
+	--	questData = questData and QuestData or QuestProxy.Instance:getWantedQuestDataByIdAndType(self.data.id,SceneQuest_pb.EQUESTLIST_COMPLETE)
+    --LogDebug('----------- questData	 -------------');
+    --ListField(questData	,"",{},"  ");
+    ROM_DumpWantedQuest();
+    
+    --local status, err =  pcall(function() kkk[2]=1; end);
+    --if status == false then
+    --    LogDebug(err);
+    --end;
 	--LogDebug('----------- Table_GM_CMD -------------');
 	--for k,v in pairs(Table_GM_CMD) do		
 	
@@ -772,19 +790,82 @@ function ROM_MyDlg()
 		{
 			event = function (npcinfo)
 				LogDebug("npcinfo=" .. tostring(npcinfo));
+                LogDebug("currentMapID=" .. Game.MapManager:GetMapID());
 				--FunctionDialogEvent.SetDialogEventEnter( DialogEventType.EquipUpgrade, npcinfo )
 				--GameFacade.Instance:sendNotification(UIEvent.JumpPanel, {view=PanelConfig.AnnounceQuestPanel, viewdata ={wanted = wantedid, npcTarget = target, isNpcFuncView = true}});
 				--FunctionNpcFunc.JumpPanel(PanelConfig.AnnounceQuestPanel, npcinfo)
 				local mapid = SceneProxy.Instance.currentScene.mapID;				
 				local nearestExit = ROM_GetNearestExitPoint();
-				LogDebug("nearestExit=" .. MyTostring(nearestExit) .. " mapid=" .. tostring(mapid));
+                local myPos = Game.Myself:GetPosition();
+				LogDebug("nearestExit=" .. MyTostring(nearestExit) .. " mapid=" .. tostring(mapid) .. " pos=" .. tostring(myPos));
 				
 				local tempVector3 = LuaVector3.zero;
-
+                local nearestNPC, nearestDist = ROM_GetNearestNPC();
+                if nearestNPC ~= nil  then
+                    LogDebug(MonsterToString(nearestNPC) .. ' ' .. nearestDist);
+                end;
+                --LuaVector3(15.533345, 7.136991, -23.064865)
 				tempVector3:Set(nearestExit.position[1],nearestExit.position[2],nearestExit.position[3]);
 				--Game.Myself:Client_MoveTo(tempVector3);
 				--ROM_CommandGOTO(mapid,tempVector3);
-				ROM_CommandVisitMonster(2,10001);
+				--ROM_CommandVisitMonster(2,10001);
+                
+                local q = ROM_GetAcceptedQuest();
+                if q ~= nil then
+                    LogDebug("Has Accepted Wanted Quest " .. QuestToString(q) );
+                    --ListField(q,"",{},"    ");  
+                    --LogDebug(MyTostring(q));
+                    if q.wantedData.Content == "move" then
+                        ROM_WalkToNPC(q.wantedData.MapId,q.params.npc);
+                    elseif q.wantedData.Content == "kill" then
+                        ListField(q,"",{},"    ");  
+                        if q.params.monster ~= nil then
+                            -- goto that monster
+                            ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
+                        else
+                            -- goto board to submit quest 
+                            -- it might possibile that this map does not have board will see
+                            ROM_WalkToNPC(mapid,q.params.npc);
+                        end;
+                    else
+                        LogDebug("Quest type not suppoted");
+                    end;
+                else 
+                    if ROM_WalkToNPC(mapid,1016) then
+                        -- near board
+                        LogDebug("Near board");
+                        if ROM_SubmitQuest() == false then
+                            ROM_AcceptQuest();
+                        end;
+                    end;
+                    --local nearestNPC, nearestDist = ROM_GetNearestNPC();
+--[[                    local found = false;
+                    if nearestNPC ~= nil then
+                        LogDebug(MonsterToString(nearestNPC) .. ' ' .. nearestDist);
+                        if nearestNPC.data.staticData.id == 1016 then
+                           if nearestDist < 5 then
+                            found = true;
+                           end;
+                        end;
+                    end;
+                    if found == false then
+                        local tempVector3 = LuaVector3.zero;
+                        tempVector3:Set(15.533345,7.136991,-23.064865);
+                        ROM_CommandGOTO(7,tempVector3);
+                    else
+                        -- near board
+                        LogDebug("Near board");
+                        if ROM_SubmitQuest() == false then
+                            ROM_AcceptQuest();
+                        end;
+                    end;]]
+                end;
+                
+                --ROM_CommandVisitNPC(7,1016,nil);
+                
+                --if ROM_SubmitQuest() == false then
+                --    ROM_AcceptQuest();
+                --end;
 				--LogDebug("Game.Myself:GetPosition()=" .. MyTostring(Game.Myself:GetPosition()));
 				--LogDebug("nearestExit=" .. MyTostring(tempVector3));
 				--Game.Myself:Client_EnterExitRangeHandler(nearestExit);
@@ -819,6 +900,42 @@ function ROM_GetNearestExitPoint()
     return ret;	
 end;
 
+function ROM_GetNPCPointByID(npcID)
+    local npcList = Game.MapManager:GetNPCPointArray();
+    --LogDebug("" .. #npcList);
+    for i=1,#npcList do
+        local v = npcList[i];
+        if v and v.ID and v.position and v.uniqueID ~= 0 and v.ID == npcID then
+            local npcData = Table_Npc[v.ID];
+            if npcData  then
+                --LogDebug("" .. v.ID .. " " .. npcID);
+                --ListField(v,"",{}," ");
+                --ListField(npcData,"",{},"");
+                return v
+            end;
+            --return v;
+        end;
+    end;
+    return nil;
+end;    
+
+function ROM_GetNearestNPC()
+	local minDist = 100000;
+    local ret = nil;
+    local mons = ROM_GetAllNPC();
+    local myPos = Game.Myself:GetPosition();
+	--local exitPoints =  Game.MapManager:GetExitPointArray();	
+	tableForEach(mons, function(i, v)
+		local distance = LuaVector3.Distance(myPos, v:GetPosition());
+        if distance < minDist then
+            ret = v;
+            minDist = distance;
+        end;
+	end);
+    return ret,minDist;	
+end;
+
+
 function ROM_CommandVisitMonster(mapID,monID)
 		local oriMonster = Table_MonsterOrigin[ monID] or {};
 		-- this will have mapID which contain that monsters
@@ -834,6 +951,21 @@ function ROM_CommandVisitMonster(mapID,monID)
 				targetMapID = mapID,
 				npcID = monID,
 				targetPos = TableUtil.Array2Vector3(oriPos),
+                callback = function(cmd, event)
+                    --LogDebug("ROM_CommandVisitMonster callback cmd=" .. MyTostring(cmd));
+                    --LogDebug("ROM_CommandVisitMonster callback event=" .. MyTostring(event));
+                    local q = ROM_GetAcceptedQuest();
+                    if q ~= nil then
+                        LogDebug(QuestToString(q));
+                        if q.params.num == nil then
+                            LogDebug("Quest done");
+                            ROM_WalkToNPC(mapID,1016);
+                            
+                        else 
+                            LogDebug("" .. tostring(q.process) .. "/" .. tostring(q.params.num));
+                        end;
+                    end;
+                end                
 			}
 			local cmd = MissionCommandFactory.CreateCommand(cmdArgs, MissionCommandSkill)	
 			if(cmd)then
@@ -857,24 +989,146 @@ end;
 function ROM_CommandGOTO(mapID,pos)
 	local tempArgs = {};
 	tempArgs.targetMapID = mapID;
-	tempArgs.targetPos = pos;
 	tempArgs.showClickGround = true;
 	tempArgs.allowExitPoint = true;
-	local x,y,z = pos[1],pos[2],pos[3];
-	tempArgs.callback = function(cmd, event)
-		LogDebug("cmd=" .. MyTostring(cmd));
-		LogDebug("event=" .. MyTostring(event));
-		local tempVector3 = LuaVector3.zero;
-		if MissionCommandMove.CallbackEvent.TeleportFailed == event then
-			LogDebug("event=TeleportFailed");
-			tempVector3:Set(x,y,z);
-			Game.Myself:Client_MoveTo( tempVector3 );
-		end
-	end
+    if pos ~= nil then
+        local x,y,z = pos[1],pos[2],pos[3];
+        local tempVector3 = LuaVector3.zero;
+        tempVector3:Set(x,y,z);
+        tempArgs.targetPos = tempVector3;      
+        LogDebug("targetPos=" .. tostring(targetPos));
+        tempArgs.callback = function(cmd, event)
+            LogDebug("cmd=" .. MyTostring(cmd));
+            LogDebug("event=" .. MyTostring(event));
+            if MissionCommandMove.CallbackEvent.TeleportFailed == event then
+                LogDebug("event=TeleportFailed");
+                Game.Myself:Client_MoveTo( tempVector3 );
+            end
+        end
+    end;
 	local cmd = MissionCommandFactory.CreateCommand(tempArgs, MissionCommandMove);
 	if(cmd)then
+        LogDebug("ROM_CommandGOTO: Client_SetMissionCommand");
 		Game.Myself:Client_SetMissionCommand( cmd );
+    else
+        LogDebug("ROM_CommandGOTO: cmd error");
 	end
+end;
+
+function ROM_DumpWantedQuest()
+    local wantedQuest = QuestProxy.Instance:getWantedQuest();
+    LogDebug('----------- wantedQuest	 -------------');
+    --
+    for i=1,#wantedQuest do
+        local wq = wantedQuest[i];
+--[[        local wd = wq.wantedData;
+        --EQUESTLIST_ACCEPT = 1
+        --EQUESTLIST_CANACCEPT = 4
+        --EQUESTLIST_COMPLETE = 3
+        --EQUESTLIST_SUBMIT = 2
+        local listType = "";
+        if wq.questListType == SceneQuest_pb.EQUESTLIST_ACCEPT then listType = "EQUESTLIST_ACCEPT" end;
+        if wq.questListType == SceneQuest_pb.EQUESTLIST_CANACCEPT then listType = "EQUESTLIST_CANACCEPT" end;
+        if wq.questListType == SceneQuest_pb.EQUESTLIST_COMPLETE then listType = "EQUESTLIST_COMPLETE" end;
+        if wq.questListType == SceneQuest_pb.EQUESTLIST_SUBMIT then listType = "EQUESTLIST_SUBMIT" end;
+        LogDebug("id=" .. wd.id .. " Target=" .. wd.Target .. " MapId=" .. wd.MapId .. " NpcId=" .. wd.NpcId .. " questListType=" .. listType .. " Content=" .. wd.Content);
+        --local info = QuestDataUtil.parseWantedQuestTranceInfo(wq,wd);
+        --LogDebug(MyTostring(info));]]
+        LogDebug(QuestToString(wq));
+        --ListField(wd.Params,"",{}," ");        
+        --ListField(wq,"",{}," ",{"Describe","Name"});        
+    end;
+end;
+
+function ROM_SubmitQuest()
+    local wantedQuest = QuestProxy.Instance:getWantedQuest();
+    for i=1,#wantedQuest do
+        local wq = wantedQuest[i];
+        local wd = wq.wantedData;
+        if wq.questListType == SceneQuest_pb.EQUESTLIST_COMPLETE then
+            -- find mission board 1016 location mapID 7
+            -- goto that location
+            -- submit it
+            LogDebug("Submitable quest found to submit");
+            ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_SUBMIT,wq.id);
+            return true;
+        end;
+    end;
+    LogDebug("Submitable quest not found to submit");
+    return false;
+end;
+
+function ROM_AcceptQuest()
+    local wantedQuest = QuestProxy.Instance:getWantedQuest();
+    for i=1,#wantedQuest do
+        local wq = wantedQuest[i];
+        local wd = wq.wantedData;
+        if wq.questListType == SceneQuest_pb.EQUESTLIST_CANACCEPT then
+            LogDebug(QuestToString(wq));
+            if wd.Content == "move" then
+                LogDebug("ROM_AcceptQuest move found");
+                ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,wq.id);
+                return true;
+            end;
+            if wd.Content == "kill" then
+                LogDebug("ROM_AcceptQuest kill found");
+                ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,wq.id);
+                return true;
+            end;
+            --LogDebug("Submitable quest found to submit");
+            --ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_SUBMIT,wq.id);
+        end;
+    end;
+    LogDebug("Accept quest quest not found to submit");
+    return false;
+    
+end;
+function ROM_GetAcceptedQuest()
+    local wantedQuest = QuestProxy.Instance:getWantedQuest();
+    for i=1,#wantedQuest do
+        local wq = wantedQuest[i];
+        local wd = wq.wantedData;
+        if wq.questListType == SceneQuest_pb.EQUESTLIST_ACCEPT then
+            return wq;
+        end;
+    end;
+    return nil;
+end;
+
+function ROM_WalkToNPC(mapID,npcID)
+    local mapid = Game.MapManager:GetMapID();
+    -- check mapID
+    if mapid ~= mapID then
+        LogDebug("ROM_WalkToNPC: wrong map current=" .. mapid .. " target=" .. mapID);
+        ROM_CommandGOTO(q.wantedData.MapId);
+        return false;
+    end;    
+    -- check nearest NPC
+    LogDebug("ROM_WalkToNPC: MapID=" .. Game.MapManager:GetMapID() .. " [" .. Game.MapManager:GetMapName() .. "]");
+    local nearestNPC, nearestDist = ROM_GetNearestNPC();
+    if nearestNPC ~= nil then
+        if nearestNPC.data.staticData.id == npcID and  nearestDist < 5 then
+            LogDebug("ROM_WalkToNPC: End (target reach)");
+            return true;
+        end;
+    end;
+    -- walk to that NPC
+    local npc = ROM_GetNPCPointByID(npcID);
+    if npc ~= nil then
+        --LogDebug("Found npc);
+        --ListField(npcs,"",{}," "); 
+        LogDebug("ROM_WalkToNPC: same map " .. MyTostring(npc.position));
+        ROM_CommandGOTO(mapID,npc.position);
+        return false;
+    else
+        if npcID == 1016 then
+            LogDebug("ROM_WalkToNPC: mission board hardcode to morroc");
+            ROM_CommandGOTO(16);
+            return false;
+        end;
+        LogDebug("ROM_WalkToNPC: End (npc not found)");
+        return true;
+    end;
 end;
 LogDebug("ROM Loaded 1.03");
 
