@@ -603,6 +603,16 @@ function ROM_Test(g)
 	ListField(QuestProxy.Instance.questList[SceneQuest_pb.EQUESTLIST_ACCEPT],"",{},"");
 	LogDebug('----------- EQUESTLIST_SUBMIT -------------');
 	ListField(QuestProxy.Instance.questList[SceneQuest_pb.EQUESTLIST_SUBMIT],"",{}," ");
+	LogDebug('----------- detailList -------------');
+	ListField(QuestProxy.Instance.detailList,"",{}," ");
+	LogDebug('----------- DailyQuestData -------------');
+	ListField(QuestProxy.Instance.DailyQuestData,"",{},"    ");
+	LogDebug('----------- menuDatas	 -------------');
+	ListField(QuestProxy.Instance.menuDatas	,"",{},"  ");
+
+
+	--LogDebug('----------- Table_GM_CMD -------------');
+	--for k,v in pairs(Table_GM_CMD) do		
 	
 	local npcData = Table_Npc[1016];
 	--ListField(npcData,"",{}," ");
