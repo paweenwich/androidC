@@ -73,3 +73,8 @@ function HOOK_SendNotification(self,p1,p2)
 	GameFacade.Instance:_sendNotification(p1,p2);
 end;
 
+function HOOK_openWantedQuestPanel( wantedid, target)
+    LogDebug("HOOK_openWantedQuestPanel " .. MyTostring(wantedid));
+    ListField(target,"",{}," ");
+    FunctionVisitNpc._openWantedQuestPanel(wantedid,target);
+end;

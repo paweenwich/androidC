@@ -278,6 +278,7 @@ end;
 
 
 function MonsterToString(m)
+    if m == nil then return "MonsterToString(null)" end;
 	local stat = ROM_GetMonStatus(m);
 	--if  m.data.props ~= nil then
 	    local props = m.data.props;
