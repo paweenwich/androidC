@@ -76,5 +76,16 @@ end;
 function HOOK_openWantedQuestPanel( wantedid, target)
     LogDebug("HOOK_openWantedQuestPanel " .. MyTostring(wantedid));
     ListField(target,"",{}," ");
-    FunctionVisitNpc._openWantedQuestPanel(wantedid,target);
+    FunctionVisitNpc.Me()._openWantedQuestPanel(wantedid,target);
+end;
+
+function HOOK_AccessTarget(self, target, custom, customType)
+    LogDebug("HOOK_AccessTarget ");
+	LogDebug("-- target --")
+	ListField(target,"",{},"");
+	LogDebug("-- custom --")
+    ListField(custom,"",{},"");
+	LogDebug("-- customType --")
+	ListField(customType,"",{},"");
+	FunctionVisitNpc.me:_AccessTarget(target, custom, customType);
 end;

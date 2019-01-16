@@ -27,6 +27,7 @@ rom:
 	adb push script/rom/AScript_org_puremvc_lua_multicore_help_oop.lua /data/local/tmp/script
 	adb push script/rom/rom.lua /data/local/tmp/script
 	adb push script/rom/romUtil.lua /data/local/tmp/script
+	adb push script/rom/romAutoQuest.lua /data/local/tmp/script
 	adb push script/rom/hookSendNotification.lua /data/local/tmp/script
 	adb push script/rom/test.lua /data/local/tmp/script
 	adb shell '/data/local/tmp/tracerx86 -tslua /data/local/tmp/script/rom.lua'

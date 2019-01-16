@@ -53,6 +53,7 @@ function ROM_DoFile(fileName)
 end;
 
 ROM_DoFile("/data/local/tmp/script/romUtil.lua");
+ROM_DoFile("/data/local/tmp/script/romAutoQuest.lua");
 ROM_DoFile("/data/local/tmp/script/hookSendNotification.lua");
 function ROM_Reload()
 	return ROM_DoFile("/data/local/tmp/script/rom.lua");
@@ -194,171 +195,6 @@ if MyTick ~= nil then
 end;
 
 
---LogDebug("myTick=" .. tostring(myTick) .. " " .. tostring(myTick.version));
---myTick.stop();
---myTick.start();
---[[
-if MiniMapWindow~= nil then
-    LogDebug("Mod MiniMapWindow");
-	function MiniMapWindow:Show()
-		--KKK
-		--Debug.Log("Reload Start");
-		--ROM_Reload();
-		--Debug.Log("Reload End");
-	
-		self.active = true;
-		self.gameObject:SetActive(true);
-
-		self:OpenCheckMyPos();
-
-		self:PlayQuestSymbolShow();
-		
-		--LogDebug(MyTostring(Game.Myself));
-		--Game.Myself:Client_MoveTo(p)
-		local uiCamera = NGUIUtil:GetCameraByLayername("UI");
-		local tempV2, tempV3, tempRot = LuaVector2(), LuaVector3(), LuaQuaternion();
-		LogDebug(MyTostring(uiCamera));
-		self:AddClickEvent(self.mapTexture.gameObject, function (go)
-			--UIUtil.FloatShowyMsg("Click");	-- simple center message
-			--UIUtil.FloatMsgByText("Click");		-- center stack mesage
-			LogDebug("MiniMap click");
-			if(self.lock)then
-				LogDebug("MiniMap Lock");	
-				return;
-			end
-			local inputWorldPos = uiCamera:ScreenToWorldPoint(Input.mousePosition);
-			LogDebug("inputWorldPos " .. MyTostring(inputWorldPos));
-			LogDebug("mousePosition " .. MyTostring(Input.mousePosition));
-			tempV3[1], tempV3[2], tempV3[3] = LuaGameObject.InverseTransformPointByVector3(self.mapTexture.transform, inputWorldPos);
-			local p = self:MapPosToScene(tempV3);
-			LogDebug("MapPos " .. MyTostring(tempV3));
-			LogDebug("ScenePos " .. MyTostring(p));
-            local currentMapID = Game.MapManager:GetMapID();            
-			if(p)then
-
-				LogDebug("currentMapID " .. MyTostring(currentMapID));
-				LogDebug("Table_Map[currentMapID] " .. MyTostring(Table_Map[currentMapID]));
-				local disableInnerTeleport = Table_Map[currentMapID].MapNavigation
-				if nil ~= disableInnerTeleport and 0 ~= disableInnerTeleport then
-					LogDebug("disableInnerTeleport");
-					self:ResetMoveCMD(nil)
-					Game.Myself:Client_MoveTo(p)
-				else
-					LogDebug("disableInnerTeleport==nil");
-					self:ResetMoveCMD(nil)
-					Game.Myself:Client_MoveTo(p,true);	-- ignore mesg seem to work
-					--Game.Myself:Client_PlaceTo(p,true);	--client side only
-				end;
-			end;
-			OnMiniMapClick(self);
-		end);
-	end
-end;
-toggle = 1;
-]]
-
-myButton = myButton or {};
-
-function CreateMyButton(text,pos,onclick)
-    if g_mainView == nil then 
-        LogDebug("CreateMyButton: g_mainView not found");
-        return nil 
-    end;
-    local templateButton = g_mainView:FindGO("RewardButton");
-    if templateButton == nil then 
-        LogDebug("CreateMyButton: RewardButton not found");
-        return nil 
-    end;
-    local uiCamera = NGUIUtil:GetCameraByLayername("UI");	
-    if uiCamera == nil then 
-        LogDebug("CreateMyButton: uiCamera not found");
-        return nil 
-    end;
-    local ret = myButton[text];
-    if ret == nil then
-        ret = GameObject.Instantiate(templateButton);
-        myButton[text] = ret;
-        ret:SetActive(false);
-        UIUtil.FindGO("Sprite",ret):SetActive(false);
-        local label = UIUtil.FindGO("Label",ret);
-        --LogDebug(MyTostring(label.transform.localPosition));
-        label.transform.localPosition = Vector3(0,0,0);
-        label:GetComponent(UILabel).text = text;
-        label:GetComponent(UILabel).effectColor = ColorUtil.NGUILabelBlueBlack;
-        label:GetComponent(UILabel).effectStyle = UILabel.Effect.None;
-        --ret.transform:SetParent(templateButton.transform.parent);
-        if pos~= nil then
-            ret.transform.position = uiCamera:ViewportToWorldPoint(pos);
-        end;
-    end;
-    return ret;
-end;
-
-if g_mainView ~= nil then
-	local tempVector3 = LuaVector3.zero
-	local testButton = g_mainView:FindGO("TestFloat");
-	local uiCamera = NGUIUtil:GetCameraByLayername("UI");	
-	--LogDebug(GameObjectToString(uiCamera));
-    
-	--local obj = g_mainView:FindGO("SkillBord");
-	--LogDebug(GameObjectToString(obj));
-    local top_right = g_mainView:FindGO("Anchor_TopRight");
-    --LogDebug(GameObjectToString(top_right,"",true));
-    
-    if CreateMyButton("Reload") then
-        local button = myButton["Reload"];
-        button.transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.05,0.70,0));
-        button:SetActive(true);       
-        LogDebug("pos=" .. MyTostring(button.transform.position));
-        g_mainView:AddClickEvent(button, function (g)
-            if ROM_Reload() then
-                UIUtil.FloatMsgByText("Reload Success");
-            end;
-        end);        
-    end;
-    if CreateMyButton("Test") then
-        LogDebug("Test");
-        local button = myButton["Test"];
-        button.transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.05,0.63,0));
-        button:SetActive(true);        
-        g_mainView:AddClickEvent(button, function (g)
-            ROM_Test(g);
-        end);        
-    end;
-    if CreateMyButton("Auto") then
-        LogDebug("Auto");
-        local button = myButton["Auto"];
-        button.transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.05,0.56,0));
-        button:SetActive(true);        
-        
-        local label = UIUtil.FindGO("Label",button);
-        local uiLabel = label:GetComponent(UILabel);
-        --uiLabel.effectColor = ColorUtil.NGUIWhite; --ColorUtil.Red;
-        --uiLabel.effectStyle = UILabel.Effect.None;
-        --LogDebug(MyTostring(uiLabel.effectStyle));
-        g_mainView:AddClickEvent(button, function (g)
-            ROM_Auto(g);
-        end);        
-    end;	
-    if CreateMyButton("Tick") then
-        LogDebug("Tick");
-        local button = myButton["Tick"];
-        button.transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.05,0.49,0));
-        button:SetActive(true);        
-        g_mainView:AddClickEvent(button, function (g)
-            ROM_MyTick(g);
-        end);        
-    end;	
-    if CreateMyButton("Dlg") then
-        LogDebug("Dlg");
-        local button = myButton["Dlg"];
-        button.transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.05,0.42,0));
-        button:SetActive(true);        
-        g_mainView:AddClickEvent(button, function (g)
-            ROM_MyDlg(g);
-        end);        
-    end;	
-end;
 
 function OnMiniMapClick(self)
 	--myTick:stop();
@@ -380,14 +216,7 @@ function OnMiniMapClick(self)
 	--g_mainView.raidMsgRoot:SetActive(toggle%2 == 1);	-- UNKNOWN
 	--g_mainView.mainBord:SetActive(toggle%2 == 1);	-- everything beside background
 	--g_mainView:FindGO("SkillBord"):SetActive(toggle%2 == 1); -- skill button
-	--LogDebug(MyTostring(questlst));
-	if toggle%2 == 1 then
-		--UIUtil.FloatMsgByText("Show");
-	end;
-	--testButton:SetActive(toggle%2 == 1);
-	toggle = toggle + 1;
-	
-	LogDebug("" .. toggle .. " " .. (toggle%2));
+
 end;
 
 function ROM_SkillTarget(tab)
@@ -581,6 +410,7 @@ function ROM_Test(g)
 		-- rotate camera
 		--g_mainView:CameraRotateToMe(true);
 		--g_mainView:CameraReset();	
+--[[		
 	LogDebug('----------- questList -------------');
 	--EQUESTLIST_ACCEPT = 1
 	--EQUESTLIST_CANACCEPT = 4
@@ -599,23 +429,16 @@ function ROM_Test(g)
     local state = QuestProxy.Instance:hasGoingWantedQuest();
     LogDebug('----------- state	 -------------');
     ListField(state	,"",{},"  ");
-    --local questData = QuestProxy.Instance:getWantedQuestDataByIdAndType(self.data.id,SceneQuest_pb.EQUESTLIST_ACCEPT)
-	--	questData = questData and QuestData or QuestProxy.Instance:getWantedQuestDataByIdAndType(self.data.id,SceneQuest_pb.EQUESTLIST_COMPLETE)
-    --LogDebug('----------- questData	 -------------');
-    --ListField(questData	,"",{},"  ");
-    ROM_DumpWantedQuest();
-    
-    --local status, err =  pcall(function() kkk[2]=1; end);
-    --if status == false then
-    --    LogDebug(err);
-    --end;
-	--LogDebug('----------- Table_GM_CMD -------------');
-	--for k,v in pairs(Table_GM_CMD) do		
-	
-	local npcData = Table_Npc[1016];
+	]]
+    --ROM_DumpWantedQuest();
+	--MsgManager.ShowMsgByID(25491);
+	--local npcData = Table_Npc[1016];
 	--ListField(npcData,"",{}," ");
 	
+	local nearestNPC, nearestDist = ROM_GetNearestNPC();	
+	ListField(nearestNPC,"",{},"");
 	
+	ROM_ClickNearestNPC();
 	
     UIUtil.FloatMsgByText("Test Done");	
     if true then
@@ -688,7 +511,8 @@ function ROM_MyTick()
             myTick:stop();
             uiLabel.effectStyle = UILabel.Effect.None;
 			GameFacade.Instance.sendNotification = GameFacade.Instance._sendNotification;
-            FunctionVisitNpc.openWantedQuestPanel = FunctionVisitNpc._openWantedQuestPanel
+            --FunctionVisitNpc.openWantedQuestPanel = FunctionVisitNpc._openWantedQuestPanel
+			FunctionVisitNpc.me.AccessTarget = FunctionVisitNpc.me._AccessTarget;
 			LogDebug("restore = " .. tostring(GameFacade.Instance.sendNotification));
         else
             myTick:start();
@@ -697,13 +521,18 @@ function ROM_MyTick()
 			
 			GameFacade.Instance._sendNotification = GameFacade.Instance.sendNotification;
 			GameFacade.Instance.sendNotification = HOOK_SendNotification;
-			LogDebug("org = " .. tostring(GameFacade.Instance._sendNotification));
-			LogDebug("new = " .. tostring(GameFacade.Instance._sendNotification));
-			LogDebug(tostring(GameFacade.Instance.sendNotification));
+			LogDebug("sendNotification org = " .. tostring(GameFacade.Instance._sendNotification));
+			LogDebug("sendNotification new = " .. tostring(GameFacade.Instance.sendNotification));
+			--LogDebug(tostring(GameFacade.Instance.sendNotification));
             
-            FunctionVisitNpc._openWantedQuestPanel = FunctionVisitNpc.openWantedQuestPanel;
-            FunctionVisitNpc.openWantedQuestPanel = HOOK_openWantedQuestPanel;
+            --FunctionVisitNpc._openWantedQuestPanel = FunctionVisitNpc.openWantedQuestPanel;
+            --FunctionVisitNpc.openWantedQuestPanel = HOOK_openWantedQuestPanel;
 			--GameFacade.Instance:sendNotification(UIEvent.ShowUI, viewdata );	
+			FunctionVisitNpc.me._AccessTarget = FunctionVisitNpc.me.AccessTarget;
+			FunctionVisitNpc.me.AccessTarget = HOOK_AccessTarget;
+			LogDebug("AccessTarget org = " .. tostring(FunctionVisitNpc.me._AccessTarget));
+			LogDebug("AccessTarget new = " .. tostring(FunctionVisitNpc.me.AccessTarget));
+			
         end
     end;
 end;
@@ -737,6 +566,35 @@ function ROM_Auto()
     end;
     UIUtil.FloatMsgByText("Auto " .. tostring(Game.Myself.ai.autoAI_Rom:IsEnable()));
 end;
+
+function ROM_Quest()
+    local button = myButton["Quest"];
+    local label = UIUtil.FindGO("Label",button);
+    local uiLabel = label:GetComponent(UILabel);
+    --uiLabel.effectColor = ColorUtil.NGUIWhite; --ColorUtil.Red;
+    --LogDebug(MyTostring(uiLabel.effectColor));
+	if Game.Myself.ai.autoQuest_Rom == nil then
+		Game.Myself.ai.autoQuest_Rom = AutoQuest_Rom.new();
+		Game.Myself.ai.idleAIManager:PushAI(Game.Myself.ai.autoQuest_Rom);
+		LogDebug("set AutoQuest_Rom");
+	else
+		local index = TableUtil.FindKeyByValue(Game.Myself.ai.idleAIManager.ais,Game.Myself.ai.autoQuest_Rom);
+        local old = Game.Myself.ai.autoQuest_Rom;
+		Game.Myself.ai.autoQuest_Rom = AutoQuest_Rom.new();
+		Game.Myself.ai.idleAIManager.ais[index] = Game.Myself.ai.autoQuest_Rom;
+        Game.Myself.ai.autoQuest_Rom:Enable(old:IsEnable());
+	end;
+    if Game.Myself.ai.autoQuest_Rom:IsEnable() then
+        Game.Myself.ai.autoQuest_Rom:Enable(false);
+        uiLabel.effectStyle = UILabel.Effect.None;
+    else
+        Game.Myself.ai.autoQuest_Rom:Enable(true);
+        uiLabel.effectColor = ColorUtil.NGUILabelRed;
+        uiLabel.effectStyle = UILabel.Effect.Outline;
+    end;
+    UIUtil.FloatMsgByText("Auto Quest " .. tostring(Game.Myself.ai.autoQuest_Rom:IsEnable()));
+end;
+
 
 function ROM_MyDlg()
 		local viewdata = {
@@ -787,6 +645,7 @@ function ROM_MyDlg()
                 local nearestNPC, nearestDist = ROM_GetNearestNPC();
                 if nearestNPC ~= nil  then
                     LogDebug(MonsterToString(nearestNPC) .. ' ' .. nearestDist);
+					
                 end;
                 --LuaVector3(15.533345, 7.136991, -23.064865)
 				tempVector3:Set(nearestExit.position[1],nearestExit.position[2],nearestExit.position[3]);
@@ -907,57 +766,6 @@ function ROM_MyDlg()
 	GameFacade.Instance:sendNotification(UIEvent.ShowUI, viewdata);
 end;
 
-function ROM_GetNearestExitPoint()
-	local minDist = 100000;
-    local ret = nil;
-    local myPos = Game.Myself:GetPosition();
-	local exitPoints =  Game.MapManager:GetExitPointArray();	
-	tableForEach(exitPoints, function(i, v)
-		local distance = LuaVector3.Distance(myPos, v.position);
-        if distance < minDist then
-            ret = v;
-            minDist = distance;
-        end;
-	end);
-    return ret;	
-end;
-
-function ROM_GetNPCPointByID(npcID)
-    local npcList = Game.MapManager:GetNPCPointArray();
-    --LogDebug("" .. #npcList);
-    for i=1,#npcList do
-        local v = npcList[i];
-        if v and v.ID and v.position and v.uniqueID ~= 0 and v.ID == npcID then
-            local npcData = Table_Npc[v.ID];
-            if npcData  then
-                --LogDebug("" .. v.ID .. " " .. npcID);
-                --ListField(v,"",{}," ");
-                --ListField(npcData,"",{},"");
-                return v
-            end;
-            --return v;
-        end;
-    end;
-    return nil;
-end;    
-
-function ROM_GetNearestNPC()
-	local minDist = 100000;
-    local ret = nil;
-    local mons = ROM_GetAllNPC();
-    local myPos = Game.Myself:GetPosition();
-	--local exitPoints =  Game.MapManager:GetExitPointArray();	
-	tableForEach(mons, function(i, v)
-		local distance = LuaVector3.Distance(myPos, v:GetPosition());
-        if distance < minDist then
-            ret = v;
-            minDist = distance;
-        end;
-	end);
-    return ret,minDist;	
-end;
-
-
 function ROM_CommandVisitMonster(mapID,monID)
 		local oriMonster = Table_MonsterOrigin[ monID] or {};
 		-- this will have mapID which contain that monsters
@@ -1010,99 +818,6 @@ function ROM_CommandVisitNPC(mapID,npcID,npcUID)
 	end
 end;
 
-function ROM_WalkToBoard()
-    local boardNPC = 1016;
-    LogDebug("ROM_WalkToBoard");
-    -- check if we have 1016 on this map
-    local npc = ROM_GetNPCPointByID(boardNPC);
-    if npc ~= nil then
-        -- found then just walk to it
-        return ROM_WalkToNPC(Game.MapManager:GetMapID(),boardNPC);
-    end;
-    -- wrong map use morrc (16) as base for now
-    
-	local tempArgs = {};
-	tempArgs.targetMapID = 16;
-	tempArgs.showClickGround = true;
-	tempArgs.allowExitPoint = true;
-    tempArgs.callback = function(cmd, event)
-        LogDebug("cmd=" .. MyTostring(cmd));
-        LogDebug("event=" .. MyTostring(event));
-        if 2 == event then
-            LogDebug("ROM_WalkToBoard auto walk to board");
-            --ROM_WalkToNPC(Game.MapManager:GetMapID(),boardNPC);
-            ROM_WalkToBoard();
-        end
-    end
-	local cmd = MissionCommandFactory.CreateCommand(tempArgs, MissionCommandMove);
-	if(cmd)then
-        LogDebug("ROM_WalkToBoard: Client_SetMissionCommand");
-		Game.Myself:Client_SetMissionCommand( cmd );
-    else
-        LogDebug("ROM_WalkToBoard: cmd error");
-	end
-    return false
-end;
-
-function ROM_WalkToNPC(mapID,npcID,finish)
-    npcID = npcID or 1016;
-    mapID = mapID or 16;
-    finish = finish or function() LogDebug("ROM_WalkToNPC Finish"); end;
-    
-    -- check nearest NPC
-    --LogDebug("ROM_WalkToNPC2: MapID=" .. Game.MapManager:GetMapID() .. " [" .. Game.MapManager:GetMapName() .. "]");
-    LogDebug("ROM_WalkToNPC2: From " .. Game.MapManager:GetMapID() .. " ->" .. mapID .. " npc=" .. npcID);
-    local nearestNPC, nearestDist = ROM_GetNearestNPC();
-    if nearestNPC ~= nil then
-        if nearestNPC.data.staticData.id == npcID and  nearestDist < 5 then
-            LogDebug("ROM_WalkToNPC: End (target reach)");
-            finish();
-            return true;
-        end;
-    end;
-    
-	local tempArgs = {};
-	tempArgs.targetMapID = mapID;
-	tempArgs.showClickGround = true;
-	tempArgs.allowExitPoint = true;
-    
-    local npc = ROM_GetNPCPointByID(npcID);    
-    if npc ~= nil then
-        -- found then just walk to it
-        tempArgs.targetMapID = Game.MapManager:GetMapID();  -- change target to current map
-        local tempVector3 = LuaVector3.zero;
-        tempVector3:Set(npc.position[1],npc.position[2],npc.position[3]);
-        tempArgs.targetPos = tempVector3;     
-        tempArgs.callback = function(cmd, event)
-            LogDebug("cmd=" .. MyTostring(cmd));
-            LogDebug("event=" .. MyTostring(event));
-            if 2 == event then
-                finish();
-            end
-        end        
-    else
-        -- just walk to that map and continue
-        tempArgs.callback = function(cmd, event)
-            LogDebug("cmd=" .. MyTostring(cmd));
-            LogDebug("event=" .. MyTostring(event));
-            if 2 == event then
-                LogDebug("ROM_WalkToNPC2 continue");
-                --ROM_WalkToNPC(Game.MapManager:GetMapID(),boardNPC);
-                ROM_WalkToNPC2(mapID,npcID,finish);
-            end
-        end        
-    end;
-	local cmd = MissionCommandFactory.CreateCommand(tempArgs, MissionCommandMove);
-	if(cmd)then
-        LogDebug("ROM_WalkToNPC2: Client_SetMissionCommand");
-		Game.Myself:Client_SetMissionCommand( cmd );
-    else
-        LogDebug("ROM_WalkToNPC2: cmd error");
-	end
-    return false
-end;
-
-
 function ROM_CommandGOTO(mapID,pos)
 	local tempArgs = {};
 	tempArgs.targetMapID = mapID;
@@ -1132,131 +847,36 @@ function ROM_CommandGOTO(mapID,pos)
 	end
 end;
 
-function ROM_DumpWantedQuest()
-    local wantedQuest = QuestProxy.Instance:getWantedQuest();
-    LogDebug('----------- wantedQuest	 -------------');
-    --
-    for i=1,#wantedQuest do
-        local wq = wantedQuest[i];
---[[        local wd = wq.wantedData;
-        --EQUESTLIST_ACCEPT = 1
-        --EQUESTLIST_CANACCEPT = 4
-        --EQUESTLIST_COMPLETE = 3
-        --EQUESTLIST_SUBMIT = 2
-        local listType = "";
-        if wq.questListType == SceneQuest_pb.EQUESTLIST_ACCEPT then listType = "EQUESTLIST_ACCEPT" end;
-        if wq.questListType == SceneQuest_pb.EQUESTLIST_CANACCEPT then listType = "EQUESTLIST_CANACCEPT" end;
-        if wq.questListType == SceneQuest_pb.EQUESTLIST_COMPLETE then listType = "EQUESTLIST_COMPLETE" end;
-        if wq.questListType == SceneQuest_pb.EQUESTLIST_SUBMIT then listType = "EQUESTLIST_SUBMIT" end;
-        LogDebug("id=" .. wd.id .. " Target=" .. wd.Target .. " MapId=" .. wd.MapId .. " NpcId=" .. wd.NpcId .. " questListType=" .. listType .. " Content=" .. wd.Content);
-        --local info = QuestDataUtil.parseWantedQuestTranceInfo(wq,wd);
-        --LogDebug(MyTostring(info));]]
-        LogDebug(QuestToString(wq));
-        --ListField(wd.Params,"",{}," ");        
-        --ListField(wq,"",{}," ",{"Describe","Name"});        
-    end;
+if g_mainView ~= nil then
+	local tempVector3 = LuaVector3.zero
+	local testButton = g_mainView:FindGO("TestFloat");
+	local uiCamera = NGUIUtil:GetCameraByLayername("UI");	
+	--LogDebug(GameObjectToString(uiCamera));
+	--local obj = g_mainView:FindGO("SkillBord");
+	--LogDebug(GameObjectToString(obj));
+    local top_right = g_mainView:FindGO("Anchor_TopRight");
+    --LogDebug(GameObjectToString(top_right,"",true));
+	local buttons = {
+		{name="Reload", pos=Vector3(0.05,0.70,0), func= function() if ROM_Reload() then UIUtil.FloatMsgByText("Reload Success"); end; end},
+		{name="Test", 	pos=Vector3(0.05,0.63,0), func= ROM_Test},
+		{name="Auto", pos=Vector3(0.05,0.56,0), func= ROM_Auto},
+		{name="Quest", pos=Vector3(0.05,0.49,0), func= ROM_Quest},
+		{name="Tick", pos=Vector3(0.05,0.42,0), func= ROM_MyTick},
+		{name="Dlg", pos=Vector3(0.05,0.35,0), func= ROM_MyDlg},
+	};
+	for i=1,#buttons do
+		local btn = buttons[i];
+		if CreateMyButton(btn.name) then
+			local button = myButton[btn.name];
+			button.transform.position = uiCamera:ViewportToWorldPoint(btn.pos);
+			button:SetActive(true);       
+			--LogDebug("pos=" .. MyTostring(button.transform.position));
+			g_mainView:AddClickEvent(button, function (g)
+				btn.func(g);
+			end);        
+		end;
+	end;
 end;
 
-function ROM_SubmitQuest()
-    local wantedQuest = QuestProxy.Instance:getWantedQuest();
-    LogDebug("ROM_SubmitQuest: #wantedQuest=" .. #wantedQuest);
-    for i=1,#wantedQuest do
-        local wq = wantedQuest[i];
-        local wd = wq.wantedData;
-        if wq.questListType == SceneQuest_pb.EQUESTLIST_COMPLETE then
-            -- find mission board 1016 location mapID 7
-            -- goto that location
-            -- submit it
-            LogDebug("Submitable quest found to submit");
-            ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_SUBMIT,wq.id);
-            return true;
-        end;
-    end;
-    LogDebug("Submitable quest not found to submit");
-    return false;
-end;
-
-
-function ROM_AcceptQuest()
-    local wantedQuest = QuestProxy.Instance:getWantedQuest();
-    LogDebug("ROM_AcceptQuest: #wantedQuest=" .. #wantedQuest);
-    for i=1,#wantedQuest do
-        local wq = wantedQuest[i];
-        local wd = wq.wantedData;
-        if wq.questListType == SceneQuest_pb.EQUESTLIST_CANACCEPT then
-            LogDebug(QuestToString(wq));
-            if wd.Content == "move" then
-                LogDebug("ROM_AcceptQuest move found");
-                ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,wq.id);
-                return true;
-            end;
-            if wd.Content == "kill" then
-                LogDebug("ROM_AcceptQuest kill found");
-                ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,wq.id);
-                return true;
-            end;
-            if wd.Content == "selfie" then
-                LogDebug("ROM_AcceptQuest selfie found");
-                ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,wq.id);
-                return true;
-            end;
-            if wd.Content == "remove_item" then
-                LogDebug("ROM_AcceptQuest collect found");
-                ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,wq.id);
-                return true;
-            end;
-            
-            
-            --LogDebug("Submitable quest found to submit");
-            --ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_SUBMIT,wq.id);
-        end;
-    end;
-    LogDebug("Accept quest quest not found to submit");
-    return false;
-    
-end;
-function ROM_GetAcceptedQuest()
-    local wantedQuest = QuestProxy.Instance:getWantedQuest();
-    for i=1,#wantedQuest do
-        local wq = wantedQuest[i];
-        local wd = wq.wantedData;
-        if wq.questListType == SceneQuest_pb.EQUESTLIST_ACCEPT then
-            return wq;
-        end;
-    end;
-    return nil;
-end;
-
-function ROM_WalkToNPC_OLD(mapID,npcID)
-    return ROM_WalkToNPC2(mapID,npcID);
---[[    
-    local mapid = Game.MapManager:GetMapID();
-    -- check mapID
-    if mapid ~= mapID then
-        LogDebug("ROM_WalkToNPC: wrong map current=" .. mapid .. " target=" .. mapID);
-        ROM_CommandGOTO(mapID);
-        return false;
-    end;    
-    -- check nearest NPC
-    LogDebug("ROM_WalkToNPC: MapID=" .. Game.MapManager:GetMapID() .. " [" .. Game.MapManager:GetMapName() .. "]");
-    local nearestNPC, nearestDist = ROM_GetNearestNPC();
-    if nearestNPC ~= nil then
-        if nearestNPC.data.staticData.id == npcID and  nearestDist < 5 then
-            LogDebug("ROM_WalkToNPC: End (target reach)");
-            return true;
-        end;
-    end;
-    -- walk to that NPC
-    local npc = ROM_GetNPCPointByID(npcID);
-    if npc ~= nil then
-        --LogDebug("Found npc);
-        --ListField(npcs,"",{}," "); 
-        LogDebug("ROM_WalkToNPC: same map " .. MyTostring(npc.position));
-        ROM_CommandGOTO(mapID,npc.position);
-        return false;
-    else
-        return false;
-    end;]]
-end;
 LogDebug("ROM Loaded 1.03");
 

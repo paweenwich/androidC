@@ -333,6 +333,43 @@ function DumpMonsters()
     end);    
 end;
 
+myButton = myButton or {};
+function CreateMyButton(text,pos,onclick)
+    if g_mainView == nil then 
+        LogDebug("CreateMyButton: g_mainView not found");
+        return nil 
+    end;
+    local templateButton = g_mainView:FindGO("RewardButton");
+    if templateButton == nil then 
+        LogDebug("CreateMyButton: RewardButton not found");
+        return nil 
+    end;
+    local uiCamera = NGUIUtil:GetCameraByLayername("UI");	
+    if uiCamera == nil then 
+        LogDebug("CreateMyButton: uiCamera not found");
+        return nil 
+    end;
+    local ret = myButton[text];
+    if ret == nil then
+        ret = GameObject.Instantiate(templateButton);
+        myButton[text] = ret;
+        ret:SetActive(false);
+        UIUtil.FindGO("Sprite",ret):SetActive(false);
+        local label = UIUtil.FindGO("Label",ret);
+        --LogDebug(MyTostring(label.transform.localPosition));
+        label.transform.localPosition = Vector3(0,0,0);
+        label:GetComponent(UILabel).text = text;
+        label:GetComponent(UILabel).effectColor = ColorUtil.NGUILabelBlueBlack;
+        label:GetComponent(UILabel).effectStyle = UILabel.Effect.None;
+        --ret.transform:SetParent(templateButton.transform.parent);
+        if pos~= nil then
+            ret.transform.position = uiCamera:ViewportToWorldPoint(pos);
+        end;
+    end;
+    return ret;
+end;
+
+
 if class ~= nil then
     if MyBot == nil then
         MyBot = class("MyBot");
@@ -606,6 +643,7 @@ if class ~= nil then
     
 end;
 
+
 function ROM_GetMonStatus(mon)
     local props = mon.data.props;
     local hp = props.Hp:GetValue();
@@ -843,6 +881,58 @@ function ROM_IsMonster(mon)
 	end;
 	return false;
 end;
+
+
+function ROM_GetNearestExitPoint()
+	local minDist = 100000;
+    local ret = nil;
+    local myPos = Game.Myself:GetPosition();
+	local exitPoints =  Game.MapManager:GetExitPointArray();	
+	tableForEach(exitPoints, function(i, v)
+		local distance = LuaVector3.Distance(myPos, v.position);
+        if distance < minDist then
+            ret = v;
+            minDist = distance;
+        end;
+	end);
+    return ret;	
+end;
+
+function ROM_GetNPCPointByID(npcID)
+    local npcList = Game.MapManager:GetNPCPointArray();
+    --LogDebug("" .. #npcList);
+    for i=1,#npcList do
+        local v = npcList[i];
+        if v and v.ID and v.position and v.uniqueID ~= 0 and v.ID == npcID then
+            local npcData = Table_Npc[v.ID];
+            if npcData  then
+                --LogDebug("" .. v.ID .. " " .. npcID);
+                --ListField(v,"",{}," ");
+                --ListField(npcData,"",{},"");
+                return v
+            end;
+            --return v;
+        end;
+    end;
+    return nil;
+end;    
+
+function ROM_GetNearestNPC()
+	local minDist = 100000;
+    local ret = nil;
+    local mons = ROM_GetAllNPC();
+    local myPos = Game.Myself:GetPosition();
+	--local exitPoints =  Game.MapManager:GetExitPointArray();	
+	tableForEach(mons, function(i, v)
+		local distance = LuaVector3.Distance(myPos, v:GetPosition());
+        if distance < minDist then
+            ret = v;
+            minDist = distance;
+        end;
+	end);
+    return ret,minDist;	
+end;
+
 
 if FunctionMonster ~= nil then
     function FunctionMonster:FilterMonster(ignoreSkill)
