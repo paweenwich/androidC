@@ -169,7 +169,7 @@ if MyTick ~= nil then
 	function MyTick:start()
 		if ROM_IsObjectInit(TimeTickManager) then
 			LogDebug("MyTick:start() " .. self.version);
-			self.timeTick = TimeTickManager.Me():CreateTick(0,2000,self.Tick,self);
+			self.timeTick = TimeTickManager.Me():CreateTick(0,10000,self.Tick,self);
             --EventManager.Me():AddEventListener(MyselfEvent.HpChange,self.onHPChange,self);
 			--LogDebug(MyTostring(self.timeTick));
 		end;
@@ -337,15 +337,15 @@ function ROM_Test(g)
 		--ListField(conf,"",{}," ");
 		local npcData = v.data.staticData;
 		local npcfunc = npcData.NpcFunction;
-		LogDebug(MyTostring(npcfunc));
+		--LogDebug(MyTostring(npcfunc));
 		for i=1,#npcfunc do
 			local single = npcfunc[i];
 			if(single.type)then
 				local funcCfg = Table_NpcFunction and Table_NpcFunction[single.type];
 				if(funcCfg and funcCfg.Type)then
-					LogDebug(" funcCfg.Type " .. MyTostring(funcCfg.Type));
+					--LogDebug(" funcCfg.Type " .. MyTostring(funcCfg.Type));
 					local configFunc = FunctionVisitNpc.SNpcFuncMap[funcCfg.Type]
-					LogDebug(" configFunc " .. MyTostring(configFunc));
+					--LogDebug(" configFunc " .. MyTostring(configFunc));
 					--if(configFunc and configFunc(npcfunc, target, events))then
 					--	return;
 					--end
@@ -354,10 +354,10 @@ function ROM_Test(g)
 		end
 		
 		local defaultDialogId = FunctionVisitNpc.GetDefaultDialog(v);
-		LogDebug(" npcData.DefaultDialog " .. MyTostring(npcData.DefaultDialog));
-		LogDebug(" defaultDialogId " .. MyTostring(defaultDialogId));
+		--LogDebug(" npcData.DefaultDialog " .. MyTostring(npcData.DefaultDialog));
+		--LogDebug(" defaultDialogId " .. MyTostring(defaultDialogId));
 		local needRequireNpcFunc = npcData.NeedRequireNpcFunction;
-		LogDebug(" needRequireNpcFunc " .. MyTostring(needRequireNpcFunc));
+		--LogDebug(" needRequireNpcFunc " .. MyTostring(needRequireNpcFunc));
     --end);
 	end;
     LogDebug("Monster");
@@ -365,14 +365,14 @@ function ROM_Test(g)
     tableForEach(mons,function(i,v)
         LogDebug(MonsterToString(v));
     end);
-    
+	
     local npcList = Game.MapManager:GetNPCPointArray();
 	LogDebug("npcList=" .. #npcList);
     tableForEach(npcList, function(i, v)
         if(v and v.ID and v.position)then
             local npcData = Table_Npc[v.ID];
             if npcData  then
-                LogDebug(MyTostring(npcData));
+                --LogDebug(MyTostring(npcData));
             end;
         end;
     end);
@@ -437,7 +437,7 @@ function ROM_Test(g)
 	
 	--local nearestNPC, nearestDist = ROM_GetNearestNPC();	
 	--ListField(nearestNPC,"",{},"");
-	ROM_ClickNearestNPC(true);
+	--ROM_ClickNearestNPC(true);
 	--[[ROM_ClickNearestNPC();
     ROM_DelayCall(5000,
         function(param) 
@@ -449,6 +449,63 @@ function ROM_Test(g)
         end,
     nil);]]
 	--ListField(UIManagerProxy.Instance,"",{}," ");
+	local filenames = {
+"AScript_FrameWork_Proxy_Service_auto_ServiceAchieveCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceActivityCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceActivityEventAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceAstrolabeCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceAuctionCCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceAuthorizeAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceBossCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceCarrierCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceChatCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceChatRoomAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceDojoAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceErrorUserCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceFuBenCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceGuildCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceInfiniteTowerAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceItemAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceLoginUserCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceMapAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceMatchCCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceNUserAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceOverseasTaiwanCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServicePhotoCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServicePveCardAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceQuestAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceRecordTradeAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceSceneAuguryAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceSceneBeingAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceSceneFoodAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceSceneInterlocutionAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceSceneManualAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceScenePetAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceSceneSealAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceSceneTipAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceSessionMailAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceSessionShopAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceSessionSocialityAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceSessionTeamAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceSkillAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceTeamRaidCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceTutorAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceUserEventAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceWeatherAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_auto_ServiceWeddingCCmdAutoProxy.lua",
+"AScript_FrameWork_Proxy_Service_ServicePlayerProxy.lua",
+"AScript_FrameWork_Proxy_Service_ServiceNpcProxy.lua",
+"AScript_FrameWork_Proxy_Service_ServiceSceneProxy.lua",
+	};
+	local out = "";
+	for i=1,#filenames do
+		local fileName = filenames[i];
+		local tmp = ROM_CreatePacketCommandFromFile("/data/local/tmp/loadbufferx/" .. fileName);
+		if tmp ~= "" then
+			out = out .. "\n" .. tmp;
+		end;
+	end;
+	LogDebug("\n" .. out);
     UIUtil.FloatMsgByText("Test Done");	
     if true then
         return;
@@ -519,35 +576,39 @@ function ROM_MyTick()
         if myTick:isStart() then
             myTick:stop();
             uiLabel.effectStyle = UILabel.Effect.None;
-			GameFacade.Instance.sendNotification = GameFacade.Instance._sendNotification;
+			--GameFacade.Instance.sendNotification = GameFacade.Instance._sendNotification;
             --FunctionVisitNpc.openWantedQuestPanel = FunctionVisitNpc._openWantedQuestPanel
-			FunctionVisitNpc.me.AccessTarget = FunctionVisitNpc.me._AccessTarget;
+			--FunctionVisitNpc.me.AccessTarget = FunctionVisitNpc.me._AccessTarget;
+			--ROM_UnHookFunc(FunctionVisitNpc.me,"AccessTarget");
             ROM_UnHookFunc(NetProtocol,"SendProto");
             ROM_UnHookFunc(NetProtocol,"Send");
-			LogDebug("restore = " .. tostring(GameFacade.Instance.sendNotification));
+			ROM_UnHookFunc(NetProtocol,"DispatchListener");
+			LogDebug("UnHook done");
             
         else
             myTick:start();
             uiLabel.effectColor = ColorUtil.NGUILabelRed;
             uiLabel.effectStyle = UILabel.Effect.Outline;
 			
-			GameFacade.Instance._sendNotification = GameFacade.Instance.sendNotification;
-			GameFacade.Instance.sendNotification = HOOK_SendNotification;
-			LogDebug("sendNotification org = " .. tostring(GameFacade.Instance._sendNotification));
-			LogDebug("sendNotification new = " .. tostring(GameFacade.Instance.sendNotification));
+			--GameFacade.Instance._sendNotification = GameFacade.Instance.sendNotification;
+			--GameFacade.Instance.sendNotification = HOOK_SendNotification;
+			--LogDebug("sendNotification org = " .. tostring(GameFacade.Instance._sendNotification));
+			--LogDebug("sendNotification new = " .. tostring(GameFacade.Instance.sendNotification));
 			--LogDebug(tostring(GameFacade.Instance.sendNotification));
             
             --FunctionVisitNpc._openWantedQuestPanel = FunctionVisitNpc.openWantedQuestPanel;
             --FunctionVisitNpc.openWantedQuestPanel = HOOK_openWantedQuestPanel;
 			--GameFacade.Instance:sendNotification(UIEvent.ShowUI, viewdata );	
-			FunctionVisitNpc.me._AccessTarget = FunctionVisitNpc.me.AccessTarget;
-			FunctionVisitNpc.me.AccessTarget = HOOK_AccessTarget;
-            
+			--FunctionVisitNpc.me._AccessTarget = FunctionVisitNpc.me.AccessTarget;
+			--FunctionVisitNpc.me.AccessTarget = HOOK_AccessTarget;
+            --ROM_HookFunc(FunctionVisitNpc.me,"AccessTarget",HOOK_AccessTarget);
             ROM_HookFunc(NetProtocol,"SendProto",HOOK_SendProto);
             ROM_HookFunc(NetProtocol,"Send",HOOK_Send);
-			LogDebug("AccessTarget org = " .. tostring(FunctionVisitNpc.me._AccessTarget));
-			LogDebug("AccessTarget new = " .. tostring(FunctionVisitNpc.me.AccessTarget));
-            
+			ROM_HookFunc(NetProtocol,"DispatchListener",HOOK_NetProtocol_DispatchListener);
+			
+			--LogDebug("AccessTarget org = " .. tostring(FunctionVisitNpc.me._AccessTarget));
+			--LogDebug("AccessTarget new = " .. tostring(FunctionVisitNpc.me.AccessTarget));
+            LogDebug("Hook done");
 
 			
         end
@@ -894,6 +955,28 @@ if g_mainView ~= nil then
 		end;
 	end;
 end;
+--[[
+	self:Listen(9, 89, function (data)
+		self:RecvActivityNtfUserCmd(data) 
+	end)
+]]	
+function ROM_CreatePacketCommandFromFile(fileName)
+	local lines = lines_from(fileName);
+	LogDebug("ROM_CreatePacketCommandFromFile " .. fileName .. " lines=" .. #lines);
+	local ret = "";
+	for i=1,#lines do
+		local line = lines[i];
+		local id1,id2 = string.match(line, 'self:Listen%((%d+)%s*,%s*(%d+)');
+		if id1 ~= nil then
+			line2 = lines[i+1];
+			local funcName = string.match(line2, 'self:(%a+)%(');
+			ret = ret .. "{" .. tostring(id1) .. "," .. tostring(id2) .. ",\"" .. tostring(funcName) .. "\"},\n"; 
+		end;
+	end;
+	--logDebug("\n" .. ret);
+	return ret;
+end;
+
 
 LogDebug("ROM Loaded 1.03");
 
