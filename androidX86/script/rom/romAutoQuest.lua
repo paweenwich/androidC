@@ -284,6 +284,7 @@ function ROM_DoAutoQuest()
 				FunctionVisitNpc.openWantedQuestPanel( 101, nearestNPC);
 				if ROM_SubmitQuest() == false then
 					ROM_AcceptQuest();
+					
 				end;
 			end;
 		else
@@ -294,8 +295,11 @@ function ROM_DoAutoQuest()
 				if q.wantedData.MapId ~= nil then
 					ROM_WalkToNPC(q.wantedData.MapId,q.params.npc,
 						function()
-							local nearestNPC, nearestDist = ROM_GetNearestNPC();
-							Game.Myself:Client_LockTarget(nearestNPC);
+							--local nearestNPC, nearestDist = ROM_GetNearestNPC();
+							--Game.Myself:Client_LockTarget(nearestNPC);
+							LogDebug("ROM_DoAutoQuest: click");
+							ROM_ClickNearestNPC();
+							FunctionVisitNpc.me:AccessTarget(nil, nil, nil);		
 						end
 					);
 				else
@@ -356,7 +360,7 @@ function ROM_DoAutoQuest()
 			--Game.Myself:Client_LockTarget(nearestNPC);
 			if ROM_SubmitQuest() == false then
 				ROM_AcceptQuest();
-				FunctionVisitNpc.me:AccessTarget(nil, nil, nil);
+				--FunctionVisitNpc.me:AccessTarget(nil, nil, nil);
 			end;
 		end;
 	end;
