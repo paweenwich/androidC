@@ -435,11 +435,20 @@ function ROM_Test(g)
 	--local npcData = Table_Npc[1016];
 	--ListField(npcData,"",{}," ");
 	
-	local nearestNPC, nearestDist = ROM_GetNearestNPC();	
-	ListField(nearestNPC,"",{},"");
-	
-	ROM_ClickNearestNPC();
-	
+	--local nearestNPC, nearestDist = ROM_GetNearestNPC();	
+	--ListField(nearestNPC,"",{},"");
+	ROM_ClickNearestNPC(true);
+	--[[ROM_ClickNearestNPC();
+    ROM_DelayCall(5000,
+        function(param) 
+            LogDebug("Called");
+            --GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
+            GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.NormalLayer)
+            
+            --FunctionVisitNpc.me:AccessTarget(nil, nil, nil);            
+        end,
+    nil);]]
+	--ListField(UIManagerProxy.Instance,"",{}," ");
     UIUtil.FloatMsgByText("Test Done");	
     if true then
         return;
@@ -513,7 +522,10 @@ function ROM_MyTick()
 			GameFacade.Instance.sendNotification = GameFacade.Instance._sendNotification;
             --FunctionVisitNpc.openWantedQuestPanel = FunctionVisitNpc._openWantedQuestPanel
 			FunctionVisitNpc.me.AccessTarget = FunctionVisitNpc.me._AccessTarget;
+            ROM_UnHookFunc(NetProtocol,"SendProto");
+            ROM_UnHookFunc(NetProtocol,"Send");
 			LogDebug("restore = " .. tostring(GameFacade.Instance.sendNotification));
+            
         else
             myTick:start();
             uiLabel.effectColor = ColorUtil.NGUILabelRed;
@@ -530,8 +542,13 @@ function ROM_MyTick()
 			--GameFacade.Instance:sendNotification(UIEvent.ShowUI, viewdata );	
 			FunctionVisitNpc.me._AccessTarget = FunctionVisitNpc.me.AccessTarget;
 			FunctionVisitNpc.me.AccessTarget = HOOK_AccessTarget;
+            
+            ROM_HookFunc(NetProtocol,"SendProto",HOOK_SendProto);
+            ROM_HookFunc(NetProtocol,"Send",HOOK_Send);
 			LogDebug("AccessTarget org = " .. tostring(FunctionVisitNpc.me._AccessTarget));
 			LogDebug("AccessTarget new = " .. tostring(FunctionVisitNpc.me.AccessTarget));
+            
+
 			
         end
     end;

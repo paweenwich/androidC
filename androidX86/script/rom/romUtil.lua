@@ -174,7 +174,11 @@ function MyTostring(value,level)
       if ((tonumber(fieldName)) and (tonumber(fieldName) > 0)) then
         entry = MyTostring(value[tonumber(fieldName)],level + 1)
       else
-        entry = fieldName.." = ".. MyTostring(value[fieldName], level + 1)
+        if (type(fieldName) == 'string') then
+            entry = fieldName .." = ".. MyTostring(value[fieldName], level + 1)
+        else
+            entry = tostring(fieldName); --.." = ".. MyTostring(value[fieldName], level + 1)
+        end;
       end
       str = str..separator..entry
       separator = ", "
@@ -931,6 +935,34 @@ function ROM_GetNearestNPC()
         end;
 	end);
     return ret,minDist;	
+end;
+
+if objDelayCal == nil then
+    objDelayCal = {};
+end;
+function ROM_DelayCall(delayTime,func,param,index)
+    index = index or 1;
+    TimeTickManager.Me():ClearTick(objDelayCal, index);
+    TimeTickManager.Me():CreateTick(delayTime, 33, function (self, deltatime)
+        LogDebug("ROM_DelayCall: " .. deltatime);
+        TimeTickManager.Me():ClearTick(self, index);
+        if func ~= nil then
+            func(param);
+        end;
+    end, objDelayCal, index);
+end;
+
+function ROM_HookFunc(obj,method,newFunc)
+    if obj~= nil then
+        obj["_" .. method] = obj[method];
+        obj[method] = newFunc;
+    end;
+    --NetProtocol.SendProto(data)
+end;
+function ROM_UnHookFunc(obj,method)
+    if obj~= nil then
+        obj[method] = obj["_" .. method];
+    end;
 end;
 
 

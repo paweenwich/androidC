@@ -307,3 +307,6 @@ AI_CMD_Myself_Skill
 
 Login Screen
     D/Hook    (11075): Save /data/local/tmp/loadbufferx/AScript_FrameWork_GUI_view_UIBlackScreen success
+
+
+ServiceGMProxy
