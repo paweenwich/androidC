@@ -340,6 +340,28 @@ function ROM_Heal(tab)
     return false;			
 end;
 
+function ROM_WillTurnSuccess(skillAndLevel,targetUser)
+    local skillID, skillLevel = CommonFun.UnmergeSkillID(skillAndLevel);
+    local srcUser = Game.Myself.data;
+    local Luk=srcUser:GetProperty("Luk");
+    local Int=srcUser:GetProperty("Int");
+    local BaseLv = srcUser.BaseLv;
+    local Hp=targetUser:GetProperty("Hp");
+    local MaxHp=targetUser:GetProperty("MaxHp");
+    local rate = ((20*skillLevel+Luk+Int+BaseLv+(1-Hp/MaxHp)*200)/10);
+    if rate >=70 then
+        rate=70
+    end   
+    local saveIndex = Game.Myself.data.randomFunc.index;
+    -- make some adjusr for index seem to need + 1
+    srcUser:GetRandom();
+    local randValue =  srcUser:GetRandom();
+    local ret = CommonFun.IsInRate(rate, randValue);
+    Game.Myself.data.randomFunc.index = saveIndex;
+    LogDebug("ROM_WillTurnSuccess rand=" .. randValue .. " rate=" .. rate .. " return=" .. tostring(ret));
+    return ret;
+end;
+
 function ROM_TurnUndead(tab)
     local skillInfo = ROM_GetMySkillInfoByName(tab.name);
     if skillInfo == nil then return false end;
@@ -366,20 +388,26 @@ function ROM_TurnUndead(tab)
 				local monStatus = ROM_GetMonStatus(npc);
 				if monStatus ~= nil then
 					if monStatus.frachp > (tab.frachp or 0.9) then
-						--Game.Myself.data.randomFunc.index = 20;					
-						Game.Myself:Client_UseSkill(skillID, npc,nil,nil,true);
-						return true;
+						--Game.Myself.data.randomFunc.index = 20;			
+                        local willHit = ROM_WillTurnSuccess(skillID,npc.data);
+                        if willHit then
+                            LogDebug("Game.Myself:Client_UseSkill rand index=" .. Game.Myself.data.randomFunc.index .. ' willHit=' .. tostring(willHit));
+                            Game.Myself:Client_UseSkill(skillID, npc,nil,nil,true);
+                            return true;
+                        else    
+                            LogDebug("ROM_TurnUndead: skip by willhit");
+                        end;
 					else	
-						LogDebug("ROM_TurnUndead: Monster frachp > ");
+						--LogDebug("ROM_TurnUndead: Monster frachp > ");
 					end;
 				else	
-					LogDebug("ROM_TurnUndead: Monster status not found");
+					--LogDebug("ROM_TurnUndead: Monster status not found");
 				end;
 			else	
-				LogDebug("ROM_TurnUndead: Monster is not undead " .. npc.data.staticData.Race);
+				--LogDebug("ROM_TurnUndead: Monster is not undead " .. npc.data.staticData.Race);
 			end;
         else
-            LogDebug("ROM_TurnUndead: Monster not found");
+            --LogDebug("ROM_TurnUndead: Monster not found");
         end;
     else
         LogDebug("ROM_TurnUndead: Not enough SP");
@@ -387,6 +415,29 @@ function ROM_TurnUndead(tab)
     return false;			
 end;
 
+function ROM_WalkToRange(tab)
+    local range = tab.range or 6;
+    
+    local npc = ROM_GetMonsterLockTarget();
+    if npc == nil then
+        npc = ROM_FindBestMonster();
+    end;
+    if npc ~= nil then
+        --ListField(npc,"",{},"  ");  
+        local myPos = Game.Myself:GetPosition();
+        local targetPosition = npc:GetPosition();
+        local distance = LuaVector3.Distance(myPos, targetPosition);
+        LogDebug("ROM_WalkToRange: dist=" .. distance);
+        if distance > range then
+            LogDebug("ROM_WalkToRange walk to target");
+            Game.Myself:Client_MoveTo(targetPosition, nil, nil, nil, nil, 6);
+            return true;
+        end;
+    else
+        --LogDebug("npc is null");
+    end;
+    return false;
+end;
 
 myMonsterList = {
 --[[
@@ -423,9 +474,9 @@ myAIRules = {
 	{name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
 	{name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
 	{name="Heal", func=ROM_Heal,frachp=0.6},  -- bless    
-	{name="Turn", func=ROM_TurnUndead, frachp=0.8},  -- holy
-    {name="Holy Light Strike", func=ROM_SkillTarget},  -- holy
-	
+	{name="Turn", func=ROM_TurnUndead, frachp=0.8},  
+    {name="Holy Light Strike", func=ROM_SkillTarget},  
+	{name="WalkToRange", func=ROM_WalkToRange,range=6},  
 	
 };
 
@@ -589,7 +640,7 @@ function ROM_Test(g)
 		--ListField(BagProxy.Instance,"",{}," ");
 		--BagProxy.Instance:GetAllItemNumByStaticID(staticID);
 		--LogDebug("randomFunc.index=" .. Game.Myself.data.randomFunc.index);
-		--ListField(Game.Myself.data.randomFunc,"",{}," ");
+		ListField(Game.Myself.data.randomFunc,"",{}," ");
 		UIUtil.FloatMsgByText("Test Done 1");	
 		
     if true then
@@ -817,6 +868,7 @@ function ROM_CommandVisitMonster(mapID,monID)
 		for i=1,#oriMonster do
 			if(oriMonster[i].mapID == mapID)then
 				oriPos = oriMonster[i].pos;
+                break;
 			end
 		end
 		if(oriPos)then
@@ -838,6 +890,21 @@ function ROM_CommandVisitMonster(mapID,monID)
 									return 
 								end;
 							end;
+                            if  q.params.npc ~= nil then
+                                LogDebug("ROM_CommandVisitMonster walk to npc");
+                                ROM_WalkToNPC(q.map,q.params.npc,
+                                    function()
+                                        local nearestNPC, nearestDist = ROM_GetNearestNPC();
+                                        --Game.Myself:Client_LockTarget(nearestNPC);
+                                        LogDebug("ROM_DoAutoQuest: remove_item click");
+                                        ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
+                                        ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
+                                        GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
+                                        LogDebug(QuestToString(q));
+                                        ROM_ClickNearestNPC(true);
+                                    end
+                                );
+                            end;
                             LogDebug("Quest done");
                             --ROM_WalkToNPC(mapID,1016);
                             ROM_WalkToBoard();

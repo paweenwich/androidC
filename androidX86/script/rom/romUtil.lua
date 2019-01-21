@@ -647,7 +647,25 @@ if class ~= nil then
                     return true;
                 end;
             end;        
-            LogDebug("AutoAI_Rom:Prepare() nothing to do");
+            -- this might do to skill delay 
+            -- so walk to monster
+            --[[
+            local npc = ROM_FindBestMonster();
+            if npc ~= nil then
+                --ListField(npc,"",{},"  ");  
+                local myPos = Game.Myself:GetPosition();
+                local targetPosition = npc:GetPosition();
+                local distance = LuaVector3.Distance(myPos, targetPosition);
+                LogDebug("npc pos=" .. tostring(targetPosition) .. " dist=" .. distance);
+                if distance > 6 then
+                    LogDebug("AutoAI_Rom:Prepare() walk to target");
+                    Game.Myself:Client_MoveTo(targetPosition, nil, nil, nil, nil, 6);
+                    return true;
+                end;
+            else
+                LogDebug("npc is null");
+            end;]]
+            LogDebug("AutoAI_Rom:Prepare() nothing to do!");
             -- nothing to do
             self.nextUpdateTime = time + 1.0;
         end;

@@ -981,9 +981,11 @@ end;
 if CommonFun ~= nil then
 	function CommonFun.CalcDamage(srcUser, targetUser, params, logger)
 	  -- 基础伤害计算
+      local indexBefore = Game.Myself.data.randomFunc.index;
 	  local damage, damagetype = CommonFun.CalcBaseDamage(srcUser, targetUser, params, logger)
 	  local sharedam = nil
-	  LogDebug("CalcDamage " .. damage .. ' ' .. tostring(damagetype) .. ' ' .. Game.Myself.data.randomFunc.index);
+	  LogDebug("CalcDamage " .. damage .. ' ' .. tostring(damagetype) .. ' before='  .. indexBefore .. ' after=' .. Game.Myself.data.randomFunc.index);
+      --ListField(srcUser.randomFunc,"",{}," ");
 	  --damage = 0;
 	  -- 承担伤害计算
 	  if damage > 0 then
@@ -1083,12 +1085,15 @@ if CommonFun ~= nil then
         if rate >=70 then
             rate=70
         end   
+        local beforeIndex = Game.Myself.data.randomFunc.index;
         local randValue =  srcUser:GetRandom();
-		LogDebug("rate=" .. rate .. ' randValue=' .. randValue);		
-		--[[while randValue > rate do
-			randValue =  srcUser:GetRandom();
-			LogDebug("rate=" .. rate .. ' randValue=' .. randValue);					
-		end;]]
+		LogDebug("rate=" .. rate .. ' randValue=' .. randValue .. ' beforeIndex=' .. beforeIndex);		
+		--while randValue > rate do
+        --    beforeIndex = Game.Myself.data.randomFunc.index;
+		--	randValue =  srcUser:GetRandom();
+		--	LogDebug("rate=" .. rate .. ' randValue=' .. randValue .. ' beforeIndex=' .. beforeIndex);
+		--end;
+        --Game.Myself.data.randomFunc.index = beforeIndex;
 		
         if CommonFun.IsInRate(rate, randValue) then
 			LogDebug("HIT");
@@ -1673,6 +1678,17 @@ if CommonFun ~= nil then
 end
 
 
+end;
+
+if AI_CMD_Myself_MoveToHelper~= nil then
+    function AI_CMD_Myself_MoveToHelper.Update(self, time, deltaTime, creature, ignoreNavMesh,range)
+        if creature.data:NoMove() then
+            self:End(time, deltaTime, creature)
+            self:SetKeepAlive(true)
+            return false
+        end
+        return AI_CMD_MoveToHelper.Update(self, time, deltaTime, creature, ignoreNavMesh,range)
+    end
 end;
 --[[
 
