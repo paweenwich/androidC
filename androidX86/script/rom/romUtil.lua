@@ -33,7 +33,12 @@ function lines_from(file)
   return lines
 end
 
-
+function singleLine(data)
+	local line = string.gsub(tostring(data), "\n", " ");
+	line = string.gsub(line, "\r", " ");
+	line = string.gsub(line, "%s+", " ");
+	return line;
+end;
 
 
 function GameObjectToString(go,tab,visible)
@@ -292,8 +297,10 @@ function QuestToString(wq)
     if wq.questListType == SceneQuest_pb.EQUESTLIST_COMPLETE then listType = "EQUESTLIST_COMPLETE" end;
     if wq.questListType == SceneQuest_pb.EQUESTLIST_SUBMIT then listType = "EQUESTLIST_SUBMIT" end;
     local info = QuestDataUtil.parseWantedQuestTranceInfo(wq,wd);
-
-    return "id=" .. wd.id .. " Target=[" .. wd.Target .. "] MapId=" .. wd.MapId .. " NpcId=" .. wd.NpcId .. " questListType=" .. listType .. " Content=" .. wd.Content .. " info=[" .. info .. "]";
+	local ret = "id=" .. wd.id .. " Target=[" .. wd.Target .. "] MapId=" .. wd.MapId .. " NpcId=" .. wd.NpcId .. " questListType=" .. listType .. " Content=" .. wd.Content .. " info=[" .. info .. "]";
+	local steps = wq.steps or {};	
+	ret = ret .. " step=" .. (wq.step or 0) .. "/" .. #steps;
+    return ret;
 end;
 
 
@@ -303,7 +310,11 @@ function MonsterToString(m)
 	--if  m.data.props ~= nil then
 	    local props = m.data.props;
 		local hp = props.Hp:GetValue();
-		return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp;	
+		if m.data.staticData ~= nil then
+			return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race;	
+		else
+			return "ID=" .. m.data.id .. 'PLAYER HP=' .. stat.hp;			
+		end;
 	--else
 	--	return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type;	
 	--end;
@@ -602,7 +613,7 @@ if class ~= nil then
 
 	function AutoAI_Rom:ctor()
         self.enable = false;
-		self.UpdateInterval = 0;
+		self.UpdateInterval = 0.5;
 		self.nextUpdateTime = 0
 		LogDebug("AutoAI_Rom:ctor()");
 	end
@@ -842,8 +853,9 @@ end;
 
 function ROM_FindMiniBoss(tab)
     local filterFunc = function(mon)
+		local stat = ROM_GetMonStatus(mon);
 		--LogDebug("ROM_FindMiniBoss " ..  MonsterToString(mon));
-        return mon.data.staticData.Type == "MINI";
+        return mon.data.staticData.Type == "MINI" and stat.hp > 0;
     end;
     return ROM_FindMonByFilter(filterFunc,"ROM_FindMiniBoss");
 end;
@@ -981,6 +993,83 @@ function ROM_UnHookFunc(obj,method)
     end;
 end;
 
+function ROM_CreatePacketCommand()
+	local filenames = {
+		"AScript_FrameWork_Proxy_Service_auto_ServiceAchieveCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceActivityCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceActivityEventAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceAstrolabeCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceAuctionCCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceAuthorizeAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceBossCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceCarrierCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceChatCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceChatRoomAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceDojoAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceErrorUserCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceFuBenCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceGuildCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceInfiniteTowerAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceItemAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceLoginUserCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceMapAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceMatchCCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceNUserAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceOverseasTaiwanCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServicePhotoCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServicePveCardAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceQuestAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceRecordTradeAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceSceneAuguryAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceSceneBeingAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceSceneFoodAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceSceneInterlocutionAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceSceneManualAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceScenePetAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceSceneSealAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceSceneTipAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceSessionMailAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceSessionShopAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceSessionSocialityAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceSessionTeamAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceSkillAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceTeamRaidCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceTutorAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceUserEventAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceWeatherAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_auto_ServiceWeddingCCmdAutoProxy.lua",
+		"AScript_FrameWork_Proxy_Service_ServicePlayerProxy.lua",
+		"AScript_FrameWork_Proxy_Service_ServiceNpcProxy.lua",
+		"AScript_FrameWork_Proxy_Service_ServiceSceneProxy.lua",
+	};
+	local out = "";
+	for i=1,#filenames do
+		local fileName = filenames[i];
+		local tmp = ROM_CreatePacketCommandFromFile("/data/local/tmp/loadbufferx/" .. fileName);
+		if tmp ~= "" then
+			out = out .. "\n" .. tmp;
+		end;
+	end;
+	LogDebug("\n" .. out);
+end;
+
+function ROM_CreatePacketCommandFromFile(fileName)
+	local lines = lines_from(fileName);
+	LogDebug("ROM_CreatePacketCommandFromFile " .. fileName .. " lines=" .. #lines);
+	local ret = "";
+	for i=1,#lines do
+		local line = lines[i];
+		local id1,id2 = string.match(line, 'self:Listen%((%d+)%s*,%s*(%d+)');
+		if id1 ~= nil then
+			line2 = lines[i+1];
+			local funcName = string.match(line2, 'self:(%a+)%(');
+			ret = ret .. "{" .. tostring(id1) .. "," .. tostring(id2) .. ",\"" .. tostring(funcName) .. "\"},\n"; 
+		end;
+	end;
+	--logDebug("\n" .. ret);
+	return ret;
+end;
+
 
 if FunctionMonster ~= nil then
     function FunctionMonster:FilterMonster(ignoreSkill)
@@ -1017,21 +1106,5 @@ if FunctionMonster ~= nil then
     end
 end;
 
---[[
-UIUtil.WarnPopup("Title","Text",
-	function(obj) 
-		LogDebug("OK" .. tostring(obj));--ListField(obj,"",{}," ");
-	end,
-	function(obj) 
-		LogDebug("Cancel" .. tostring(obj));--ListField(obj,"",{}," ");
-	end,
-	g_mainView,"OK","Cancel");
-]]	
 
---[[
-local msg = {text = "text",title = "title"};
-GameFacade.Instance:sendNotification(UIEvent.CloseUI, {viewname = "PopUp10View"});
-GameFacade.Instance:sendNotification(UIEvent.ShowUI, {viewname = "PopUp10View"});
-GameFacade.Instance:sendNotification(SystemMsgEvent.MenuMsg,msg);
-]]
 

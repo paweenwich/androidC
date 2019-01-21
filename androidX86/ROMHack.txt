@@ -310,3 +310,5 @@ Login Screen
 
 
 ServiceGMProxy
+
+ServiceManualProxy inherited from ServiceAutoProxy

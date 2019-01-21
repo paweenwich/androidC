@@ -74,7 +74,7 @@ function ROM_WalkToBoard()
 	tempArgs.targetMapID = 16;
 	tempArgs.showClickGround = true;
 	tempArgs.allowExitPoint = true;
-    tempArgs.callback = function(cmd, event)
+--[[    tempArgs.callback = function(cmd, event)
         LogDebug("cmd=" .. MyTostring(cmd));
         LogDebug("event=" .. MyTostring(event));
         if 2 == event then
@@ -82,7 +82,7 @@ function ROM_WalkToBoard()
             --ROM_WalkToNPC(Game.MapManager:GetMapID(),boardNPC);
             ROM_WalkToBoard();
         end
-    end
+    end]]
 	local cmd = MissionCommandFactory.CreateCommand(tempArgs, MissionCommandMove);
 	if(cmd)then
         LogDebug("ROM_WalkToBoard: Client_SetMissionCommand");
@@ -154,8 +154,7 @@ end;
 
 function ROM_DumpWantedQuest()
     local wantedQuest = QuestProxy.Instance:getWantedQuest();
-    LogDebug('----------- wantedQuest	 -------------');
-    --
+    LogDebug('----------- wantedQuest ' .. #wantedQuest .. '-------------');
     for i=1,#wantedQuest do
         local wq = wantedQuest[i];
 --[[        local wd = wq.wantedData;
@@ -184,13 +183,18 @@ function ROM_SubmitQuest()
         local wq = wantedQuest[i];
         local wd = wq.wantedData;
         if wq.questListType == SceneQuest_pb.EQUESTLIST_COMPLETE then
-            -- find mission board 1016 location mapID 7
-            -- goto that location
-            -- submit it
-            LogDebug("Submitable quest found to submit");
-            ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_SUBMIT,wq.id);
+            LogDebug("Submitable quest found to submit " .. wd.id);
+            ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_SUBMIT,wd.id);
             return true;
         end;
+		--[[
+		local traceInfo = wq.traceInfo or "";
+		--LogDebug("traceInfot " .. traceInfo );
+		if string.match(traceInfo, "Mission Board") then	
+            LogDebug("Submitable quest found (traceinfo) to submit " .. wd.id);
+            ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_SUBMIT,wd.id);
+            return true;
+		end;]]
     end;
     LogDebug("Submitable quest not found to submit");
     return false;
@@ -200,40 +204,23 @@ end;
 function ROM_AcceptQuest()
     local wantedQuest = QuestProxy.Instance:getWantedQuest();
     local maxWanted = QuestProxy.Instance:getMaxWanted();
-    local submitCount = MyselfProxy.Instance:getVarValueByType(Var_pb.EVARTYPE_QUEST_WANTED);
+    local submitCount = MyselfProxy.Instance:getVarValueByType(Var_pb.EVARTYPE_QUEST_WANTED) or 0;
     LogDebug("ROM_AcceptQuest: #wantedQuest=" .. #wantedQuest .. " maxWanted=" .. maxWanted .. " submitCount=" .. submitCount);
-	local contents = {"move","kill","selfie","remove_item","gather"};
+	local contents = {"move","kill","gather","selfie","remove_item","visit"};
 	for j=1,#contents do
 		local content = contents[j];
 		for i=1,#wantedQuest do
 			local wq = wantedQuest[i];
 			local wd = wq.wantedData;
+			--LogDebug("ROM_AcceptQuest: " .. QuestToString(wq));
 			if wq.questListType == SceneQuest_pb.EQUESTLIST_CANACCEPT then
-				LogDebug(QuestToString(wq));
+				LogDebug("ROM_AcceptQuest: Check canaccept " .. QuestToString(wq));
+				
 				if wd.Content == content then
-					LogDebug("ROM_AcceptQuest: found " .. content);
-					ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,wq.id);
+					LogDebug("ROM_AcceptQuest: Found " .. QuestToString(wq) .. ' ' .. wd.id);
+					ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,wd.id);
 					return true;
 				end;
---[[				if wd.Content == "kill" then
-					LogDebug("ROM_AcceptQuest kill found");
-					ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,wq.id);
-					return true;
-				end;
-				if wd.Content == "selfie" then
-					LogDebug("ROM_AcceptQuest selfie found");
-					ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,wq.id);
-					return true;
-				end;
-				if wd.Content == "remove_item" then
-					LogDebug("ROM_AcceptQuest collect found");
-					ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,wq.id);
-					return true;
-				end;]]
-				
-				
-				--LogDebug("Submitable quest found to submit");
-				--ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_SUBMIT,wq.id);
 			end;
 		end;
 	end;
@@ -263,7 +250,8 @@ function ROM_ClickNearestNPC(autoClose)
 	if nearestNPC ~= nil then
         LogDebug("ROM_ClickNearestNPC: " .. MonsterToString(nearestNPC) .. ' ' .. nearestDist);
 		Game.Myself:Client_LockTarget(nearestNPC);
-		FunctionVisitNpc.me:AccessTarget(nearestNPC, nil, nil);
+		--FunctionVisitNpc.me:AccessTarget(nearestNPC, nil, nil);
+		Game.Myself:Client_AccessTarget(nearestNPC);
         if autoClose then
             ROM_DelayCall(5000,
                 function(param) 
@@ -273,6 +261,7 @@ function ROM_ClickNearestNPC(autoClose)
                     else
                         GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
                     end;
+					ServiceQuestProxy.Instance:CallQuestList(SceneQuest_pb.EQUESTLIST_CANACCEPT,101);
                     --FunctionVisitNpc.me:AccessTarget(nil, nil, nil);            
                 end,
             nil);
@@ -287,10 +276,16 @@ function ROM_DoAutoQuest()
 	local myPos = Game.Myself:GetPosition();
 	local nearestNPC, nearestDist = ROM_GetNearestNPC();
     local maxQuestWanted = QuestProxy.Instance:getMaxWanted();
+	local wantedQuest = QuestProxy.Instance:getWantedQuest();
+    local submitCount = MyselfProxy.Instance:getVarValueByType(Var_pb.EVARTYPE_QUEST_WANTED) or 0;	
 	if nearestNPC ~= nil  then
 		LogDebug("ROM_DoAutoQuest: NeartesNPC=" .. MonsterToString(nearestNPC) .. ' ' .. nearestDist);
 	end;
-    LogDebug("ROM_DoAutoQuest: maxQuestWanted=" .. maxQuestWanted);
+    LogDebug("ROM_DoAutoQuest: maxQuestWanted=" .. maxQuestWanted .. " #wantedQuest=" .. #wantedQuest .. " submitCount=" .. submitCount);
+	if submitCount >= maxQuestWanted then
+		LogDebug("ROM_DoAutoQuest no quest left");
+		UIUtil.FloatMsgByText("AutoQuest Done");			
+	end;
 	-- check if we have quest that can be accept
 	local q = ROM_GetAcceptedQuest();
 	if q ~= nil then
@@ -302,13 +297,11 @@ function ROM_DoAutoQuest()
 			LogDebug("Mission complete walk to board");
 			if ROM_WalkToBoard() then
 				-- near board
-				LogDebug("Near board");
+				--LogDebug("Near board submit");
+				--ROM_SubmitQuest();
+				--LogDebug("Near board refresh");
+				--ServiceQuestProxy.Instance:CallQuestList(SceneQuest_pb.EQUESTLIST_CANACCEPT,101);
                 ROM_ClickNearestNPC(true);
-				--Game.Myself:Client_LockTarget(nearestNPC);
-				--FunctionVisitNpc.openWantedQuestPanel( 101, nearestNPC);
-				--if ROM_SubmitQuest() == false then
-				--	ROM_AcceptQuest();
-				--end;
 			end;
 		else
 			--ListField(q,"",{},"    ");  
@@ -318,9 +311,13 @@ function ROM_DoAutoQuest()
 				if q.wantedData.MapId ~= nil then
 					ROM_WalkToNPC(q.wantedData.MapId,q.params.npc,
 						function()
-							--local nearestNPC, nearestDist = ROM_GetNearestNPC();
+							local nearestNPC, nearestDist = ROM_GetNearestNPC();
 							--Game.Myself:Client_LockTarget(nearestNPC);
-							LogDebug("ROM_DoAutoQuest: click");
+							LogDebug("ROM_DoAutoQuest: move click");
+							ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
+							ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
+							GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
+							LogDebug(QuestToString(q));
 							ROM_ClickNearestNPC(true);
 							--FunctionVisitNpc.me:AccessTarget(nil, nil, nil);		
 						end
@@ -344,53 +341,84 @@ function ROM_DoAutoQuest()
 					LogDebug("target pos = " .. MyTostring(q.staticData.Params.tarpos));
 					LogDebug("target pos = " .. MyTostring(q.pos));
 					ROM_CommandGOTO(q.wantedData.MapId,q.pos);
-					--ROM_WalkToNPC(q.wantedData.MapId,q.wantedData.NpcId,
-					--    function()
-					--        local nearestNPC, nearestDist = ROM_GetNearestNPC();
-					--        Game.Myself:Client_LockTarget(nearestNPC);
-					--    end
-					--);
 				else
 					LogDebug("Should not be here");
 				end                            
 			elseif q.wantedData.Content == "remove_item" then
 				ListField(q,"",{},"    ");  
-				if q.wantedData.MapId ~= nil then
-					ROM_WalkToNPC(q.staticData.Map,q.wantedData.NpcId,
-                        function()
-							--local nearestNPC, nearestDist = ROM_GetNearestNPC();
-							--Game.Myself:Client_LockTarget(nearestNPC);
-							LogDebug("ROM_DoAutoQuest: click");
-							ROM_ClickNearestNPC(true);
-						end
-                    );
-                    --ROM_ClickNearestNPC();
-					--LogDebug("target pos = " .. MyTostring(q.staticData.Params.tarpos));
-					--LogDebug("target pos = " .. MyTostring(q.pos));
-					--ROM_CommandGOTO(q.wantedData.MapId,q.pos);
-					--ROM_WalkToNPC(q.wantedData.MapId,q.wantedData.NpcId,
-					--    function()
-					--        local nearestNPC, nearestDist = ROM_GetNearestNPC();
-					--        Game.Myself:Client_LockTarget(nearestNPC);
-					--    end
-					--);
+				if q.params.monster ~= nil then
+					--ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
+					LogDebug("----");
+					ListField(q.params,"",{},"    ");  
+					local num = BagProxy.Instance:GetAllItemNumByStaticID(q.params.item[1].id);
+					LogDebug("num=" .. num);
+					if num <  q.params.item[1].num then
+						ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
+					end;
 				else
-					--LogDebug("Should not be here");
-				end                            
+					if q.wantedData.MapId ~= nil then
+						ROM_WalkToNPC(q.staticData.Map,q.wantedData.NpcId,
+							function()
+								local nearestNPC, nearestDist = ROM_GetNearestNPC();
+								--Game.Myself:Client_LockTarget(nearestNPC);
+								LogDebug("ROM_DoAutoQuest: remove_item click");
+								ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
+								ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
+								GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
+								LogDebug(QuestToString(q));
+								ROM_ClickNearestNPC(true);
+							end
+						);
+					else
+						--LogDebug("Should not be here");
+					end                            
+				end;
+			elseif q.wantedData.Content == "gather" then
+				ListField(q,"",{},"    ");  
+				if q.params.monster ~= nil then
+					-- goto that monster
+					ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
+				else
+					-- goto board to submit quest 
+					ROM_WalkToNPC(mapid,q.params.npc);
+				end;
+			elseif q.wantedData.Content == "visit" then
+				ListField(q,"",{},"    ");  
+				ROM_WalkToNPC(q.map,q.params.npc,
+					function()
+						local nearestNPC, nearestDist = ROM_GetNearestNPC();
+						--Game.Myself:Client_LockTarget(nearestNPC);
+						LogDebug("ROM_DoAutoQuest: visit click");
+						ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
+						ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
+						GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
+						LogDebug(QuestToString(q));
+						--ROM_ClickNearestNPC(true);
+						--FunctionVisitNpc.me:AccessTarget(nil, nil, nil);		
+					end
+				);
 			else
 				LogDebug("Quest type not suppoted");
 			end;
 		end;
 	else 
+		ROM_DumpWantedQuest();
 		LogDebug("ROM_DoAutoQuest: No quest to already accept walk to board");
 		if ROM_WalkToBoard() then
+			-- refresh wanted quest list
+			LogDebug("ROM_DoAutoQuest: try refresh())");
+			ServiceQuestProxy.Instance:CallQuestList(SceneQuest_pb.EQUESTLIST_CANACCEPT,101);
+
 			-- near board
-			LogDebug("ROM_DoAutoQuest: at board need");
+			
 			-- TODO: find a way to click
 			--ROM_ClickNearestNPC();
 			--Game.Myself:Client_LockTarget(nearestNPC);
 			if ROM_SubmitQuest() == false then
                 --ROM_ClickNearestNPC();
+				LogDebug("Before ROM_AcceptQuest");		
+				local nearestNPC, nearestDist = ROM_GetNearestNPC();
+				ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
 				ROM_AcceptQuest();
 				--FunctionVisitNpc.me:AccessTarget(nil, nil, nil);
             else
@@ -398,21 +426,10 @@ function ROM_DoAutoQuest()
 			end;
 		end;
 	end;
-	--ROM_CommandVisitNPC(7,1016,nil);
-	
-	
-	--if ROM_SubmitQuest() == false then
-	--    ROM_AcceptQuest();
-	--end;
-	--LogDebug("Game.Myself:GetPosition()=" .. MyTostring(Game.Myself:GetPosition()));
-	--LogDebug("nearestExit=" .. MyTostring(tempVector3));
-	--Game.Myself:Client_EnterExitRangeHandler(nearestExit);
-	--tempVector3:Set(nearestExit.position[1]*1000,nearestExit.position[2]*1000,nearestExit.position[3]*1000);
-	--LogDebug("fake myposition=" .. MyTostring(tempVector3));
-	--ServiceNUserProxy.Instance:CallExitPosUserCmd(tempVector3,nearestExit.ID,mapid); 
 	LogDebug("done");
 
 end;
 
 
 LogDebug("romAutoQuest.lua 1.0");
+	

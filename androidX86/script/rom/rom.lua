@@ -223,6 +223,11 @@ function ROM_SkillTarget(tab)
     local skillInfo = ROM_GetMySkillInfoByName(tab.name);
     if skillInfo == nil then return false end;
     local skillID = skillInfo.staticData.id;
+	if SkillProxy.Instance:SkillCanBeUsedByID(skillID) == false then
+--		LogDebug("ROM_SkillTarget: " .. tab.name .. " skill can not be used");
+		return false;
+	end;
+	
     local myStatus= ROM_GetMyStatus();
     local skillNeeded = ROM_GetSkillNeeded(skillID);
     if skillNeeded.sp < myStatus.sp then
@@ -275,20 +280,111 @@ function ROM_BuffNoTarget(tab)
     local skillInfo = ROM_GetMySkillInfoByName(tab.name);
     if skillInfo == nil then return false end;
     local skillID = skillInfo.staticData.id;
+	
+	if SkillProxy.Instance:SkillCanBeUsedByID(skillID) == false then
+--		LogDebug("ROM_BuffNoTarget: " .. tab.name .. " skill can not be used");
+		return false;
+	end;
 
     --local skillID = tab.id;
     local myStatus= ROM_GetMyStatus();
     local skillNeeded = ROM_GetSkillNeeded(skillID);
     if skillNeeded.sp < myStatus.sp then
-        if ROM_HasBuffFromSkillID(skillID) == false then
-            LogDebug("ROM_BuffNoTarget: " .. SkillToStringByID(skillID));
-            Game.Myself:Client_UseSkill(skillID, Game.Myself ,nil,nil,true);
-            return true;
-        end;
+		if tab.fracsp and myStatus.fracsp > tab.fracsp then
+			--LogDebug("ROM_BuffNoTarget: " .. tab.name .. " fracsp > fracsp");
+			return false;
+		end;
+		local npc = ROM_GetMonsterLockTarget();
+		if npc == nil then
+			if ROM_HasBuffFromSkillID(skillID) == false then
+				LogDebug("ROM_BuffNoTarget: " .. SkillToStringByID(skillID));
+				Game.Myself:Client_UseSkill(skillID, Game.Myself ,nil,nil,true);
+				return true;
+			end;
+		else	
+			--LogDebug("ROM_BuffNoTarget: " .. tab.name .. " has lock target");
+		end;
     else
-        LogDebug("ROM_BuffNoTarget: Not enough SP");
+        LogDebug("ROM_BuffNoTarget: " .. tab.name .. " Not enough SP " .. myStatus.sp);
     end;
     return false;
+end;
+
+function ROM_Heal(tab)
+	local frac = tab.frachp or 0.6;
+    local skillInfo = ROM_GetMySkillInfoByName(tab.name);
+    if skillInfo == nil then return false end;
+    local skillID = skillInfo.staticData.id;
+	
+	if SkillProxy.Instance:SkillCanBeUsedByID(skillID) == false then
+--		LogDebug("ROM_Heal: " .. tab.name .. " skill can not be used");
+		return false;
+	end;
+	
+    local myStatus= ROM_GetMyStatus();
+    local skillNeeded = ROM_GetSkillNeeded(skillID);
+	LogDebug("ROM_Heal: " .. skillNeeded.sp .. " " .. myStatus.frachp);
+	if skillNeeded.sp < myStatus.sp then
+		if myStatus.frachp < frac then
+			--if ROM_HasBuffFromSkillID(skillID) == false then
+			LogDebug("ROM_Heal: " .. SkillToStringByID(skillID));
+			Game.Myself:Client_UseSkill(skillID, Game.Myself ,nil,nil,true);
+			return true;
+		else
+--			LogDebug("ROM_Heal: hp high enough");
+		end;
+        --end;
+    else
+--        LogDebug("ROM_Heal: Not enough SP");
+    end;
+    return false;			
+end;
+
+function ROM_TurnUndead(tab)
+    local skillInfo = ROM_GetMySkillInfoByName(tab.name);
+    if skillInfo == nil then return false end;
+    local skillID = skillInfo.staticData.id;
+	if SkillProxy.Instance:SkillCanBeUsedByID(skillID) == false then
+--		LogDebug("ROM_TurnUndead: " .. tab.name .. " skill can not be used");
+		return false;
+	end;
+	
+    local myStatus= ROM_GetMyStatus();
+    local skillNeeded = ROM_GetSkillNeeded(skillID);
+	if skillNeeded.sp < myStatus.sp then
+		local npc = ROM_GetMonsterLockTarget();
+		if npc == nil then
+--			LogDebug("ROM_TurnUndead: ROM_FindBestMonster");
+			npc = ROM_FindBestMonster();
+		else
+			--LogDebug("ROM_SkillTarget: use locktarget");
+		end;
+        if npc ~= nil then
+			if npc.data.staticData.Race == "Undead" then
+				-- check if that monster is undead
+				--LogDebug("ROM_TurnUndead: " .. MonsterToString(npc));
+				local monStatus = ROM_GetMonStatus(npc);
+				if monStatus ~= nil then
+					if monStatus.frachp > (tab.frachp or 0.9) then
+						--Game.Myself.data.randomFunc.index = 20;					
+						Game.Myself:Client_UseSkill(skillID, npc,nil,nil,true);
+						return true;
+					else	
+						LogDebug("ROM_TurnUndead: Monster frachp > ");
+					end;
+				else	
+					LogDebug("ROM_TurnUndead: Monster status not found");
+				end;
+			else	
+				LogDebug("ROM_TurnUndead: Monster is not undead " .. npc.data.staticData.Race);
+			end;
+        else
+            LogDebug("ROM_TurnUndead: Monster not found");
+        end;
+    else
+        LogDebug("ROM_TurnUndead: Not enough SP");
+    end;
+    return false;			
 end;
 
 
@@ -309,6 +405,9 @@ myMonsterList = {
 --  10024, -- name=Thara Frog Type=Monster
 	10025, -- name=Marina Type=Monster
 --  10023, -- name=Vadon Type=Monster
+	10050, -- name=Soldier Skeleton
+--	10051, -- name=Matyr	
+	10052, -- name=Mummy
 };
 
 myMonsterRules = {
@@ -321,7 +420,13 @@ myMonsterRules = {
 myAIRules = {
     {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
     {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
+	{name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
+	{name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
+	{name="Heal", func=ROM_Heal,frachp=0.6},  -- bless    
+	{name="Turn", func=ROM_TurnUndead, frachp=0.8},  -- holy
     {name="Holy Light Strike", func=ROM_SkillTarget},  -- holy
+	
+	
 };
 
 
@@ -363,7 +468,7 @@ function ROM_Test(g)
     LogDebug("Monster");
     local mons = ROM_GetAllMonster();
     tableForEach(mons,function(i,v)
-        LogDebug(MonsterToString(v));
+        LogDebug(MonsterToString(v)  .. ' - ' .. MyTostring(v.data.randomFunc));
     end);
 	
     local npcList = Game.MapManager:GetNPCPointArray();
@@ -430,12 +535,17 @@ function ROM_Test(g)
     LogDebug('----------- state	 -------------');
     ListField(state	,"",{},"  ");
 	]]
-    --ROM_DumpWantedQuest();
+    
 	--MsgManager.ShowMsgByID(25491);
 	--local npcData = Table_Npc[1016];
 	--ListField(npcData,"",{}," ");
 	
-	--local nearestNPC, nearestDist = ROM_GetNearestNPC();	
+	local nearestNPC, nearestDist = ROM_GetNearestNPC();	
+	--Game.Myself:Client_AccessTarget(nearestNPC);
+	LogDebug(MonsterToString(nearestNPC));
+	--ServiceQuestAutoProxy.Instance
+	--ServiceSessionTeamProxy.Instance:CallTeamMemberApply(nearestNPC.data.id);
+	--ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
 	--ListField(nearestNPC,"",{},"");
 	--ROM_ClickNearestNPC(true);
 	--[[ROM_ClickNearestNPC();
@@ -449,64 +559,39 @@ function ROM_Test(g)
         end,
     nil);]]
 	--ListField(UIManagerProxy.Instance,"",{}," ");
-	local filenames = {
-"AScript_FrameWork_Proxy_Service_auto_ServiceAchieveCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceActivityCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceActivityEventAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceAstrolabeCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceAuctionCCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceAuthorizeAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceBossCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceCarrierCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceChatCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceChatRoomAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceDojoAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceErrorUserCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceFuBenCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceGuildCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceInfiniteTowerAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceItemAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceLoginUserCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceMapAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceMatchCCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceNUserAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceOverseasTaiwanCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServicePhotoCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServicePveCardAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceQuestAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceRecordTradeAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceSceneAuguryAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceSceneBeingAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceSceneFoodAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceSceneInterlocutionAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceSceneManualAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceScenePetAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceSceneSealAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceSceneTipAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceSessionMailAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceSessionShopAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceSessionSocialityAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceSessionTeamAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceSkillAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceTeamRaidCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceTutorAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceUserEventAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceWeatherAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_auto_ServiceWeddingCCmdAutoProxy.lua",
-"AScript_FrameWork_Proxy_Service_ServicePlayerProxy.lua",
-"AScript_FrameWork_Proxy_Service_ServiceNpcProxy.lua",
-"AScript_FrameWork_Proxy_Service_ServiceSceneProxy.lua",
-	};
-	local out = "";
-	for i=1,#filenames do
-		local fileName = filenames[i];
-		local tmp = ROM_CreatePacketCommandFromFile("/data/local/tmp/loadbufferx/" .. fileName);
-		if tmp ~= "" then
-			out = out .. "\n" .. tmp;
-		end;
-	end;
-	LogDebug("\n" .. out);
-    UIUtil.FloatMsgByText("Test Done");	
+	--ROM_DumpWantedQuest();
+	--ServiceQuestProxy.Instance:CallQuestList(SceneQuest_pb.EQUESTLIST_CANACCEPT,101);
+		LogDebug("randomFunc.index=" .. Game.Myself.data.randomFunc.index);
+	--Game.Myself.data.randomFunc.index = Game.Myself.data.randomFunc.index + 1;
+	--LogDebug("randomFunc.index=" .. Game.Myself.data.randomFunc.index);
+		local srcUser = Game.Myself.data;
+		local Luk=srcUser:GetProperty("Luk")
+        local Int=srcUser:GetProperty("Int")
+        local BaseLv = srcUser.BaseLv
+        --local Hp=targetUser:GetProperty("Hp")
+        --local MaxHp=targetUser:GetProperty("MaxHp")
+        --local rate = ((20*skillLevel+Luk+Int+BaseLv+(1-Hp/MaxHp)*200)/10)
+		local rate = ((20*10+Luk+Int+BaseLv)/10);
+		local saveIndex = Game.Myself.data.randomFunc.index;
+		LogDebug("rate=" .. rate);
+		for i=1,100 do
+			Game.Myself.data.randomFunc.index = i;
+			local index = Game.Myself.data.randomFunc.index;
+			local value = srcUser:GetRandom();
+			LogDebug("" .. index .. " " .. value);
+			--if CommonFun.IsInRate(rate, value) then
+			--	LogDebug("Found index = " .. index);
+			--	Game.Myself.data.randomFunc.index = index;
+			--	break;
+			--end;
+        end
+		Game.Myself.data.randomFunc.index = saveIndex;
+		--ListField(BagProxy.Instance,"",{}," ");
+		--BagProxy.Instance:GetAllItemNumByStaticID(staticID);
+		--LogDebug("randomFunc.index=" .. Game.Myself.data.randomFunc.index);
+		--ListField(Game.Myself.data.randomFunc,"",{}," ");
+		UIUtil.FloatMsgByText("Test Done 1");	
+		
     if true then
         return;
     end;
@@ -711,126 +796,6 @@ function ROM_MyDlg()
 			event = function (npcinfo)
 				LogDebug("npcinfo=" .. tostring(npcinfo));
                 LogDebug("currentMapID=" .. Game.MapManager:GetMapID());
-				--FunctionDialogEvent.SetDialogEventEnter( DialogEventType.EquipUpgrade, npcinfo )
-				--GameFacade.Instance:sendNotification(UIEvent.JumpPanel, {view=PanelConfig.AnnounceQuestPanel, viewdata ={wanted = wantedid, npcTarget = target, isNpcFuncView = true}});
-				--FunctionNpcFunc.JumpPanel(PanelConfig.AnnounceQuestPanel, npcinfo)
-				local mapid = SceneProxy.Instance.currentScene.mapID;				
-				local nearestExit = ROM_GetNearestExitPoint();
-                local myPos = Game.Myself:GetPosition();
-				LogDebug("nearestExit=" .. MyTostring(nearestExit) .. " mapid=" .. tostring(mapid) .. " pos=" .. tostring(myPos));
-				
-				local tempVector3 = LuaVector3.zero;
-                local nearestNPC, nearestDist = ROM_GetNearestNPC();
-                if nearestNPC ~= nil  then
-                    LogDebug(MonsterToString(nearestNPC) .. ' ' .. nearestDist);
-					
-                end;
-                --LuaVector3(15.533345, 7.136991, -23.064865)
-				tempVector3:Set(nearestExit.position[1],nearestExit.position[2],nearestExit.position[3]);
-				--Game.Myself:Client_MoveTo(tempVector3);
-				--ROM_CommandGOTO(mapid,tempVector3);
-				--ROM_CommandVisitMonster(2,10001);
-                
-                local q = ROM_GetAcceptedQuest();
-                if q ~= nil then
-                    local questString = QuestToString(q);
-                    LogDebug("Has Accepted Wanted Quest " .. questString );
-                    local traceInfo = q.traceInfo or "";
-                    LogDebug("traceInfot " .. traceInfo );
-                    if string.match(traceInfo, "Mission Board") then	
-                        LogDebug("Mission complete walk to board");
-                        if ROM_WalkToBoard() then
-                            -- near board
-                            LogDebug("Near board");
-                            Game.Myself:Client_LockTarget(nearestNPC);
-                            FunctionVisitNpc.openWantedQuestPanel( 101, nearestNPC);
-                            if ROM_SubmitQuest() == false then
-                                ROM_AcceptQuest();
-                            end;
-                        end;
-                    else
-                        --ListField(q,"",{},"    ");  
-                        --LogDebug(MyTostring(q));
-                        if q.wantedData.Content == "move" then
-                            ListField(q,"",{},"    ");
-                            if q.wantedData.MapId ~= nil then
-                                ROM_WalkToNPC(q.wantedData.MapId,q.params.npc,
-                                    function()
-                                        local nearestNPC, nearestDist = ROM_GetNearestNPC();
-                                        Game.Myself:Client_LockTarget(nearestNPC);
-                                    end
-                                );
-                            else
-                                LogDebug("Should not be here");
-                            end;
-                        elseif q.wantedData.Content == "kill" then
-                            ListField(q,"",{},"    ");  
-                            if q.params.monster ~= nil then
-                                -- goto that monster
-                                ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
-                            else
-                                -- goto board to submit quest 
-                                -- it might possibile that this map does not have board will see
-                                ROM_WalkToNPC(mapid,q.params.npc);
-                            end;
-                        elseif q.wantedData.Content == "selfie" then
-                            ListField(q,"",{},"    ");  
-                            if q.wantedData.MapId ~= nil then
-                                LogDebug("target pos = " .. MyTostring(q.staticData.Params.tarpos));
-                                LogDebug("target pos = " .. MyTostring(q.pos));
-                                ROM_CommandGOTO(q.wantedData.MapId,q.pos);
-                                --ROM_WalkToNPC(q.wantedData.MapId,q.wantedData.NpcId,
-                                --    function()
-                                --        local nearestNPC, nearestDist = ROM_GetNearestNPC();
-                                --        Game.Myself:Client_LockTarget(nearestNPC);
-                                --    end
-                                --);
-                            else
-                                LogDebug("Should not be here");
-                            end                            
-                        elseif q.wantedData.Content == "remove_item" then
-                            ListField(q,"",{},"    ");  
-                            if q.wantedData.MapId ~= nil then
-                                ROM_WalkToNPC(q.staticData.Map,q.wantedData.NpcId);
-                                --LogDebug("target pos = " .. MyTostring(q.staticData.Params.tarpos));
-                                --LogDebug("target pos = " .. MyTostring(q.pos));
-                                --ROM_CommandGOTO(q.wantedData.MapId,q.pos);
-                                --ROM_WalkToNPC(q.wantedData.MapId,q.wantedData.NpcId,
-                                --    function()
-                                --        local nearestNPC, nearestDist = ROM_GetNearestNPC();
-                                --        Game.Myself:Client_LockTarget(nearestNPC);
-                                --    end
-                                --);
-                            else
-                                --LogDebug("Should not be here");
-                            end                            
-                        else
-                            LogDebug("Quest type not suppoted");
-                        end;
-                    end;
-                else 
-                    --if ROM_WalkToNPC(mapid,1016) then
-                    if ROM_WalkToBoard() then
-                        -- near board
-                        LogDebug("Near board");
-                        Game.Myself:Client_LockTarget(nearestNPC);
-                        if ROM_SubmitQuest() == false then
-                            ROM_AcceptQuest();
-                        end;
-                    end;
-                end;
-                --ROM_CommandVisitNPC(7,1016,nil);
-                
-                
-                --if ROM_SubmitQuest() == false then
-                --    ROM_AcceptQuest();
-                --end;
-				--LogDebug("Game.Myself:GetPosition()=" .. MyTostring(Game.Myself:GetPosition()));
-				--LogDebug("nearestExit=" .. MyTostring(tempVector3));
-				--Game.Myself:Client_EnterExitRangeHandler(nearestExit);
-				--tempVector3:Set(nearestExit.position[1]*1000,nearestExit.position[2]*1000,nearestExit.position[3]*1000);
-				--LogDebug("fake myposition=" .. MyTostring(tempVector3));
-				--ServiceNUserProxy.Instance:CallExitPosUserCmd(tempVector3,nearestExit.ID,mapid); 
 				LogDebug("done");
 			end,
 			closeDialog = true,
@@ -847,7 +812,7 @@ end;
 function ROM_CommandVisitMonster(mapID,monID)
 		local oriMonster = Table_MonsterOrigin[ monID] or {};
 		-- this will have mapID which contain that monsters
-		--LogDebug(MyTostring(oriMonster));
+		LogDebug(MyTostring(oriMonster));
 		local oriPos = nil;
 		for i=1,#oriMonster do
 			if(oriMonster[i].mapID == mapID)then
@@ -866,6 +831,13 @@ function ROM_CommandVisitMonster(mapID,monID)
                     if q ~= nil then
                         LogDebug(QuestToString(q));
                         if q.params.num == nil then
+							if q.params.item ~= nil then
+								local num = BagProxy.Instance:GetAllItemNumByStaticID(q.params.item[1].id);
+								if num < q.params.item[1].num then
+									LogDebug("" .. tostring(num) .. "/" .. tostring(q.params.item[1].num));
+									return 
+								end;
+							end;
                             LogDebug("Quest done");
                             --ROM_WalkToNPC(mapID,1016);
                             ROM_WalkToBoard();
@@ -960,22 +932,6 @@ end;
 		self:RecvActivityNtfUserCmd(data) 
 	end)
 ]]	
-function ROM_CreatePacketCommandFromFile(fileName)
-	local lines = lines_from(fileName);
-	LogDebug("ROM_CreatePacketCommandFromFile " .. fileName .. " lines=" .. #lines);
-	local ret = "";
-	for i=1,#lines do
-		local line = lines[i];
-		local id1,id2 = string.match(line, 'self:Listen%((%d+)%s*,%s*(%d+)');
-		if id1 ~= nil then
-			line2 = lines[i+1];
-			local funcName = string.match(line2, 'self:(%a+)%(');
-			ret = ret .. "{" .. tostring(id1) .. "," .. tostring(id2) .. ",\"" .. tostring(funcName) .. "\"},\n"; 
-		end;
-	end;
-	--logDebug("\n" .. ret);
-	return ret;
-end;
 
 
 LogDebug("ROM Loaded 1.03");
