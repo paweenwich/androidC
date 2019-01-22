@@ -644,35 +644,22 @@ if class ~= nil then
                 local rule = myAIRules[i];
                 --LogDebug("" .. i .. " " .. MyTostring(rule));
                 if rule.func ~= nil and rule.func(rule) then
+					--self.nextUpdateTime = time + 1.0;
                     return true;
                 end;
             end;        
             if Game.Myself.autoPos ~= nil then
                 local myPos = Game.Myself:GetPosition();
                 local distance = LuaVector3.Distance(myPos, Game.Myself.autoPos);
+				LogDebug("AutoAI_Rom: dist=" .. distance);
                 if distance > 2 then
                     LogDebug("AutoAI_Rom: Move to auto pos");
-                    Game.Myself:Client_MoveTo(targetPosition, nil, nil, nil, nil, nil);
+                    --Game.Myself:Client_MoveTo(Game.Myself.autoPos, nil, nil, nil, nil, nil);
+					return true;
                 end;
+			else	
+				LogDebug("Game.Myself.autoPos not set");
             end;
-            -- this might do to skill delay 
-            -- so walk to monster
-            --[[
-            local npc = ROM_FindBestMonster();
-            if npc ~= nil then
-                --ListField(npc,"",{},"  ");  
-                local myPos = Game.Myself:GetPosition();
-                local targetPosition = npc:GetPosition();
-                local distance = LuaVector3.Distance(myPos, targetPosition);
-                LogDebug("npc pos=" .. tostring(targetPosition) .. " dist=" .. distance);
-                if distance > 6 then
-                    LogDebug("AutoAI_Rom:Prepare() walk to target");
-                    Game.Myself:Client_MoveTo(targetPosition, nil, nil, nil, nil, 6);
-                    return true;
-                end;
-            else
-                LogDebug("npc is null");
-            end;]]
             LogDebug("AutoAI_Rom:Prepare() nothing to do!");
             -- nothing to do
             self.nextUpdateTime = time + 1.0;

@@ -224,7 +224,9 @@ function ROM_SkillTarget(tab)
     if skillInfo == nil then return false end;
     local skillID = skillInfo.staticData.id;
 	if SkillProxy.Instance:SkillCanBeUsedByID(skillID) == false then
---		LogDebug("ROM_SkillTarget: " .. tab.name .. " skill can not be used");
+		local skillItem = SkillProxy.Instance:GetLearnedSkill(skillID)
+		local inCD = SkillProxy.Instance:IsInCD(skillItem);
+		LogDebug("ROM_SkillTarget: " .. tab.name .. " skill can not be used " .. tostring(inCD));		
 		return false;
 	end;
 	
@@ -434,7 +436,7 @@ function ROM_WalkToRange(tab)
         LogDebug("ROM_WalkToRange: dist=" .. distance);
         if distance > range then
             LogDebug("ROM_WalkToRange walk to target");
-            Game.Myself:Client_MoveTo(targetPosition, nil, nil, nil, nil, 6);
+            Game.Myself:Client_MoveTo(targetPosition, nil, nil, nil, nil, range);
             return true;
         end;
     else
@@ -480,14 +482,14 @@ myMonsterRules = {
 
 myAIRules = {
     {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
+
     {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
 	{name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
 	{name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
+	{name="WalkToRange", func=ROM_WalkToRange,range=5},  		
 	{name="Heal", func=ROM_Heal,frachp=0.6},  -- bless    
 	{name="Turn", func=ROM_TurnUndead, frachp=0.6},  
-    {name="Holy Light Strike", func=ROM_SkillTarget},  
-	{name="WalkToRange", func=ROM_WalkToRange,range=6},  
-	
+    {name="Holy Light Strike", func=ROM_SkillTarget},  	
 };
 
 
@@ -766,7 +768,7 @@ function ROM_Auto()
         uiLabel.effectColor = ColorUtil.NGUILabelRed;
         uiLabel.effectStyle = UILabel.Effect.Outline;
         -- remember this position
-        Game.Myself.autoPos = Game.Myself:GetPosition();
+        Game.Myself.autoPos = Game.Myself:GetPosition():Clone();
         LogDebug("autoPos=" .. tostring(Game.Myself.autoPos))
     end;
     UIUtil.FloatMsgByText("Auto " .. tostring(Game.Myself.ai.autoAI_Rom:IsEnable()));
