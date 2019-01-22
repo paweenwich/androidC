@@ -234,7 +234,6 @@ function ROM_SkillTarget(tab)
 		local npc = ROM_GetMonsterLockTarget();
 		if npc == nil then
 			LogDebug("ROM_SkillTarget: ROM_FindBestMonster");
-			--npc = ROM_FindNearestMonsterEx(myMonsterList);
 			npc = ROM_FindBestMonster();
 		else
 			--LogDebug("ROM_SkillTarget: use locktarget");
@@ -390,6 +389,11 @@ function ROM_TurnUndead(tab)
 					if monStatus.frachp > (tab.frachp or 0.9) then
 						--Game.Myself.data.randomFunc.index = 20;			
                         local willHit = ROM_WillTurnSuccess(skillID,npc.data);
+                        while willHit == false do
+                            LogDebug("Game.Myself:Client_UseSkill rand index=" .. Game.Myself.data.randomFunc.index .. ' willHit=' .. tostring(willHit));
+                            Game.Myself.data:GetRandom();   -- roll next dice
+                            willHit = ROM_WillTurnSuccess(skillID,npc.data);
+                        end;
                         if willHit then
                             LogDebug("Game.Myself:Client_UseSkill rand index=" .. Game.Myself.data.randomFunc.index .. ' willHit=' .. tostring(willHit));
                             Game.Myself:Client_UseSkill(skillID, npc,nil,nil,true);
@@ -439,6 +443,11 @@ function ROM_WalkToRange(tab)
     return false;
 end;
 
+function ROM_MonFullHP(npc)
+    local monStatus = ROM_GetMonStatus(npc);
+    return monStatus.frachp > 0.99 
+end;
+
 myMonsterList = {
 --[[
     10005,    --Thief Bug      
@@ -459,13 +468,14 @@ myMonsterList = {
 	10050, -- name=Soldier Skeleton
 --	10051, -- name=Matyr	
 	10052, -- name=Mummy
+    10063, -- name=Archer Skeleton
 };
 
 myMonsterRules = {
-    {func= ROM_FindMiniBoss}, -- priority to miniboss
+--    {func= ROM_FindMiniBoss}, -- priority to miniboss
     {func= ROM_FindStaticMonster},  -- priority to static monster
-    {func= ROM_FindNearestMonsterEx, param=myMonsterList},  -- selected monster
---    {func= ROM_FindNearestMonsterEx, param=nil},            -- all monster
+--    {func= ROM_FindNearestMonsterEx, param=myMonsterList},  -- selected monster
+    {func= ROM_FindNearestMonsterEx2, monlist=myMonsterList, filter=ROM_MonFullHP},  -- selected monster
 };
 
 myAIRules = {
@@ -474,7 +484,7 @@ myAIRules = {
 	{name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
 	{name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
 	{name="Heal", func=ROM_Heal,frachp=0.6},  -- bless    
-	{name="Turn", func=ROM_TurnUndead, frachp=0.8},  
+	{name="Turn", func=ROM_TurnUndead, frachp=0.6},  
     {name="Holy Light Strike", func=ROM_SkillTarget},  
 	{name="WalkToRange", func=ROM_WalkToRange,range=6},  
 	
@@ -612,35 +622,14 @@ function ROM_Test(g)
 	--ListField(UIManagerProxy.Instance,"",{}," ");
 	--ROM_DumpWantedQuest();
 	--ServiceQuestProxy.Instance:CallQuestList(SceneQuest_pb.EQUESTLIST_CANACCEPT,101);
-		LogDebug("randomFunc.index=" .. Game.Myself.data.randomFunc.index);
-	--Game.Myself.data.randomFunc.index = Game.Myself.data.randomFunc.index + 1;
-	--LogDebug("randomFunc.index=" .. Game.Myself.data.randomFunc.index);
-		local srcUser = Game.Myself.data;
-		local Luk=srcUser:GetProperty("Luk")
-        local Int=srcUser:GetProperty("Int")
-        local BaseLv = srcUser.BaseLv
-        --local Hp=targetUser:GetProperty("Hp")
-        --local MaxHp=targetUser:GetProperty("MaxHp")
-        --local rate = ((20*skillLevel+Luk+Int+BaseLv+(1-Hp/MaxHp)*200)/10)
-		local rate = ((20*10+Luk+Int+BaseLv)/10);
-		local saveIndex = Game.Myself.data.randomFunc.index;
-		LogDebug("rate=" .. rate);
-		for i=1,100 do
-			Game.Myself.data.randomFunc.index = i;
-			local index = Game.Myself.data.randomFunc.index;
-			local value = srcUser:GetRandom();
-			LogDebug("" .. index .. " " .. value);
-			--if CommonFun.IsInRate(rate, value) then
-			--	LogDebug("Found index = " .. index);
-			--	Game.Myself.data.randomFunc.index = index;
-			--	break;
-			--end;
-        end
-		Game.Myself.data.randomFunc.index = saveIndex;
+    
 		--ListField(BagProxy.Instance,"",{}," ");
 		--BagProxy.Instance:GetAllItemNumByStaticID(staticID);
 		--LogDebug("randomFunc.index=" .. Game.Myself.data.randomFunc.index);
-		ListField(Game.Myself.data.randomFunc,"",{}," ");
+        --ListField(Table_Skill,"",{}," ");
+        local skillInfo = ROM_GetMySkillInfoByName("Holy");
+        local skillID = skillInfo.staticData.id;
+        
 		UIUtil.FloatMsgByText("Test Done 1");	
 		
     if true then
@@ -654,7 +643,6 @@ function ROM_Test(g)
     end);
     
 
-    --local npc = ROM_FindNearestMonsterEx(myMonsterList);
     local npc = ROM_FindBestMonster();
     --LogDebug(MyTostring(npc));
     --ListField(npc);
@@ -777,6 +765,9 @@ function ROM_Auto()
         Game.Myself.ai.autoAI_Rom:Enable(true);
         uiLabel.effectColor = ColorUtil.NGUILabelRed;
         uiLabel.effectStyle = UILabel.Effect.Outline;
+        -- remember this position
+        Game.Myself.autoPos = Game.Myself:GetPosition();
+        LogDebug("autoPos=" .. tostring(Game.Myself.autoPos))
     end;
     UIUtil.FloatMsgByText("Auto " .. tostring(Game.Myself.ai.autoAI_Rom:IsEnable()));
 end;

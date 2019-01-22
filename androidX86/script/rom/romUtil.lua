@@ -311,7 +311,7 @@ function MonsterToString(m)
 	    local props = m.data.props;
 		local hp = props.Hp:GetValue();
 		if m.data.staticData ~= nil then
-			return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race;	
+			return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature;	
 		else
 			return "ID=" .. m.data.id .. 'PLAYER HP=' .. stat.hp;			
 		end;
@@ -647,6 +647,14 @@ if class ~= nil then
                     return true;
                 end;
             end;        
+            if Game.Myself.autoPos ~= nil then
+                local myPos = Game.Myself:GetPosition();
+                local distance = LuaVector3.Distance(myPos, Game.Myself.autoPos);
+                if distance > 2 then
+                    LogDebug("AutoAI_Rom: Move to auto pos");
+                    Game.Myself:Client_MoveTo(targetPosition, nil, nil, nil, nil, nil);
+                end;
+            end;
             -- this might do to skill delay 
             -- so walk to monster
             --[[
@@ -750,6 +758,24 @@ function ROM_FindNearestMonsterEx(monlist)
     local mons = ROM_GetAllMonster(filterFunc);
     return ROM_GetNearestMonFromList(mons);
 end;
+
+function ROM_FindNearestMonsterEx2(tab)
+    local monlist = tab.monlist or {};
+    local filterFunc = function(mon)
+        if #monlist == 0 or TableUtil.HasValue(monlist,mon.data.staticData.id) then
+            if tab.filter ~= nil then
+                return tab.filter(mon);
+                --LogDebug(MonsterToString(mon));
+            end;
+            return true;
+        end;
+        return false;
+    end;
+    local mons = ROM_GetAllMonster(filterFunc);
+    return ROM_GetNearestMonFromList(mons);
+end;
+
+
 
 function ROM_GetNearestMonFromList(mons)
     local minDist = 100000;
@@ -895,8 +921,8 @@ function ROM_FindBestMonster()
         local rule = myMonsterRules[i];
         --LogDebug(MyTostring(rule));
         if rule.func ~= nil then
-            local param = rule.param or rule;
-            local npc = rule.func(param);
+            --local param = rule.param or rule;
+            local npc = rule.func(rule);
             if npc ~= nil then
                 return npc;
             end;
