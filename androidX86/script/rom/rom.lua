@@ -226,7 +226,10 @@ function ROM_SkillTarget(tab)
 	if SkillProxy.Instance:SkillCanBeUsedByID(skillID) == false then
 		local skillItem = SkillProxy.Instance:GetLearnedSkill(skillID)
 		local inCD = SkillProxy.Instance:IsInCD(skillItem);
-		LogDebug("ROM_SkillTarget: " .. tab.name .. " skill can not be used " .. tostring(inCD));		
+        --return self:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,id) or self:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,CDProxy.CommunalSkillCDSortID)
+        local in1 = CDProxy.Instance:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,skillItem.sortID);
+        local in2 = CDProxy.Instance:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,CDProxy.CommunalSkillCDSortID);
+		LogDebug("ROM_SkillTarget: " .. tab.name .. " inCD=" .. tostring(inCD) .. ' ' .. tostring(in1) .. ' ' .. tostring(in2));		
 		return false;
 	end;
 	
@@ -477,12 +480,11 @@ myMonsterRules = {
 --    {func= ROM_FindMiniBoss}, -- priority to miniboss
     {func= ROM_FindStaticMonster},  -- priority to static monster
 --    {func= ROM_FindNearestMonsterEx, param=myMonsterList},  -- selected monster
-    {func= ROM_FindNearestMonsterEx2, monlist=myMonsterList, filter=ROM_MonFullHP},  -- selected monster
+    {func= ROM_FindNearestMonsterEx2, filter=ROM_MonFullHP},  -- selected monster
 };
 
 myAIRules = {
     {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
-
     {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
 	{name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
 	{name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
@@ -492,8 +494,42 @@ myAIRules = {
     {name="Holy Light Strike", func=ROM_SkillTarget},  	
 };
 
+ROM_Config = {};
+ROM_Config[4313990901] = {
+    myMonsterList = {
+    	10052, -- name=Mummy
+        10063, -- name=Archer Skeleton
+        10061, --  name=Bongun
+        10060, --  name=Munak
+    },
+    myMonsterRules ={
+        {func= ROM_FindStaticMonster},  -- priority to static monster
+        {func= ROM_FindNearestMonsterEx2, filter=ROM_MonFullHP},  -- selected monster
+    },
+    myAIRules = {
+        {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
+        {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
+        {name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
+        {name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
+        {name="WalkToRange", func=ROM_WalkToRange,range=6},  		
+        {name="Heal", func=ROM_Heal,frachp=0.6},  -- bless    
+        {name="Turn", func=ROM_TurnUndead, frachp=0.6},  
+        {name="Holy Light Strike", func=ROM_SkillTarget},  	
+    },
+}
+--4313990901
+if Game and Game.Myself and Game.Myself.data then
+    if ROM_Config[Game.Myself.data.id] ~= nil then
+        LogDebug("Use ROM_Config for " .. Game.Myself.data.id);
+        local conf = ROM_Config[Game.Myself.data.id];
+        myMonsterList = conf.myMonsterList;
+        myMonsterRules = conf.myMonsterRules;
+        myAIRules = conf.myAIRules;
+    end;
+end;
 
 function ROM_Test(g)
+    LogDebug("MyID=" .. Game.Myself.data.id);   
     LogDebug("NPC");
     local mons = ROM_GetAllNPC();
     --tableForEach(mons,function(i,v)
@@ -540,7 +576,9 @@ function ROM_Test(g)
         if(v and v.ID and v.position)then
             local npcData = Table_Npc[v.ID];
             if npcData  then
-                --LogDebug(MyTostring(npcData));
+                if npcData.id == 1125 then
+                    LogDebug(MyTostring(npcData));
+                end;
             end;
         end;
     end);
@@ -604,35 +642,12 @@ function ROM_Test(g)
 	--ListField(npcData,"",{}," ");
 	
 	local nearestNPC, nearestDist = ROM_GetNearestNPC();	
-	--Game.Myself:Client_AccessTarget(nearestNPC);
 	LogDebug(MonsterToString(nearestNPC));
-	--ServiceQuestAutoProxy.Instance
-	--ServiceSessionTeamProxy.Instance:CallTeamMemberApply(nearestNPC.data.id);
-	--ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
-	--ListField(nearestNPC,"",{},"");
-	--ROM_ClickNearestNPC(true);
-	--[[ROM_ClickNearestNPC();
-    ROM_DelayCall(5000,
-        function(param) 
-            LogDebug("Called");
-            --GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
-            GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.NormalLayer)
-            
-            --FunctionVisitNpc.me:AccessTarget(nil, nil, nil);            
-        end,
-    nil);]]
-	--ListField(UIManagerProxy.Instance,"",{}," ");
-	--ROM_DumpWantedQuest();
-	--ServiceQuestProxy.Instance:CallQuestList(SceneQuest_pb.EQUESTLIST_CANACCEPT,101);
     
-		--ListField(BagProxy.Instance,"",{}," ");
-		--BagProxy.Instance:GetAllItemNumByStaticID(staticID);
-		--LogDebug("randomFunc.index=" .. Game.Myself.data.randomFunc.index);
-        --ListField(Table_Skill,"",{}," ");
-        local skillInfo = ROM_GetMySkillInfoByName("Holy");
-        local skillID = skillInfo.staticData.id;
+    --local players = ROM_GetNearPlayers();
+    --UIUtil.FloatMsgByText("Players=" .. #players);	
         
-		UIUtil.FloatMsgByText("Test Done 1");	
+    UIUtil.FloatMsgByText("Test Done 1");	
 		
     if true then
         return;
@@ -858,12 +873,17 @@ function ROM_CommandVisitMonster(mapID,monID)
 		-- this will have mapID which contain that monsters
 		LogDebug(MyTostring(oriMonster));
 		local oriPos = nil;
+        local tmpPos = {};
 		for i=1,#oriMonster do
 			if(oriMonster[i].mapID == mapID)then
-				oriPos = oriMonster[i].pos;
-                break;
+				--oriPos = oriMonster[i].pos;
+                tmpPos[#tmpPos+1] = oriMonster[i].pos;
+                --break;
 			end
 		end
+        local randIndex = math.random(#tmpPos);
+        oriPos = tmpPos[randIndex];
+        LogDebug("randIndex=" .. randIndex .. " oriPos=" .. tostring(oriPos));        
 		if(oriPos)then
 			local cmdArgs = {
 				targetMapID = mapID,
@@ -928,7 +948,7 @@ function ROM_CommandVisitNPC(mapID,npcID,npcUID)
 	end
 end;
 
-function ROM_CommandGOTO(mapID,pos)
+function ROM_CommandGOTO(mapID,pos,finish)
 	local tempArgs = {};
 	tempArgs.targetMapID = mapID;
 	tempArgs.showClickGround = true;
@@ -946,6 +966,11 @@ function ROM_CommandGOTO(mapID,pos)
                 LogDebug("event=TeleportFailed");
                 Game.Myself:Client_MoveTo( tempVector3 );
             end
+            if event == 2 then
+                if finish ~= nil then
+                    finish();
+                end;
+            end;
         end
     end;
 	local cmd = MissionCommandFactory.CreateCommand(tempArgs, MissionCommandMove);

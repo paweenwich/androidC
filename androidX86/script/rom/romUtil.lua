@@ -613,7 +613,7 @@ if class ~= nil then
 
 	function AutoAI_Rom:ctor()
         self.enable = false;
-		self.UpdateInterval = 0.5;
+		self.UpdateInterval = 0.25;
 		self.nextUpdateTime = 0
 		LogDebug("AutoAI_Rom:ctor()");
 	end
@@ -647,22 +647,23 @@ if class ~= nil then
 					--self.nextUpdateTime = time + 1.0;
                     return true;
                 end;
-            end;        
-            if Game.Myself.autoPos ~= nil then
+            end;
+                
+            if Game.Myself.autoPos ~= nil and ROM_FindCurrentMonster() == nil then
                 local myPos = Game.Myself:GetPosition();
                 local distance = LuaVector3.Distance(myPos, Game.Myself.autoPos);
 				LogDebug("AutoAI_Rom: dist=" .. distance);
                 if distance > 2 then
                     LogDebug("AutoAI_Rom: Move to auto pos");
-                    --Game.Myself:Client_MoveTo(Game.Myself.autoPos, nil, nil, nil, nil, nil);
+                    Game.Myself:Client_MoveTo(Game.Myself.autoPos, nil, nil, nil, nil, nil);
 					return true;
                 end;
 			else	
-				LogDebug("Game.Myself.autoPos not set");
+				--LogDebug("Game.Myself.autoPos not set");
             end;
             LogDebug("AutoAI_Rom:Prepare() nothing to do!");
             -- nothing to do
-            self.nextUpdateTime = time + 1.0;
+            --self.nextUpdateTime = time + 1.0;
         end;
         return false
 	end
@@ -747,7 +748,7 @@ function ROM_FindNearestMonsterEx(monlist)
 end;
 
 function ROM_FindNearestMonsterEx2(tab)
-    local monlist = tab.monlist or {};
+    local monlist = tab.monlist or myMonsterList;
     local filterFunc = function(mon)
         if #monlist == 0 or TableUtil.HasValue(monlist,mon.data.staticData.id) then
             if tab.filter ~= nil then
@@ -916,6 +917,11 @@ function ROM_FindBestMonster()
         end;
     end;     
     return nil;
+end;
+
+function ROM_FindCurrentMonster()
+	local npc = ROM_GetMonsterLockTarget() or ROM_FindBestMonster();
+    return npc;
 end;
 
 function ROM_GetMonsterLockTarget()
@@ -1099,6 +1105,48 @@ function ROM_CreatePacketCommandFromFile(fileName)
 	end;
 	--logDebug("\n" .. ret);
 	return ret;
+end;
+
+function ROM_GetNearestTown(mapID)
+    mapID = mapID or Game.MapManager:GetMapID();
+    local currentMapID = mapID; --15;
+    local minDist = 10000;
+    local nearestMapID = -1;
+    --LogDebug("currentMapID=" .. currentMapID);
+    if Table_Map[currentMapID].MapArea ~= nil then
+        local currentPos = Table_Map[Table_Map[currentMapID].MapArea].Position;
+        if currentPos ~= _EmptyTable then
+            tableForEach(Table_Map,function(i,v)
+                local map = v;
+                if map.Type == 6 then
+                    --LogDebug(MyTostring(map));
+                    local pos = Table_Map[map.MapArea].Position;
+                    if pos ~= _EmptyTable then
+                        local dist = (currentPos[1]-pos[1])*(currentPos[1]-pos[1])  + (currentPos[2]-pos[2])*(currentPos[2]-pos[2]);
+                        --LogDebug("Dist=" .. dist);
+                        if dist < minDist then
+                            minDist = dist;
+                            nearestMapID = map.id;
+                        end;
+                    end;
+                end;
+            end);
+        end;
+        if nearestMapID > 0 then
+            LogDebug("ROM_GetNearestTown: " .. Table_Map[mapID].NameEn .. " -> " .. Table_Map[nearestMapID].NameEn);
+            return nearestMapID;
+        else
+            LogDebug("ROM_GetNearestTown: " .. Table_Map[mapID].NameEn .. " -> NOT FOUND");
+            return nil;
+        end;
+    end;    
+    return nil;
+end;
+
+function ROM_GetNearPlayers(range)
+    range = range or 10;
+    local players = NSceneUserProxy.Instance:FindNearUsers(Game.Myself:GetPosition(),range,nil);
+    return players;
 end;
 
 

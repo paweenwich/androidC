@@ -68,21 +68,11 @@ function ROM_WalkToBoard()
         -- found then just walk to it
         return ROM_WalkToNPC(Game.MapManager:GetMapID(),boardNPC);
     end;
-    -- wrong map use morrc (16) as base for now
-    
+    local nearestTownID = ROM_GetNearestTown() or 1;
 	local tempArgs = {};
-	tempArgs.targetMapID = 16;
+	tempArgs.targetMapID = nearestTownID;
 	tempArgs.showClickGround = true;
 	tempArgs.allowExitPoint = true;
---[[    tempArgs.callback = function(cmd, event)
-        LogDebug("cmd=" .. MyTostring(cmd));
-        LogDebug("event=" .. MyTostring(event));
-        if 2 == event then
-            LogDebug("ROM_WalkToBoard auto walk to board");
-            --ROM_WalkToNPC(Game.MapManager:GetMapID(),boardNPC);
-            ROM_WalkToBoard();
-        end
-    end]]
 	local cmd = MissionCommandFactory.CreateCommand(tempArgs, MissionCommandMove);
 	if(cmd)then
         LogDebug("ROM_WalkToBoard: Client_SetMissionCommand");
@@ -95,7 +85,7 @@ end;
 
 function ROM_WalkToNPC(mapID,npcID,finish)
     npcID = npcID or 1016;
-    mapID = mapID or 16;
+    mapID = mapID or Game.MapManager:GetMapID();
     finish = finish or function() LogDebug("ROM_WalkToNPC Finish"); end;
     
     -- check nearest NPC
@@ -117,6 +107,7 @@ function ROM_WalkToNPC(mapID,npcID,finish)
     
     local npc = ROM_GetNPCPointByID(npcID);    
     if npc ~= nil then
+        LogDebug("ROM_WalkToNPC: NPC found on map");
         -- found then just walk to it
         tempArgs.targetMapID = Game.MapManager:GetMapID();  -- change target to current map
         local tempVector3 = LuaVector3.zero;
@@ -130,6 +121,7 @@ function ROM_WalkToNPC(mapID,npcID,finish)
             end
         end        
     else
+        LogDebug("ROM_WalkToNPC: NPC not found on map");
         -- just walk to that map and continue
         tempArgs.callback = function(cmd, event)
             LogDebug("cmd=" .. MyTostring(cmd));
@@ -340,14 +332,21 @@ function ROM_DoAutoQuest()
 				if q.wantedData.MapId ~= nil then
 					LogDebug("target pos = " .. MyTostring(q.staticData.Params.tarpos));
 					LogDebug("target pos = " .. MyTostring(q.pos));
-					ROM_CommandGOTO(q.wantedData.MapId,q.pos);
+					ROM_CommandGOTO(q.wantedData.MapId,q.pos,function()
+                        ROM_DelayCall(2000,function()
+                            LogDebug("ROM_DoAutoQuest: take photo");
+                            ServiceNUserProxy.Instance:CallStateChange(ProtoCommon_pb.ECREATURESTATUS_SELF_PHOTO);
+                            ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 
+                            ServiceNUserProxy.Instance:CallStateChange(0);
+                        end);
+                    end);
+                    
 				else
 					LogDebug("Should not be here");
 				end                            
 			elseif q.wantedData.Content == "remove_item" then
 				ListField(q,"",{},"    ");  
 				if q.params.monster ~= nil then
-					--ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
 					LogDebug("----");
 					ListField(q.params,"",{},"    ");  
 					local num = BagProxy.Instance:GetAllItemNumByStaticID(q.params.item[1].id);
@@ -357,7 +356,8 @@ function ROM_DoAutoQuest()
 					end;
 				else
 					if q.wantedData.MapId ~= nil then
-						ROM_WalkToNPC(q.staticData.Map,q.wantedData.NpcId,
+						--ROM_WalkToNPC(q.staticData.Map,q.wantedData.NpcId,
+                        ROM_WalkToNPC(q.staticData.Map,q.params.npc,
 							function()
 								local nearestNPC, nearestDist = ROM_GetNearestNPC();
 								--Game.Myself:Client_LockTarget(nearestNPC);
@@ -428,6 +428,29 @@ function ROM_DoAutoQuest()
 	end;
 	LogDebug("done");
 
+end;
+
+function ROM_DoSelfie()
+    -- SENDPROTO [9] [42] status: 7
+    ServiceNUserProxy.Instance:CallStateChange(ProtoCommon_pb.ECREATURESTATUS_SELF_PHOTO);
+--[[
+SENDPROTO [5] [27] random: 0 skillID: 20004001 data { pos { z: 120400 y: 5179 x: 16700 } hitedTargets { type: 1 charid: 4313990901 damage: 1 } dir: 351549 number: 1 } charid: 4313990901
+01/22/19 10:15:57 SENDPROTO [8] [4] subgroup: 0 step: 1 questid: 53360001
+]]
+    -- GameConfig.NewRole.flashskill
+--[[    
+    
+	local phaseData = SkillPhaseData.Create(GameConfig.NewRole.flashskill)
+	for i=1,#nearMonster do
+		-- helplog("nearMonster checkFocus_N:",nearMonster[i].data.id)
+		phaseData:AddTarget(nearMonster[i].data.id, 1, 1)
+	end
+	for i=1,#nearPlayers do
+		-- helplog("nearPlayers checkFocus_N:",nearPlayers[i].data.id)
+		phaseData:AddTarget(nearPlayers[i].data.id, 1, 1)
+	end
+	phaseData:SetSkillPhase(SkillPhase.Attack)
+	Game.Myself:Client_UseSkillHandler(0, phaseData)]]
 end;
 
 

@@ -1690,6 +1690,116 @@ if AI_CMD_Myself_MoveToHelper~= nil then
         return AI_CMD_MoveToHelper.Update(self, time, deltaTime, creature, ignoreNavMesh,range)
     end
 end;
+
+if CDProxy and CDProxy.Instance then
+    function CDProxy:SkillIsInCD(id)
+        --LogDebug("CDProxy:SkillIsInCD " .. id);
+        return self:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,id) or self:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,CDProxy.CommunalSkillCDSortID)
+        --return self:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,id);
+    end
+    
+    function CDProxy:IsInCD(cdType,id)
+        local map = self:GetCDMapByType(cdType)
+        local data = map[id]
+        if(data == nil) then return false
+        else
+            --LogDebug(MyTostring(data:GetCd()));
+            return data:GetCd() >0
+        end
+        -- return map[id]~=nil
+    end    
+end;
+
+if SkillInfo ~= nil then
+    function SkillInfo:GetCastInfo(creature)
+        local staticData = self.staticData
+        local castParams = staticData.Lead_Type
+        local castTime = 0
+        local castAllowInterrupted = false
+        if nil ~= castParams then
+            if SkillCastType.Physics == castParams.type then
+                castTime = castParams.ReadyTime
+                local dynamicSkillInfo,dynamicSkillInfoProp = self:_GetDynamicSkillInfoAndProp(creature)
+                if(dynamicSkillInfo~=nil) then
+                    castTime = castTime + dynamicSkillInfo:GetChangeReady()
+                end
+                if(castTime<0) then
+                    castTime = 0
+                end
+                if(creature and creature.data:NextSkillNoReady()) then
+                    castTime = 0
+                end
+            elseif SkillCastType.Magic == castParams.type then
+                local props = creature.data.props
+                local CTChangePer = props.CTChangePer:GetValue()
+                local CTChange = props.CTChange:GetValue()
+                local CastSpd = props.CastSpd:GetValue()
+                local CTFixedPer = props.CTFixedPer:GetValue()
+                local CTFixed = props.CTFixed:GetValue()
+
+                --skill dynamic start
+                local dynamicSkillInfo,dynamicSkillInfoProp = self:_GetDynamicSkillInfoAndProp(creature)
+
+                if(dynamicSkillInfoProp~=nil) then
+                    CTChangePer = CTChangePer + dynamicSkillInfoProp.CTChangePer:GetValue()
+                    CTChange = CTChange + dynamicSkillInfoProp.CTChange:GetValue()
+                    CastSpd = CastSpd + dynamicSkillInfoProp.CastSpd:GetValue()
+                    CTFixedPer = CTFixedPer + dynamicSkillInfoProp.CTFixedPer:GetValue()
+                    CTFixed = CTFixed + dynamicSkillInfoProp.CTFixed:GetValue()
+                end
+                --skill dynamic end
+
+                if 0 > CastSpd then
+                    CastSpd = 0
+                end
+
+                local fct = castParams.FCT*(1+CTChangePer)+CTChange-CastSpd
+                if 0 > fct then
+                    fct = 0
+                end
+
+                local fixedCCT = (castParams.CCT + CTFixed)
+                if(fixedCCT<0) then
+                    fixedCCT = 0
+                end
+                local cct = fixedCCT*(1+CTFixedPer)
+                if(cct<0) then
+                    cct = 0
+                end
+                castTime = cct+fct
+                if(creature.data:NextSkillNoReady()) then
+                    castTime = 0
+                end
+            elseif SkillCastType.Lead == castParams.type then
+                castTime = castParams.duration
+                castAllowInterrupted = true
+            elseif SkillCastType.Guide == castParams.type then
+                local props = creature.data.props
+                local DChangePer = props.DChangePer:GetValue()
+                local DChange = props.DChange:GetValue()
+
+                --skill dynamic start
+                local dynamicSkillInfo,dynamicSkillInfoProp = self:_GetDynamicSkillInfoAndProp(creature)
+                if nil ~= dynamicSkillInfoProp then
+                    DChangePer = DChangePer + dynamicSkillInfoProp.DChangePer:GetValue()
+                    DChange = DChange + dynamicSkillInfoProp.DChange:GetValue()
+                end
+                --skill dynamic end
+
+                castTime = (castParams.DCT+DChange)*(1+DChangePer)
+                if 0 > castTime then
+                    castTime = 0
+                end
+            end
+        end
+        --LogDebug("GetCastInfo " .. castTime .. ' ' .. 'castAllowInterrupted=' .. tostring(castAllowInterrupted));
+        --castTime = 0.01;
+        --castAllowInterrupted = false;
+        --LogDebug("GetCastInfo " .. castTime .. ' ' .. 'castAllowInterrupted=' .. tostring(castAllowInterrupted));
+        return castTime, castAllowInterrupted
+    end
+end;
+
 --[[
 
 ]]
