@@ -454,11 +454,11 @@ function ROM_MonFullHP(npc)
 end;
 
 myMonsterList = {
---[[
+
+	10004, -- name=Tarou
     10005,    --Thief Bug      
     10006,    --Spore   
-]]    
---    10007,  --Familiar
+    10007,  --Familiar
 --    40013,  --Thief Bug Egg
 --    110002, --Huge Thief Bug
 	10020, -- name=Pirate Skeleton Type=Monster
@@ -474,24 +474,29 @@ myMonsterList = {
 --	10051, -- name=Matyr	
 	10052, -- name=Mummy
     10063, -- name=Archer Skeleton
+	
+
 };
 
 myMonsterRules = {
 --    {func= ROM_FindMiniBoss}, -- priority to miniboss
-    {func= ROM_FindStaticMonster},  -- priority to static monster
+--    {func= ROM_FindStaticMonster},  -- priority to static monster
 --    {func= ROM_FindNearestMonsterEx, param=myMonsterList},  -- selected monster
     {func= ROM_FindNearestMonsterEx2, filter=ROM_MonFullHP},  -- selected monster
 };
 
 myAIRules = {
-    {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
-    {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
-	{name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
-	{name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
-	{name="WalkToRange", func=ROM_WalkToRange,range=5},  		
-	{name="Heal", func=ROM_Heal,frachp=0.6},  -- bless    
-	{name="Turn", func=ROM_TurnUndead, frachp=0.6},  
-    {name="Holy Light Strike", func=ROM_SkillTarget},  	
+--    {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
+	{name="Bash", func=ROM_SkillTarget},    
+	{name="Auto", func=ROM_SkillTarget},    
+
+--    {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
+--	{name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
+--	{name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
+--	{name="WalkToRange", func=ROM_WalkToRange,range=5},  		
+--	{name="Heal", func=ROM_Heal,frachp=0.6},  -- bless    
+--	{name="Turn", func=ROM_TurnUndead, frachp=0.6},  
+--    {name="Holy Light Strike", func=ROM_SkillTarget},  	
 };
 
 ROM_Config = {};
