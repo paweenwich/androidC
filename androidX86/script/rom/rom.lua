@@ -58,7 +58,7 @@ ROM_DoFile("/data/local/tmp/script/hookSendNotification.lua");
 function ROM_Reload()
 	return ROM_DoFile("/data/local/tmp/script/rom.lua");
 end;
-
+--[[
 if AI_Myself~=nil then
 	function AI_Myself:_Idle(time, deltaTime, creature)
 		--LogDebug("AI_Myself:_Idle " .. time .. ' ' .. deltaTime);
@@ -78,6 +78,7 @@ if AI_Myself~=nil then
 	return self.autoAI_Battle:SearchLockTarget(creature, skillInfo), 10003
 	end
 end;
+
 if MainViewHeadPage~=nil then
 	function MainViewHeadPage:clickMyHead()
 		LogDebug("Click");
@@ -137,7 +138,7 @@ if Game~=nil and Game.LogicManager_Myself_Props ~= nil and Game.me~=nil then
     LogDebug(tostring(Game.LogicManager_Myself_Props.UpdateHp));
     LogDebug("LogicManager_Myself_Props");
 end;
-
+]]
 if FunctionChangeScene~= nil then
     LogDebug("Mod FunctionChangeScene");
 	function FunctionChangeScene:EnterScene()
@@ -194,7 +195,7 @@ if MyTick ~= nil then
 	end;
 end;
 
-
+--[[
 
 function OnMiniMapClick(self)
 	--myTick:stop();
@@ -218,7 +219,7 @@ function OnMiniMapClick(self)
 	--g_mainView:FindGO("SkillBord"):SetActive(toggle%2 == 1); -- skill button
 
 end;
-
+]]
 function ROM_SkillTarget(tab)
     local skillInfo = ROM_GetMySkillInfoByName(tab.name);
     if skillInfo == nil then return false end;
@@ -648,6 +649,24 @@ function ROM_Test(g)
 	
 	local nearestNPC, nearestDist = ROM_GetNearestNPC();	
 	LogDebug(MonsterToString(nearestNPC));
+    
+    LogDebug("--Table_Skill--");
+    tableForEach(Table_Skill, function(i, v)
+        local sk = v;
+        if v.Level == 1 then
+            local damages = v.Damage;
+            if damages and #damages > 0 then
+                local damage = damages[1];
+                local func = CommonFun.CalcDamageFuncs[damage.type]
+                if nil == func then
+                    LogDebug("ID=" .. sk.id .. " " .. sk.NameZh .. " FUNC NOT FOUND");
+                else
+                    LogDebug("ID=" .. sk.id .. " " .. sk.NameZh .. " d-type=" .. damage.type );                
+                end;
+            end;
+        end;
+    end);
+    
     
     --local players = ROM_GetNearPlayers();
     --UIUtil.FloatMsgByText("Players=" .. #players);	

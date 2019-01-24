@@ -312,3 +312,67 @@ Login Screen
 ServiceGMProxy
 
 ServiceManualProxy inherited from ServiceAutoProxy
+
+Logic_SamplePosition
+
+
+13001 Auto Attack d-type=19
+10000001 Auto Attack d-type=19
+70680001 Weapon Break d-type=19   
+70550001 Stunning Attack d-type=19
+461001 Auto Attack d-type=19
+70560001 Curse Atk d-type=19
+
+01/24/19 15:35:35 ID=1255001 Warg Strike d-type=22
+
+01/24/19 15:35:35 ID=372001 Auto Attack d-type=25
+
+
+01/24/19 15:35:35 ID=79001 Fire Bolt d-type=35  (rune)
+
+
+01/24/19 15:35:35 ID=94001 Napalm Vulcan d-type=37 (rune)
+
+01/24/19 15:35:35 ID=74001 Cold Bolt d-type=38 (rune)
+
+01/24/19 15:35:35 ID=204001 Mammonite d-type=6102
+
+01/24/19 15:35:35 ID=100100001 Soul Strike d-type=2103
+
+01/24/19 15:35:35 ID=176001 Strong Blade Attack d-type=3106
+01/24/19 15:35:35 ID=70810001 Slow Attack d-type=3106
+
+01/24/19 15:35:35 ID=183001 Grimtooth d-type=3201
+
+01/24/19 15:35:35 ID=197001 Meteor Assault d-type=3301
+
+01/24/19 15:35:35 ID=121001 Arrow Shower d-type=4103
+01/24/19 15:35:35 ID=1246001 Arrow Storm d-type=4103
+
+
+01/24/19 15:35:35 ID=1245001 Deadly Snipe d-type=4401
+
+01/24/19 15:35:35 ID=100140001 Magic Fire d-type=8006
+
+
+01/24/19 15:35:35 ID=91015001 Trick d-type=9011
+01/24/19 15:35:35 ID=91014001 Naughty Light d-type=9011
+01/24/19 15:35:35 ID=91000001 auto attack (Poring Battle) d-type=9011
+
+01/24/19 15:35:35 ID=470001 Auto Attack d-type=9202
+
+function CommonFun.Inhale(srcUser, targetUser)
+
+function CommonFun.StealMoney(srcUser, targetUser)
+
+
+function CommonFun.calcBuff_2430(srcUser, targetUser, a, b, c, d,lv)
+function CommonFun.calcBuff_2410(srcUser, targetUser, a, b, c, d,lv)
+function CommonFun.calcBuff_2190(srcUser, targetUser, a, b, c, d,lv, damage)
+function CommonFun.calcBuff_2440(srcUser, targetUser, a, b, c, d,lv)
+function CommonFun.calcBuff_2441(srcUser, targetUser, a, b, c, d,lv)
+function CommonFun.calcBuff_2442(srcUser, targetUser, a, b, c, d,lv)
+function CommonFun.calcBuff_2450(srcUser, targetUser, a, b, c, d,lv)
+function CommonFun.calcBuff_2460(srcUser, targetUser, a, b, c, d,lv)
+function CommonFun.calcBuff_2470(srcUser, targetUser, a, b, c, d,lv)
+function CommonFun.calcBuff_2480(srcUser, targetUser, a, b, c, d,lv)

@@ -20,11 +20,11 @@ all:	jni/luaServer/lua_server.cpp ragnarok ragnarokMono elf mtail rom
 rom:	
 	adb push script/rom/AScript_FrameWork_GUI_view_MainView.lua /data/local/tmp/script
 	adb push script/rom/AScript_Refactory_Game_FunctionSystem_Logic_AI_Myself_AI_CMD_Myself_Skill.lua /data/local/tmp/script
-	adb push script/rom/AScript_Refactory_Game_FunctionSystem_Logic_AI_Myself_AI_Myself.lua /data/local/tmp/script
-	adb push script/rom/AScript_FrameWork_GUI_view_MainSubviews_MiniMapWindow.lua /data/local/tmp/script
-	adb push script/rom/AScript_FrameWork_GUI_view_MainView.lua /data/local/tmp/script
+#	adb push script/rom/AScript_Refactory_Game_FunctionSystem_Logic_AI_Myself_AI_Myself.lua /data/local/tmp/script
+#	adb push script/rom/AScript_FrameWork_GUI_view_MainSubviews_MiniMapWindow.lua /data/local/tmp/script
+#	adb push script/rom/AScript_FrameWork_GUI_view_MainView.lua /data/local/tmp/script
 #	oop for test
-	adb push script/rom/AScript_org_puremvc_lua_multicore_help_oop.lua /data/local/tmp/script
+#	adb push script/rom/AScript_org_puremvc_lua_multicore_help_oop.lua /data/local/tmp/script
 	adb push script/rom/rom.lua /data/local/tmp/script
 	adb push script/rom/romUtil.lua /data/local/tmp/script
 	adb push script/rom/romAutoQuest.lua /data/local/tmp/script
