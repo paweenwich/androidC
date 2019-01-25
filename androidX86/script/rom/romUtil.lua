@@ -311,9 +311,15 @@ function MonsterToString(m)
 	    local props = m.data.props;
 		local hp = props.Hp:GetValue();
 		if m.data.staticData ~= nil then
-			return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature;	
+			if  m.data.staticData.Type ~= "Monster" then
+				return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape;	
+			else
+				local ret =  "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape;	
+				ret = ret .. " lvl=" .. m.data.staticData.Level .. " BExp=" .. m.data.staticData.BaseExp .. " JExp=" .. m.data.staticData.JobExp;
+				return ret;			
+			end;			
 		else
-			return "ID=" .. m.data.id .. 'PLAYER HP=' .. stat.hp;			
+			return "ID=" .. m.data.id .. ' PLAYER HP=' .. stat.hp;			
 		end;
 	--else
 	--	return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type;	
@@ -661,7 +667,12 @@ if class ~= nil then
 			else	
 				--LogDebug("Game.Myself.autoPos not set");
             end;
-            LogDebug("AutoAI_Rom:Prepare() nothing to do!");
+			local in2 = CDProxy.Instance:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,CDProxy.CommunalSkillCDSortID);
+			if in2 then
+				LogDebug("AutoAI_Rom:Prepare() InCD");
+			else
+				LogDebug("AutoAI_Rom:Prepare() nothing to do!");
+			end;
             -- nothing to do
             --self.nextUpdateTime = time + 1.0;
         end;
@@ -780,7 +791,7 @@ function ROM_GetNearestMonFromList(mons)
         end;
     end);
     if retNpc ~= nil then
-        LogDebug("ROM_GetNearestMonFromList: found " .. MonsterToString(retNpc) .. " " .. minDist);
+        --LogDebug("ROM_GetNearestMonFromList: found " .. MonsterToString(retNpc) .. " " .. minDist);
     end;
     return retNpc;
 end;

@@ -117,7 +117,8 @@ function HOOK_Send(id1, id2, data)
 end;
 
 function ROM_RecvSKIP()
-	return true;
+	--return true;
+	return false;
 end;
 function ROM_RecvAddMapItem(data)
 	--LogDebug("items=" .. MyTostring(data.items));
@@ -125,20 +126,24 @@ function ROM_RecvAddMapItem(data)
 end;
 
 function ROM_RecvGUIDSkip(data)
-	return data.guid ~= Game.Myself.data.id;
+	return false;
+	--return data.guid ~= Game.Myself.data.id;
 end;
 
 function ROM_RecvCHARIDSkip(data)
-	return data.charid ~= Game.Myself.data.id;
+	return false;
+	--return data.charid ~= Game.Myself.data.id;
 end;
 
 
 function ROM_RecvUSERIDSkip(data)
-	return data.userid ~= Game.Myself.data.id;
+	return false;
+--	return data.userid ~= Game.Myself.data.id;
 end;
 
 function ROM_RecvPLAYERGUIDSkip(data)
-	return data.playerguid ~= Game.Myself.data.id;
+	return false;
+--	return data.playerguid ~= Game.Myself.data.id;
 end;
 
 
@@ -979,6 +984,49 @@ function HOOK_NetProtocol_DispatchListener(id1, id2, data)
 end;
 
 if CommonFun ~= nil then
+	function CommonFun.IsInRate(rate, random)
+	  if rate == nil or random == nil then
+		LogDebug("IsInRate false");	
+		return false
+	  end
+	  LogDebug("IsInRate " .. rate .. " " .. random);	
+	  return rate > random
+	end
+
+	function CommonFun.IsCrit(srcUser, targetUser, skillParams)
+		-- 必定命中且暴击
+		local AttrEffect = srcUser:GetProperty("AttrEffect")
+		local AttrEffect2 = targetUser:GetProperty("AttrEffect")
+		local StateEffect2 = targetUser:GetProperty("StateEffect")
+		local bits=CommonFun.getBits(AttrEffect)
+		local bits1=CommonFun.getBits(AttrEffect2)
+		local bits2=CommonFun.getBits(StateEffect2)
+		local skillID = skillParams.id
+		if math.floor(skillID/1000)== 91001 then-----------------------波利乱斗技能撞击判断不会暴击
+		  return false
+		end
+
+		-----------------------------------------------------------------------------------------------------并定名中且暴击属性和睡眠属性都会导致必定被暴击
+		if bits[CommonFun.AttrEffect.MustHitAndCri] == 1 or bits2[CommonFun.StateEffect.Sleep]==1 then
+		  return true
+		end
+		-----------------------------------------------------------------------------------------------------必定无法被暴击属性导致不会受到暴击
+		if bits1[CommonFun.AttrEffect.MustNotCri] == 1 then
+		   return false
+		end   
+
+		local critRate = CommonFun.CalcCritRate(srcUser, targetUser, skillParams)
+		
+		-----------------------------------------------------------------------------------------------------判断自己对敌方暴击是否成立，成立返回暴击值
+		if CommonFun.IsInRate(critRate, srcUser:GetRandom()) then
+		  LogDebug("IsCrit true " .. critRate)		
+		  return true
+		end
+		LogDebug("IsCrit false " .. critRate)		
+		return false
+	end
+
+
 	function CommonFun.CalcDamage(srcUser, targetUser, params, logger)
 	  -- 基础伤害计算
       local indexBefore = Game.Myself.data.randomFunc.index;

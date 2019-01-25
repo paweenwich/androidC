@@ -230,7 +230,7 @@ function ROM_SkillTarget(tab)
         --return self:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,id) or self:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,CDProxy.CommunalSkillCDSortID)
         local in1 = CDProxy.Instance:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,skillItem.sortID);
         local in2 = CDProxy.Instance:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,CDProxy.CommunalSkillCDSortID);
-		LogDebug("ROM_SkillTarget: " .. tab.name .. " inCD=" .. tostring(inCD) .. ' ' .. tostring(in1) .. ' ' .. tostring(in2));		
+		--LogDebug("ROM_SkillTarget: " .. tab.name .. " inCD=" .. tostring(inCD) .. ' ' .. tostring(in1) .. ' ' .. tostring(in2));		
 		return false;
 	end;
 	
@@ -401,6 +401,7 @@ function ROM_TurnUndead(tab)
                             willHit = ROM_WillTurnSuccess(skillID,npc.data);
                         end;
                         if willHit then
+							LogDebug("ROM_TurnUndead: " .. MonsterToString(npc));
                             LogDebug("Game.Myself:Client_UseSkill rand index=" .. Game.Myself.data.randomFunc.index .. ' willHit=' .. tostring(willHit));
                             Game.Myself:Client_UseSkill(skillID, npc,nil,nil,true);
                             return true;
@@ -437,7 +438,7 @@ function ROM_WalkToRange(tab)
         local myPos = Game.Myself:GetPosition();
         local targetPosition = npc:GetPosition();
         local distance = LuaVector3.Distance(myPos, targetPosition);
-        LogDebug("ROM_WalkToRange: dist=" .. distance);
+        --LogDebug("ROM_WalkToRange: dist=" .. distance);
         if distance > range then
             LogDebug("ROM_WalkToRange walk to target");
             Game.Myself:Client_MoveTo(targetPosition, nil, nil, nil, nil, range);
@@ -462,6 +463,8 @@ myMonsterList = {
     10007,  --Familiar
 --    40013,  --Thief Bug Egg
 --    110002, --Huge Thief Bug
+	10012, -- name=Rocker
+	10013, -- name=Willow
 	10020, -- name=Pirate Skeleton Type=Monster
 --	10017, -- name=Hydra Type=Monster
 --  10021, -- name=Poison Spore Type=Monster
@@ -481,7 +484,7 @@ myMonsterList = {
 
 myMonsterRules = {
 --    {func= ROM_FindMiniBoss}, -- priority to miniboss
---    {func= ROM_FindStaticMonster},  -- priority to static monster
+    {func= ROM_FindStaticMonster},  -- priority to static monster
 --    {func= ROM_FindNearestMonsterEx, param=myMonsterList},  -- selected monster
     {func= ROM_FindNearestMonsterEx2, filter=ROM_MonFullHP},  -- selected monster
 };
@@ -536,8 +539,9 @@ end;
 
 function ROM_Test(g)
     LogDebug("MyID=" .. Game.Myself.data.id);   
-    LogDebug("NPC");
-    local mons = ROM_GetAllNPC();
+    local mons = ROM_GetAllNPC();	
+    LogDebug("NPC " .. #mons);
+
     --tableForEach(mons,function(i,v)
 	for monIndex = 1,#mons do
 		local v = mons[monIndex];
@@ -573,7 +577,7 @@ function ROM_Test(g)
     LogDebug("Monster");
     local mons = ROM_GetAllMonster();
     tableForEach(mons,function(i,v)
-        LogDebug(MonsterToString(v)  .. ' - ' .. MyTostring(v.data.randomFunc));
+        LogDebug(MonsterToString(v));
     end);
 	
     local npcList = Game.MapManager:GetNPCPointArray();
