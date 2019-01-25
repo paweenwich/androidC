@@ -387,7 +387,7 @@ function ROM_TurnUndead(tab)
 			--LogDebug("ROM_SkillTarget: use locktarget");
 		end;
         if npc ~= nil then
-			if npc.data.staticData.Race == "Undead" then
+			if npc.data.staticData.Nature == "Undead" then
 				-- check if that monster is undead
 				--LogDebug("ROM_TurnUndead: " .. MonsterToString(npc));
 				local monStatus = ROM_GetMonStatus(npc);
@@ -510,6 +510,9 @@ ROM_Config[4313990901] = {
         10063, -- name=Archer Skeleton
         10061, --  name=Bongun
         10060, --  name=Munak
+        10120, --  name=Evil Druid
+        10121,--  name=Dark Priest
+        10080, --  name=Wraith Type=Monster
     },
     myMonsterRules ={
         {func= ROM_FindStaticMonster},  -- priority to static monster
@@ -538,10 +541,17 @@ if Game and Game.Myself and Game.Myself.data then
 end;
 
 function ROM_Test(g)
-    LogDebug("MyID=" .. Game.Myself.data.id);   
+    LogDebug("----- ROM_Test --------");
+    LogDebug(CreatureToString(Game.Myself));
+    local props = Game.Myself.data.props;
+    --self.configs
+    tableForEach(props.configs,function(i,v)
+        --LogDebug(i);
+    end);
+    
+    --DumpMyself();
     local mons = ROM_GetAllNPC();	
-    LogDebug("NPC " .. #mons);
-
+    LogDebug("NPC List count=" .. #mons);
     --tableForEach(mons,function(i,v)
 	for monIndex = 1,#mons do
 		local v = mons[monIndex];
@@ -574,10 +584,10 @@ function ROM_Test(g)
 		--LogDebug(" needRequireNpcFunc " .. MyTostring(needRequireNpcFunc));
     --end);
 	end;
-    LogDebug("Monster");
+    LogDebug("Monster List count=" .. #mons);
     local mons = ROM_GetAllMonster();
     tableForEach(mons,function(i,v)
-        LogDebug(MonsterToString(v));
+        LogDebug(CreatureToString(v));
     end);
 	
     local npcList = Game.MapManager:GetNPCPointArray();
@@ -587,7 +597,7 @@ function ROM_Test(g)
             local npcData = Table_Npc[v.ID];
             if npcData  then
                 if npcData.id == 1125 then
-                    LogDebug(MyTostring(npcData));
+                    --LogDebug(MyTostring(npcData));
                 end;
             end;
         end;
@@ -653,7 +663,7 @@ function ROM_Test(g)
 	
 	local nearestNPC, nearestDist = ROM_GetNearestNPC();	
 	LogDebug(MonsterToString(nearestNPC));
-    
+--[[    
     LogDebug("--Table_Skill--");
     tableForEach(Table_Skill, function(i, v)
         local sk = v;
@@ -670,11 +680,30 @@ function ROM_Test(g)
             end;
         end;
     end);
-    
+]]    
     
     --local players = ROM_GetNearPlayers();
     --UIUtil.FloatMsgByText("Players=" .. #players);	
-        
+    --ServicePlayerProxy.Instance:CallChangeMap("", 0, 0, 0, 8)
+    
+    local nearestNPC, nearestDist = ROM_GetNearestNPC();
+    --Game.Myself:Client_LockTarget(nearestNPC);
+    --ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
+    --ServiceQuestProxy.Instance:CallRunQuestStep(300010075, nil, nil, 0); 
+    LogDebug("--- questList -----");
+    LogDebug("--- questList 1-----");
+    tableForEach(QuestProxy.Instance.questList[1], function(i, v)    
+        --LogDebug(i);
+        --LogDebug(tostring(v) .. " " .. v.id);
+        --ListField(v,"",{}," ");
+        LogDebug(QuestToString(v));
+        if v.questDataStepType == "visit" then
+            --ListField(v,"",{}," ");
+            local info = QuestDataUtil.getTranceInfoTable(v,v.params);
+            ListField(info,"",{}," ");
+        end;
+    end);
+    
     UIUtil.FloatMsgByText("Test Done 1");	
 		
     if true then

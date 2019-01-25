@@ -289,42 +289,84 @@ function DumpSelf(self)
     LogDebug("activeScene " .. MyTostring(activeScene));
 end;
 
+
 function QuestToString(wq)
     local listType = "";
     local wd = wq.wantedData;
-    if wq.questListType == SceneQuest_pb.EQUESTLIST_ACCEPT then listType = "EQUESTLIST_ACCEPT" end;
-    if wq.questListType == SceneQuest_pb.EQUESTLIST_CANACCEPT then listType = "EQUESTLIST_CANACCEPT" end;
-    if wq.questListType == SceneQuest_pb.EQUESTLIST_COMPLETE then listType = "EQUESTLIST_COMPLETE" end;
-    if wq.questListType == SceneQuest_pb.EQUESTLIST_SUBMIT then listType = "EQUESTLIST_SUBMIT" end;
-    local info = QuestDataUtil.parseWantedQuestTranceInfo(wq,wd);
-	local ret = "id=" .. wd.id .. " Target=[" .. wd.Target .. "] MapId=" .. wd.MapId .. " NpcId=" .. wd.NpcId .. " questListType=" .. listType .. " Content=" .. wd.Content .. " info=[" .. info .. "]";
-	local steps = wq.steps or {};	
-	ret = ret .. " step=" .. (wq.step or 0) .. "/" .. #steps;
-    return ret;
+    if wd ~= nil then
+        if wq.questListType == SceneQuest_pb.EQUESTLIST_ACCEPT then listType = "EQUESTLIST_ACCEPT" end;
+        if wq.questListType == SceneQuest_pb.EQUESTLIST_CANACCEPT then listType = "EQUESTLIST_CANACCEPT" end;
+        if wq.questListType == SceneQuest_pb.EQUESTLIST_COMPLETE then listType = "EQUESTLIST_COMPLETE" end;
+        if wq.questListType == SceneQuest_pb.EQUESTLIST_SUBMIT then listType = "EQUESTLIST_SUBMIT" end;
+        local info = QuestDataUtil.parseWantedQuestTranceInfo(wq,wd);
+        local ret = "id=" .. wd.id .. " " .. wq.questDataStepType .. " Target=[" .. wd.Target .. "] MapId=" .. wd.MapId .. " NpcId=" .. wd.NpcId .. " questListType=" .. listType .. " Content=" .. wd.Content .. " info=[" .. info .. "]";
+        local steps = wq.steps or {};	
+        ret = ret .. " step=" .. (wq.step or 0) .. "/" .. #steps;
+        return ret;
+    else
+        --local info = QuestDataUtil.getTranceInfoTable(wq,wq.params);
+        local ret = "id=" .. wq.id .. " questDataStepType=[" .. wq.questDataStepType .. "] ";
+        return ret;    
+    end;    
 end;
 
+function CreatureToString(creature)
+    if creature == nil then return "CreatureToString NULL" end;
+
+    local creatureType = creature:GetCreatureType();
+    if creatureType == Creature_Type.Player then
+        return PlayerToString(creature);
+    end;
+    if creatureType == Creature_Type.Pet then
+        return "PET ID=" .. creature.data.id;
+    end;
+    if creatureType == Creature_Type.Npc then
+        if creature.data:IsNpc() then
+            return NPCToString(creature);
+        else
+            return MonsterToString(creature);
+        end;
+    end;
+    if creatureType == Creature_Type.Me then
+        return MeToString(creature);
+    end;
+end;
+
+function MeToString(m)
+    local props = m.data.props;
+    local stat = ROM_GetMonStatus(m);
+    local mp = MyselfProxy.Instance;
+    return "ME ID=" .. m.data.id .. ' HP=' .. stat.hp .. "/" .. stat.maxhp .. " SP=" .. stat.sp .. "/" .. stat.maxSp .. " lvl=" ..  mp:RoleLevel() .. " Zeny=" .. mp.GetROB();   
+end;
+
+function NPCToString(m)
+    local stat = ROM_GetMonStatus(m);
+    local props = m.data.props;
+    local ret =  "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape;	
+    ret = ret .. " lvl=" .. m.data.staticData.Level .. " BExp=" .. m.data.staticData.BaseExp .. " JExp=" .. m.data.staticData.JobExp;
+    return ret;			
+end;
+
+function PlayerToString(m)
+    local stat = ROM_GetMonStatus(m);
+    local props = m.data.props;
+    return "ID=" .. m.data.id .. ' PLAYER HP=' .. stat.hp;	
+end;
 
 function MonsterToString(m)
     if m == nil then return "MonsterToString(null)" end;
 	local stat = ROM_GetMonStatus(m);
 	--if  m.data.props ~= nil then
 	    local props = m.data.props;
-		local hp = props.Hp:GetValue();
 		if m.data.staticData ~= nil then
 			if  m.data.staticData.Type ~= "Monster" then
-				return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape;	
+				return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape .. " " .. m:GetCreatureType();	
 			else
-				local ret =  "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape;	
-				ret = ret .. " lvl=" .. m.data.staticData.Level .. " BExp=" .. m.data.staticData.BaseExp .. " JExp=" .. m.data.staticData.JobExp;
-				return ret;			
+                return NPCToString(m);
 			end;			
 		else
-			return "ID=" .. m.data.id .. ' PLAYER HP=' .. stat.hp;			
+            return PlayerToString(m);
 		end;
-	--else
-	--	return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type;	
-	--end;
-
 end;
 
 function SkillToString(s)
@@ -720,21 +762,6 @@ end;
 
 function ROM_GetMyStatus()
 	return ROM_GetMonStatus(Game.Myself);
---[[    local props = Game.Myself.data.props;
-    local hp = props.Hp:GetValue();
-    local maxhp = props.MaxHp:GetValue();
-    local frachp = hp/maxhp;
-    local sp = props.Sp:GetValue();
-    local maxSp = props.MaxSp:GetValue();
-    local fracsp = sp/maxSp;
-    return {
-        hp=hp,
-        maxhp=maxhp,
-        frachp=frachp,
-        sp=sp,
-        maxSp=maxSp,
-        fracsp=fracsp,
-    };]]
 end;
 
 function ROM_GetSkillNeeded(skillID)

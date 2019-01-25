@@ -325,7 +325,10 @@ function ROM_DoAutoQuest()
 				else
 					-- goto board to submit quest 
 					-- it might possibile that this map does not have board will see
-					ROM_WalkToNPC(mapid,q.params.npc);
+                    if ROM_WalkToBoard() then
+                        ROM_ClickNearestNPC(true);
+                    end;
+					--ROM_WalkToNPC(mapid,q.params.npc);
 				end;
 			elseif q.wantedData.Content == "selfie" then
 				ListField(q,"",{},"    ");  
