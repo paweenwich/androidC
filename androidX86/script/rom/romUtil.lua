@@ -388,7 +388,7 @@ function MonsterToString(m)
 	    local props = m.data.props;
 		if m.data.staticData ~= nil then
 			if  m.data.staticData.Type ~= "Monster" then
-				return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape .. " " .. m:GetCreatureType();	
+				return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape .. " " .. m:GetCreatureType() .. " IsStar=" .. (m.data.staticData.IsStar or 0);	
 			else
                 return NPCToString(m);
 			end;			
@@ -970,12 +970,22 @@ function ROM_GetMySkillInfoByName(name)
     return nil;
 end;
 
+function ROM_IsStaticMonster(mon)
+    return (mon.data.staticData.id >= 40000 and mon.data.staticData.id < 50000) 
+end;
+
+function ROM_IsEliteMonster(mon)
+    --LogDebug("ROM_IsEliteMonster " .. mon.data.staticData.id);
+    return (mon.data.staticData.IsStar == 1) 
+end;
+
+
 function ROM_FindStaticMonster(tab)
     local filterFunc = function(mon)
 		if mon.data.staticData.id == 40015 then 
 			return false;
 		end;
-        return (mon.data.staticData.id >= 40000 and mon.data.staticData.id < 50000) or (mon.data.staticData.id >= 100000); 
+        return ROM_IsStaticMonster(mon) or (mon.data.staticData.id >= 100000); 
     end;
     return ROM_FindMonByFilter(filterFunc,"ROM_FindStaticMonster");
 end;

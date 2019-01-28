@@ -1923,6 +1923,87 @@ if SkillInfo ~= nil then
         --LogDebug("GetCastInfo " .. castTime .. ' ' .. 'castAllowInterrupted=' .. tostring(castAllowInterrupted));
         return castTime, castAllowInterrupted
     end
+    
+    function CommonFun.calcDamage_7205(srcUser, targetUser, params, damageParam, logger)
+      local Str = srcUser:GetProperty("Str")
+      local Dex = srcUser:GetProperty("Dex")
+      local Vit = srcUser:GetProperty("Vit")
+      local Luk = srcUser:GetProperty("Luk")
+      local Atk = srcUser:GetProperty("Atk")
+      local AtkPer = srcUser:GetProperty("AtkPer")
+      local DamIncrease = srcUser:GetProperty("DamIncrease")
+      local shield=srcUser:GetEquipedID(1)
+      local RefineLv=srcUser:GetEquipedRefineLv(1)
+      local IgnoreDef  = 0
+      local IgnoreDef1 = srcUser:GetProperty("IgnoreDef")
+      local IgnoreDef2 = srcUser:GetProperty("IgnoreEquipDef")
+      if targetUser.boss or targetUser.mini then
+         IgnoreDef=IgnoreDef1
+      else
+         IgnoreDef=(IgnoreDef1+IgnoreDef2)  
+      end
+      
+      if IgnoreDef >= 1 then
+         IgnoreDef=1
+      end 
+        ------------------------------------------------------------------------------------将原来的物伤加成改成精炼物理攻击
+      local Refine = srcUser:GetProperty("Refine")
+
+      local Def2 = targetUser:GetProperty("Def")
+      local DefPer2 = targetUser:GetProperty("DefPer")
+      local Vit2 = targetUser:GetProperty("Vit")
+      local VitPer2 = targetUser:GetProperty("VitPer")
+      local DamReduc2 = CommonFun.calcDamReDuc(srcUser, targetUser)
+      local RefineDamReduc = targetUser:GetProperty("RefineDamReduc")
+
+      local damChangePer = damageParam.damChangePer
+
+      ----------------------------------------------------------------------------------------------------------------种族，体型，属性，BOSS加伤效果
+      local raceparam     = CommonFun.CalcRaceParam(srcUser, targetUser, params, damageParam, logger)
+      local bodyparam     = CommonFun.CalcBodyParam(srcUser, targetUser, params, damageParam, logger)
+      local elementparam  = CommonFun.CalcElementParam(srcUser, targetUser, params, damageParam, logger)
+      local bossparam     = CommonFun.CalcBossParam(srcUser, targetUser, params, damageParam, logger)
+
+      ----------------------------------------------------------------------------------------------------------------种族，体型，属性，BOSS减伤效果
+      local raceparam2    = CommonFun.CalcRaceParam2(srcUser, targetUser, params, damageParam, logger)
+      local bodyparam2    = CommonFun.CalcBodyParam2(srcUser, targetUser, params, damageParam, logger)
+      local elementparam2 = CommonFun.CalcElementParam2(srcUser, targetUser, params, damageParam, logger)
+      local bossparam2    = CommonFun.CalcBossParam2(srcUser, targetUser, params, damageParam, logger)
+
+
+
+      local BaseAtk  = Str*2 + math.floor(Str*Str/100) + math.floor(Dex/5) + math.floor(Luk/5)
+      local AtkFinal = ((Atk-BaseAtk)*(1+AtkPer)*CommonFun.ShapeCorrection(srcUser,targetUser)*bodyparam*elementparam*elementparam2+BaseAtk)*raceparam*bossparam*bossparam2
+
+      ----------------------------物理防御减免
+      local DefReduc= CommonFun.CalcDef(Def,Vit,srcUser,targetUser)
+      ------------------------------------------------------------体质和灵巧带来伤害加成
+      local RefineLv=srcUser:GetEquipedRefineLv(1)
+      local VDDamage = Vit/150 + Dex/200 + RefineLv/15
+      if VDDamage <= 0 then
+         VDDamage  = 0
+      end   
+      
+      local skilllv_1 = srcUser:GetLernedSkillLevel(1181)--------------守护之盾
+      local Sheild = skilllv_1*0.01+1
+
+      local A = ((AtkFinal*DefReduc*(1-DamReduc2)+Refine)*(damChangePer + VDDamage)*(1+DamIncrease)*(1-RefineDamReduc)-Vit2*(1+VitPer2))*Sheild
+      LogDebug("" .. (AtkFinal*DefReduc*(1-DamReduc2)+Refine) .. " " .. (damChangePer + VDDamage) .. " " .. (1+DamIncrease) .. " " .. (1-RefineDamReduc) .. " " .. Sheild);
+      
+      LogDebug("RefineLv=" .. RefineLv/15 .. " Vit=" .. Vit/150 .. " Dex" .. Dex/200 .. ' skilllv_1=' .. skilllv_1 .. ' Refine=' .. Refine);
+      ----------------------------------------------------------------------------------------------------------------------------镜盾装备效果
+      if shield==42508 or shield==142508 then
+        return A*1.15
+      end
+
+       if 1 >= A then
+             return 1
+       end
+
+       return A
+    end
+    
+    CommonFun.CalcDamageFuncs[7205] = CommonFun.calcDamage_7205;
 end;
 
 --[[

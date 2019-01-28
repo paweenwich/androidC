@@ -245,7 +245,7 @@ function ROM_SkillTarget(tab)
 			--LogDebug("ROM_SkillTarget: use locktarget");
 		end;
         if npc ~= nil then
-            LogDebug("ROM_SkillTarget: " .. MonsterToString(npc));
+            LogDebug("ROM_SkillTarget: " .. skillID .. " " .. MonsterToString(npc));
             Game.Myself:Client_UseSkill(skillID, npc,nil,nil,true);
             return true;
         else
@@ -347,19 +347,38 @@ end;
 
 function ROM_WillMiss(skillAndLevel,targetUser,value)
 	value = value or 50;
-	local srcUser = Game.Myself.data;
+--    local skillID, skillLevel = CommonFun.UnmergeSkillID(skillAndLevel);
+    local srcUser = Game.Myself.data;
 	local saveIndex = Game.Myself.data.randomFunc.index;
+    local skillParams = Table_Skill[skillAndLevel];
+    srcUser:GetRandom();    
+    local willMiss = CommonFun.IsMiss(srcUser,targetUser,skillParams);
+
+    logDebug("ROM_WillMiss " .. tostring(willMiss));
+--[[    
 	local randValue =  srcUser:GetRandom();
 	randValue =  srcUser:GetRandom();
-	--randValue =  srcUser:GetRandom();
 	logDebug("ROM_WillMiss " .. randValue .. ' saveIndex=' .. saveIndex);
-	local ret = randValue > value
+	local ret = randValue > value]]
 	Game.Myself.data.randomFunc.index = saveIndex;
-	return ret;
+	return willMiss;
 end;
 
 function ROM_NeverMiss(tab)
-	while ROM_WillMiss(nil,nil,49) do
+    local skillInfo = ROM_GetMySkillInfoByName(tab.name);
+    if skillInfo == nil then return false end;
+    local skillID = skillInfo.staticData.id;
+    local npc = ROM_FindCurrentMonster();
+    if npc == nil then
+        return false;
+    end;
+    if tab.filter then
+        if tab.filter(npc) == false then
+            return false;
+        end;
+    end;
+
+	while ROM_WillMiss(skillID,npc.data,49) do
 		LogDebug("index=" .. Game.Myself.data.randomFunc.index);
 		Game.Myself.data:GetRandom();
 	end;
@@ -503,6 +522,7 @@ myMonsterList = {
 	10025, -- name=Marina Type=Monster
 --  10023, -- name=Vadon Type=Monster
 	10050, -- name=Soldier Skeleton
+    10037, -- name=Flora Type=Monster    
 --	10051, -- name=Matyr	
 	10052, -- name=Mummy
     10063, -- name=Archer Skeleton
@@ -520,7 +540,7 @@ myMonsterRules = {
 myAIRules = {
     {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
 --	{name="Bash", func=ROM_SkillTarget},    
-	{name="Shield Charge", func=ROM_NeverMiss},    	
+	{name="Shield Charge", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
 	{name="Auto", func=ROM_SkillTarget},    
 
 
