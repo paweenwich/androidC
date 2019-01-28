@@ -176,6 +176,7 @@ function ROM_SubmitQuest()
         local wd = wq.wantedData;
         if wq.questListType == SceneQuest_pb.EQUESTLIST_COMPLETE then
             LogDebug("Submitable quest found to submit " .. wd.id);
+			ROM_VisitNearestNPC();
             ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_SUBMIT,wd.id);
             return true;
         end;
@@ -190,6 +191,11 @@ function ROM_SubmitQuest()
     end;
     LogDebug("Submitable quest not found to submit");
     return false;
+end;
+
+function ROM_VisitNearestNPC()
+	local nearestNPC, nearestDist = ROM_GetNearestNPC();
+	ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
 end;
 
 
@@ -210,6 +216,7 @@ function ROM_AcceptQuest()
 				
 				if wd.Content == content then
 					LogDebug("ROM_AcceptQuest: Found " .. QuestToString(wq) .. ' ' .. wd.id);
+					ROM_VisitNearestNPC();
 					ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,wd.id);
 					return true;
 				end;
@@ -289,11 +296,14 @@ function ROM_DoAutoQuest()
 			LogDebug("Mission complete walk to board");
 			if ROM_WalkToBoard() then
 				-- near board
-				--LogDebug("Near board submit");
+				LogDebug("Near board submit");
 				--ROM_SubmitQuest();
 				--LogDebug("Near board refresh");
-				--ServiceQuestProxy.Instance:CallQuestList(SceneQuest_pb.EQUESTLIST_CANACCEPT,101);
-                ROM_ClickNearestNPC(true);
+				ROM_VisitNearestNPC();
+				ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 				
+				ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 				
+				ServiceQuestProxy.Instance:CallQuestList(SceneQuest_pb.EQUESTLIST_CANACCEPT,101);
+                --ROM_ClickNearestNPC(true);
 			end;
 		else
 			--ListField(q,"",{},"    ");  
@@ -303,10 +313,7 @@ function ROM_DoAutoQuest()
 				if q.wantedData.MapId ~= nil then
 					ROM_WalkToNPC(q.wantedData.MapId,q.params.npc,
 						function()
-							local nearestNPC, nearestDist = ROM_GetNearestNPC();
-							--Game.Myself:Client_LockTarget(nearestNPC);
-							LogDebug("ROM_DoAutoQuest: move click");
-							ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
+							ROM_VisitNearestNPC();
 							ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
 							GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
 							LogDebug(QuestToString(q));
@@ -319,9 +326,13 @@ function ROM_DoAutoQuest()
 				end;
 			elseif q.wantedData.Content == "kill" then
 				ListField(q,"",{},"    ");  
-				if q.params.monster ~= nil then
+				if q.params.monster ~= nil or q.params.groupId then
 					-- goto that monster
-					ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
+					if q.params.monster ~= nil then
+						ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
+					else
+						ROM_CommandVisitMonster(q.wantedData.MapId,q.params.groupId);
+					end;
 				else
 					-- goto board to submit quest 
 					-- it might possibile that this map does not have board will see
@@ -362,10 +373,7 @@ function ROM_DoAutoQuest()
 						--ROM_WalkToNPC(q.staticData.Map,q.wantedData.NpcId,
                         ROM_WalkToNPC(q.staticData.Map,q.params.npc,
 							function()
-								local nearestNPC, nearestDist = ROM_GetNearestNPC();
-								--Game.Myself:Client_LockTarget(nearestNPC);
-								LogDebug("ROM_DoAutoQuest: remove_item click");
-								ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
+								ROM_VisitNearestNPC();
 								ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
 								GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
 								LogDebug(QuestToString(q));
@@ -389,10 +397,7 @@ function ROM_DoAutoQuest()
 				ListField(q,"",{},"    ");  
 				ROM_WalkToNPC(q.map,q.params.npc,
 					function()
-						local nearestNPC, nearestDist = ROM_GetNearestNPC();
-						--Game.Myself:Client_LockTarget(nearestNPC);
-						LogDebug("ROM_DoAutoQuest: visit click");
-						ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
+						ROM_VisitNearestNPC();
 						ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
 						GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
 						LogDebug(QuestToString(q));
@@ -406,24 +411,14 @@ function ROM_DoAutoQuest()
 		end;
 	else 
 		ROM_DumpWantedQuest();
-		LogDebug("ROM_DoAutoQuest: No quest to already accept walk to board");
+		LogDebug("ROM_DoAutoQuest: No quest already accept walk to board");
 		if ROM_WalkToBoard() then
 			-- refresh wanted quest list
 			LogDebug("ROM_DoAutoQuest: try refresh())");
 			ServiceQuestProxy.Instance:CallQuestList(SceneQuest_pb.EQUESTLIST_CANACCEPT,101);
-
-			-- near board
-			
-			-- TODO: find a way to click
-			--ROM_ClickNearestNPC();
-			--Game.Myself:Client_LockTarget(nearestNPC);
 			if ROM_SubmitQuest() == false then
-                --ROM_ClickNearestNPC();
 				LogDebug("Before ROM_AcceptQuest");		
-				local nearestNPC, nearestDist = ROM_GetNearestNPC();
-				ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
 				ROM_AcceptQuest();
-				--FunctionVisitNpc.me:AccessTarget(nil, nil, nil);
             else
                 
 			end;

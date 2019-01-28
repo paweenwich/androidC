@@ -376,3 +376,8 @@ function CommonFun.calcBuff_2450(srcUser, targetUser, a, b, c, d,lv)
 function CommonFun.calcBuff_2460(srcUser, targetUser, a, b, c, d,lv)
 function CommonFun.calcBuff_2470(srcUser, targetUser, a, b, c, d,lv)
 function CommonFun.calcBuff_2480(srcUser, targetUser, a, b, c, d,lv)
+
+
+REvive
+SENDPROTO [9] [8] type: 1
+ServiceSceneProxy.Instance:CallReliveUserCmd(1)

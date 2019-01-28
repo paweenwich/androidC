@@ -1,5 +1,40 @@
 -- hookSendNofication.lua --- 
+
 function HOOK_SendNotification(self,p1,p2)
+	if p1 ~= nil then
+		if p1 == UIEvent.ShowUI then
+			LogDebug("HOOK_SendNotification: " .. tostring(p1));	
+			--ListField(p2,"",{}," ");
+			if p2 and p2.viewname == "DeathPopView" then
+				LogDebug(p2.viewname);
+				LogDebug("I am dead");
+				ROM_DelayCall(5000,function(param)
+					LogDebug("Auto revive start");
+					ServiceSceneProxy.Instance:CallReliveUserCmd(1)
+					LogDebug("Auto revive end");
+				end);
+			end;
+			--LogDebug(MonsterToString(p2.npcinfo));
+		end;
+		
+		if p1 == UIEvent.CloseUI then
+			--LogDebug("HOOK_SendNotification: " .. tostring(p1));	
+			--ListField(p2,"",{}," ");
+			--LogDebug(MonsterToString(p2.npcinfo));
+		end;
+		if p1 == UIEvent.JumpPanel then
+			--LogDebug("HOOK_SendNotification: " .. tostring(p1));	
+			--ListField(p2,"",{}," ");
+			--if p2 and p2.viewdata ~= nil then
+			--	LogDebug(p2.viewdata);
+				--LogDebug("npcTarget=" .. MonsterToString(p2.viewdata.npcTarget));
+			--end;
+		end;
+	end;
+	GameFacade.Instance:_sendNotification(p1,p2);
+end;
+
+function _HOOK_SendNotification(self,p1,p2)
     if p1 ~= nil then
         if string.match(p1, "ServiceEvent_") then	
         --if p1 == "ServiceEvent_NUserUserNineSyncCmd" then
@@ -85,6 +120,17 @@ function HOOK_SendNotification(self,p1,p2)
     end;
 	GameFacade.Instance:_sendNotification(p1,p2);
 end;
+
+if GameFacade and GameFacade.Instance and GameFacade.Instance.sendNotification then
+	if GameFacade.Instance._sendNotification == nil then
+		-- keep original
+		GameFacade.Instance._sendNotification = GameFacade.Instance.sendNotification;
+	end;
+	if GameFacade.Instance._sendNotification  then
+		--GameFacade.Instance.sendNotification = HOOK_SendNotification;
+	end;
+end;
+
 
 function HOOK_openWantedQuestPanel( wantedid, target)
     LogDebug("HOOK_openWantedQuestPanel " .. MyTostring(wantedid));
@@ -992,6 +1038,37 @@ if CommonFun ~= nil then
 	  LogDebug("IsInRate " .. rate .. " " .. random);	
 	  return rate > random
 	end
+	
+	function CommonFun.IsMiss(srcUser, targetUser, skillParams)
+		-- 必定命中且暴击
+		local AttrEffect = srcUser:GetProperty("AttrEffect")
+		local StateEffect2 = targetUser:GetProperty("StateEffect")
+		local bits=CommonFun.getBits(AttrEffect)
+		local bits2=CommonFun.getBits(StateEffect2)
+	  
+		--------------------------------------------------------------------------------------------------------并定名中且暴击，或者睡眠情况下 是不会闪避的
+		if bits[CommonFun.AttrEffect.MustHitAndCri] == 1 or bits2[CommonFun.StateEffect.Sleep]==1 then
+		  return false
+		end
+
+		-- 1----------------------------------------------------------------------------------------------------判断自己对敌方的命中是否成立，不成立则返回闪避
+		local hitRate = CommonFun.CalcHitRate(srcUser, targetUser, skillParams)
+			local index = Game.Myself.data.randomFunc.index
+			if CommonFun.IsInRate(hitRate, srcUser:GetRandom()) == false then
+				LogDebug("IsMiss true " .. hitRate .. ' ' .. index)		
+			   return true
+			end
+			LogDebug("IsMiss false " .. hitRate .. ' ' .. index)				
+		-- 2----------------------------------------------------------------------------------------------------判断自己对敌方的闪避是否成立，成立则返回闪避
+		--local fleeRate = CommonFun.CalcFleeRate(srcUser, targetUser, skillParams)
+		--local random = srcUser:GetRandom()
+		--if CommonFun.IsInRate(fleeRate, random) then
+		  --return true
+		--end
+
+		return false
+	end
+	
 
 	function CommonFun.IsCrit(srcUser, targetUser, skillParams)
 		-- 必定命中且暴击

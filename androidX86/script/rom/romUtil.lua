@@ -41,6 +41,8 @@ function singleLine(data)
 end;
 
 
+
+
 function GameObjectToString(go,tab,visible)
 	tab = tab or "";
 	if go == nil then return "NULL"; end;
@@ -80,6 +82,31 @@ function UserDataToString(value)
 		ret = "[UILabel] name=" .. value.name .. " text=" .. value.text .. " fontSize=" .. value.fontSize;
 	end;
 	
+	return ret;
+end;
+
+function PropToString(obj,prefix,order)
+	if obj == nil then	
+		return "";
+	end;
+	prefix = prefix or "";
+	order = order or {"id","ID"};
+	local ret = "";
+	tableForEach(order, function(i, v)	
+		if obj[v] ~= nil then
+			if ((type(obj[v]) == 'string') or (type(obj[v]) == 'number'))  then
+				ret = ret .. prefix .. tostring(v) .. "=" .. tostring(obj[v]) .. ",";
+			end;
+		end;
+	end);
+
+	tableForEach(obj, function(i, v)	
+		if ((type(i) == 'string') or (type(i) == 'number')) and ((type(v) == 'string') or (type(v) == 'number')) then
+			if TableUtil.HasValue(order,tostring(i)) == false then	
+				ret = ret .. prefix .. tostring(i) .. "=" .. tostring(v) .. ",";
+			end;
+		end;
+	end);
 	return ret;
 end;
 
@@ -293,19 +320,20 @@ end;
 function QuestToString(wq)
     local listType = "";
     local wd = wq.wantedData;
-    if wd ~= nil then
+    if wd and wd.questListType then
         if wq.questListType == SceneQuest_pb.EQUESTLIST_ACCEPT then listType = "EQUESTLIST_ACCEPT" end;
         if wq.questListType == SceneQuest_pb.EQUESTLIST_CANACCEPT then listType = "EQUESTLIST_CANACCEPT" end;
         if wq.questListType == SceneQuest_pb.EQUESTLIST_COMPLETE then listType = "EQUESTLIST_COMPLETE" end;
         if wq.questListType == SceneQuest_pb.EQUESTLIST_SUBMIT then listType = "EQUESTLIST_SUBMIT" end;
         local info = QuestDataUtil.parseWantedQuestTranceInfo(wq,wd);
-        local ret = "id=" .. wd.id .. " " .. wq.questDataStepType .. " Target=[" .. wd.Target .. "] MapId=" .. wd.MapId .. " NpcId=" .. wd.NpcId .. " questListType=" .. listType .. " Content=" .. wd.Content .. " info=[" .. info .. "]";
+        local ret = "id=" .. wd.id .. " " .. wq.questDataStepType .. " Target=[" .. tostring(wd.Target) .. "] MapId=" .. wd.MapId .. " NpcId=" .. tostring(wd.NpcId) .. " questListType=" .. listType .. " Content=" .. tostring(wd.Content) .. " info=[" .. tostring(info) .. "]";
         local steps = wq.steps or {};	
         ret = ret .. " step=" .. (wq.step or 0) .. "/" .. #steps;
         return ret;
     else
         --local info = QuestDataUtil.getTranceInfoTable(wq,wq.params);
-        local ret = "id=" .. wq.id .. " questDataStepType=[" .. wq.questDataStepType .. "] ";
+        --local ret = "id=" .. wq.id .. " questDataStepType=[" .. wq.questDataStepType .. "] acceptlv=" .. wq.acceptlv .. " scope=" .. wq.scope;
+		local ret = PropToString(wq,"",{"id","type","map","step"}) .. PropToString(wq.params,"params.");
         return ret;    
     end;    
 end;
@@ -698,14 +726,19 @@ if class ~= nil then
             end;
                 
             if Game.Myself.autoPos ~= nil and ROM_FindCurrentMonster() == nil then
-                local myPos = Game.Myself:GetPosition();
+				if ROM_IsMeNear(Game.Myself.autoMapID,Game.Myself.autoPos,2) then
+				else
+					ROM_CommandGOTO(Game.Myself.autoMapID,Game.Myself.autoPos);
+				end;
+--[[                local myPos = Game.Myself:GetPosition();
+				
                 local distance = LuaVector3.Distance(myPos, Game.Myself.autoPos);
 				LogDebug("AutoAI_Rom: dist=" .. distance);
                 if distance > 2 then
                     LogDebug("AutoAI_Rom: Move to auto pos");
                     Game.Myself:Client_MoveTo(Game.Myself.autoPos, nil, nil, nil, nil, nil);
 					return true;
-                end;
+                end;]]
 			else	
 				--LogDebug("Game.Myself.autoPos not set");
             end;
@@ -798,10 +831,33 @@ function ROM_FindNearestMonsterEx2(tab)
         return false;
     end;
     local mons = ROM_GetAllMonster(filterFunc);
-    return ROM_GetNearestMonFromList(mons);
+	if tab.selectFunc ~= nil then
+		return tab.selectFunc(mons);
+	else
+		return ROM_GetNearestMonFromList(mons);
+	end;
 end;
 
-
+function ROM_GetBestScoreMonFromList(mons)
+    local minScore = 100000;
+    local retNpc = nil;
+    local myPos = Game.Myself:GetPosition();
+    tableForEach(mons,function(i,v)
+        local npc = v;
+		local pos = npc:GetPosition();
+        local distance = LuaVector3.Distance(myPos,pos);
+		local players = NSceneUserProxy.Instance:FindNearUsers(pos,10,nil);
+		local score = distance + #players;
+        if score < minScore then
+            retNpc = npc;
+            minScore = score;
+        end;
+    end);
+	if retNpc ~= nil then
+		LogDebug("ROM_GetBestScoreMonFromList: " .. CreatureToString(retNpc));
+	end;
+    return retNpc;
+end;
 
 function ROM_GetNearestMonFromList(mons)
     local minDist = 100000;
@@ -916,6 +972,9 @@ end;
 
 function ROM_FindStaticMonster(tab)
     local filterFunc = function(mon)
+		if mon.data.staticData.id == 40015 then 
+			return false;
+		end;
         return (mon.data.staticData.id >= 40000 and mon.data.staticData.id < 50000) or (mon.data.staticData.id >= 100000); 
     end;
     return ROM_FindMonByFilter(filterFunc,"ROM_FindStaticMonster");
