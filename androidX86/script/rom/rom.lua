@@ -583,7 +583,7 @@ ROM_Config[4313990901] = {
         {name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
         {name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
         {name="WalkToRange", func=ROM_WalkToRange,range=6},  		
-        {name="Heal", func=ROM_Heal,frachp=0.6},  -- bless    
+        {name="Heal", func=ROM_Heal,frachp=0.7},  -- bless    
         {name="Turn", func=ROM_TurnUndead, frachp=0.6},  
         {name="Holy Light Strike", func=ROM_SkillTarget},  	
     },
@@ -598,6 +598,15 @@ if Game and Game.Myself and Game.Myself.data then
         myAIRules = conf.myAIRules;
     end;
 end;
+
+local GetKey = function (attribute)
+	local key = UserData.CacheEUSERkey[attribute]
+	if(key==nil) then
+		key = ProtoCommon_pb["EUSERDATATYPE_"..attribute]
+		UserData.CacheEUSERkey[attribute] = key
+	end
+	return key
+end
 
 function ROM_Test(g)
     LogDebug("----- ROM_Test --------");
@@ -619,7 +628,7 @@ function ROM_Test(g)
 	LogDebug(tostring(Game.Myself.data.name));
     tableForEach(userDatas.datas,function(i,v)
 		if (type(i) == 'number') then
-			LogDebug("" .. i .. " " .. tostring(v));
+			LogDebug("" .. tostring(i) .. " " .. tostring(v));
 			--local p = props:GetPropByName(v.name);
 			--if p ~= nil then
 			--	local value  = p:GetValue() or 0
@@ -629,6 +638,10 @@ function ROM_Test(g)
 			--LogDebug(props:GetValueByName(v.name));
 		end;
     end);
+	
+	tableForEach(UDEnum,function(i,v)
+		LogDebug("" .. tostring(GetKey(v)) .. " " .. tostring(v));
+	end);
 	
     
     --DumpMyself();
