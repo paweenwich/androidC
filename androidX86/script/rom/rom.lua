@@ -245,6 +245,9 @@ function ROM_SkillTarget(tab)
 			--LogDebug("ROM_SkillTarget: use locktarget");
 		end;
         if npc ~= nil then
+			if tab.filter ~= nil and tab.filter(npc) == false then
+				return false;
+			end;
             LogDebug("ROM_SkillTarget: " .. skillID .. " " .. MonsterToString(npc));
             Game.Myself:Client_UseSkill(skillID, npc,nil,nil,true);
             return true;
@@ -282,6 +285,7 @@ function ROM_FakeDead(tab)
     return false;
 end;
 function ROM_BuffNoTarget(tab)
+	local ignoreLockTarget = tab.ignoreLockTarget or false
     local skillInfo = ROM_GetMySkillInfoByName(tab.name);
     if skillInfo == nil then return false end;
     local skillID = skillInfo.staticData.id;
@@ -300,7 +304,7 @@ function ROM_BuffNoTarget(tab)
 			return false;
 		end;
 		local npc = ROM_GetMonsterLockTarget();
-		if npc == nil then
+		if npc == nil or ignoreLockTarget == true then
 			if ROM_HasBuffFromSkillID(skillID) == false then
 				LogDebug("ROM_BuffNoTarget: " .. SkillToStringByID(skillID));
 				Game.Myself:Client_UseSkill(skillID, Game.Myself ,nil,nil,true);
@@ -539,9 +543,14 @@ myMonsterRules = {
 
 myAIRules = {
     {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
---	{name="Bash", func=ROM_SkillTarget},    
-	{name="Shield Charge", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
-	{name="Auto", func=ROM_SkillTarget},    
+	{name="Bash", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
+    {name="Endure", func=ROM_BuffNoTarget, ignoreLockTarget=true},
+--	{name="Shield Charge", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
+	{name="Auto", func=ROM_SkillTarget, 
+		filter = function(mon) 
+			return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
+		end
+	},    
 
 
 --    {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
@@ -767,18 +776,20 @@ function ROM_Test(g)
 	local qtab = {1,2,3,4};
 	local qtabName = {"ACCEPT","COMPLETE","SUBMIT","CANACEPT"};
 	tableForEach(qtab, function(_, index)
-		LogDebug("--- questList " .. qtabName[index] .. "-----" .. #QuestProxy.Instance.questList[index]);
-		for i, v in pairs(QuestProxy.Instance.questList[index]) do 
-			--LogDebug(i);
-			--LogDebug(tostring(v) .. " " .. v.id);
-			--ListField(v,"",{}," ");
-			if v ~= nil then
-				-- only trace quest
-				if v.whetherTrace == 1 and v.traceInfo and v.traceInfo ~= "" then
-					LogDebug(QuestToString(v));
+		if QuestProxy.Instance.questList[index] then
+			LogDebug("--- questList " .. qtabName[index] .. "-----" .. #QuestProxy.Instance.questList[index]);
+			for i, v in pairs(QuestProxy.Instance.questList[index]) do 
+				--LogDebug(i);
+				--LogDebug(tostring(v) .. " " .. v.id);
+				--ListField(v,"",{}," ");
+				if v ~= nil then
+					-- only trace quest
+					if v.whetherTrace == 1 and v.traceInfo and v.traceInfo ~= "" then
+						LogDebug(QuestToString(v));
+					end;
 				end;
-			end;
-		end 
+			end 
+		end;
 	end);
 
 	local quest = ROM_GetBestQuest();

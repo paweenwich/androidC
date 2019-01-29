@@ -371,7 +371,7 @@ function NPCToString(m)
     local stat = ROM_GetMonStatus(m);
     local props = m.data.props;
     local ret =  "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape;	
-    ret = ret .. " lvl=" .. m.data.staticData.Level .. " BExp=" .. m.data.staticData.BaseExp .. " JExp=" .. m.data.staticData.JobExp;
+    ret = ret .. " lvl=" .. m.data.staticData.Level .. " BExp=" .. m.data.staticData.BaseExp .. " JExp=" .. m.data.staticData.JobExp .. " IsStar=" .. (m.data.staticData.IsStar or 0);
     return ret;			
 end;
 
@@ -388,7 +388,7 @@ function MonsterToString(m)
 	    local props = m.data.props;
 		if m.data.staticData ~= nil then
 			if  m.data.staticData.Type ~= "Monster" then
-				return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape .. " " .. m:GetCreatureType() .. " IsStar=" .. (m.data.staticData.IsStar or 0);	
+				return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape .. " " .. m:GetCreatureType();	
 			else
                 return NPCToString(m);
 			end;			
@@ -724,8 +724,9 @@ if class ~= nil then
                     return true;
                 end;
             end;
-                
-            if Game.Myself.autoPos ~= nil and ROM_FindCurrentMonster() == nil then
+			local in2 = CDProxy.Instance:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,CDProxy.CommunalSkillCDSortID);                
+            --if Game.Myself.autoPos ~= nil and ROM_FindCurrentMonster() == nil then
+			if Game.Myself.autoPos ~= nil and in2 == false then
 				if ROM_IsMeNear(Game.Myself.autoMapID,Game.Myself.autoPos,2) then
 				else
 					ROM_CommandGOTO(Game.Myself.autoMapID,Game.Myself.autoPos);
@@ -742,7 +743,7 @@ if class ~= nil then
 			else	
 				--LogDebug("Game.Myself.autoPos not set");
             end;
-			local in2 = CDProxy.Instance:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,CDProxy.CommunalSkillCDSortID);
+
 			if in2 then
 				LogDebug("AutoAI_Rom:Prepare() InCD");
 			else
@@ -847,7 +848,7 @@ function ROM_GetBestScoreMonFromList(mons)
 		local pos = npc:GetPosition();
         local distance = LuaVector3.Distance(myPos,pos);
 		local players = NSceneUserProxy.Instance:FindNearUsers(pos,10,nil);
-		local score = distance + #players;
+		local score = distance + (#players * 5);
         if score < minScore then
             retNpc = npc;
             minScore = score;
@@ -975,7 +976,7 @@ function ROM_IsStaticMonster(mon)
 end;
 
 function ROM_IsEliteMonster(mon)
-    --LogDebug("ROM_IsEliteMonster " .. mon.data.staticData.id);
+    --LogDebug("ROM_IsEliteMonster " .. tostring(mon.data.staticData.IsStar));
     return (mon.data.staticData.IsStar == 1) 
 end;
 
@@ -985,7 +986,7 @@ function ROM_FindStaticMonster(tab)
 		if mon.data.staticData.id == 40015 then 
 			return false;
 		end;
-        return ROM_IsStaticMonster(mon) or (mon.data.staticData.id >= 100000); 
+        return ROM_IsStaticMonster(mon) or ROM_IsEliteMonster(mon); 
     end;
     return ROM_FindMonByFilter(filterFunc,"ROM_FindStaticMonster");
 end;
