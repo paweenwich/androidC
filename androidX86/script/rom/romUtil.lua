@@ -1257,6 +1257,56 @@ function ROM_GetNearPlayers(range)
     return players;
 end;
 
+function ROM_DataGetName(id)
+    local GetKey = function (attribute)
+        local key = UserData.CacheEUSERkey[attribute]
+        if(key==nil) then
+            key = ProtoCommon_pb["EUSERDATATYPE_"..attribute]
+            UserData.CacheEUSERkey[attribute] = key
+        end
+        return key
+    end
+    for i, v in pairs(UDEnum) do 
+        local key = GetKey(v);
+        if key == id then
+            return v;
+        end;
+    end;
+    return "DATA_" .. id;
+end;
+
+function ROM_GetCreatureNameFromID(id)
+    local creature = SceneCreatureProxy.FindCreature(id);
+    if creature == nil then return "Creature(NULL)" end;
+
+    local creatureType = creature:GetCreatureType();
+    if creatureType == Creature_Type.Player then
+        return "PLAYER[" .. creature.data.id .. "]";
+    end;
+    if creatureType == Creature_Type.Pet then
+        return "PET[" .. creature.data.id .. "]";
+    end;
+    if creatureType == Creature_Type.Npc then
+        if creature.data:IsNpc() then
+            return "NPC[" .. creature.data.id .. "] " .. creature.data.staticData.NameZh;
+        else
+            return "MON[" .. creature.data.id .. "] " .. creature.data.staticData.NameZh;
+        end;
+    end;
+    if creatureType == Creature_Type.Me then
+        return "ME"
+    end;    
+end;
+
+function ROM_PropGetName(props,id)
+    for i, v in pairs(props.configs) do 
+        if i == id then
+            return v.name or "PROP_" .. id;
+        end;
+    end;        
+    return "PROP_" .. id;
+end;
+
 
 if FunctionMonster ~= nil then
     function FunctionMonster:FilterMonster(ignoreSkill)

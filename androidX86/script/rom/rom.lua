@@ -599,14 +599,6 @@ if Game and Game.Myself and Game.Myself.data then
     end;
 end;
 
-local GetKey = function (attribute)
-	local key = UserData.CacheEUSERkey[attribute]
-	if(key==nil) then
-		key = ProtoCommon_pb["EUSERDATATYPE_"..attribute]
-		UserData.CacheEUSERkey[attribute] = key
-	end
-	return key
-end
 
 function ROM_Test(g)
     LogDebug("----- ROM_Test --------");
@@ -614,21 +606,22 @@ function ROM_Test(g)
     local props = Game.Myself.data.props;
     tableForEach(props.configs,function(i,v)
 		if (type(i) == 'number') then
-			local p = props:GetPropByName(v.name);
-			if p ~= nil then
-				local value  = p:GetValue() or 0
-				LogDebug("" .. tostring(i) .. " " .. v.name .. ' ' .. value) -- .. " " .. props:GetValueByID(i)); GetValueByName			
+            LogDebug(ROM_PropGetName(props,i) .. " " .. tostring(props:GetValueByID(i)))
+			--local p = props:GetPropByName(v.name);
+			--if p ~= nil then
+				--local value  = p:GetValue() or 0
+            --LogDebug("" .. tostring(i) .. " " .. v.name .. ' ' .. value) -- .. " " .. props:GetValueByID(i)); GetValueByName			
 				--
-			end;
+			--end;
 			--LogDebug(props:GetValueByName(v.name));
 		end;
     end);
 	local userDatas = Game.Myself.data.userdata;
-	LogDebug(tostring(Game.Myself.data.userdata:GetBytes(UDEnum.NAME)));
-	LogDebug(tostring(Game.Myself.data.name));
+	--LogDebug(tostring(Game.Myself.data.userdata:GetBytes(UDEnum.NAME)));
+	--LogDebug(tostring(Game.Myself.data.name));
     tableForEach(userDatas.datas,function(i,v)
 		if (type(i) == 'number') then
-			LogDebug("" .. tostring(i) .. " " .. tostring(v));
+			LogDebug("" .. ROM_DataGetName(i) .. " " .. tostring(v));
 			--local p = props:GetPropByName(v.name);
 			--if p ~= nil then
 			--	local value  = p:GetValue() or 0
@@ -639,9 +632,9 @@ function ROM_Test(g)
 		end;
     end);
 	
-	tableForEach(UDEnum,function(i,v)
-		LogDebug("" .. tostring(GetKey(v)) .. " " .. tostring(v));
-	end);
+	--tableForEach(UDEnum,function(i,v)
+	--	LogDebug("" .. tostring(GetKey(v)) .. " " .. tostring(v));
+	--end);
 	
     
     --DumpMyself();

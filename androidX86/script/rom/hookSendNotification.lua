@@ -192,6 +192,34 @@ function ROM_RecvPLAYERGUIDSkip(data)
 --	return data.playerguid ~= Game.Myself.data.id;
 end;
 
+function ROM_UserAttrSyncCmd(data)
+    local status,err = pcall(function()
+        local ret = "";
+        local props = Game.Myself.data.props;
+        if data.guid ~= nil then
+            local creature = SceneCreatureProxy.FindCreature(data.guid);
+            LogDebug(CreatureToString(creature));
+        end;
+        if data.attrs ~= nil then
+            for i = 1, #data.attrs do
+                sdata = data.attrs[i];
+                ret = ret .. tostring(sdata.type) .. "=" .. tostring(sdata.value) .. " ";
+            end
+        end;
+        if data.datas ~= nil then
+            for i = 1, #data.datas do
+                sdata = data.datas[i];
+                ret = ret .. ROM_DataGetName(sdata.type) .. "=" .. tostring(sdata.value) .. " ";
+            end
+        end;
+        LogDebug("ME AttrSync" .. ret);
+    end);
+    if status == false then
+        LogDebug("ERROR: " .. singleLine(tostring(err)));
+    end;
+    return false;
+end;
+
 
 ROM_Packets = {
 {17,1,"RecvQueryUserResumeAchCmd"},
@@ -524,7 +552,7 @@ ROM_Packets = {
 
 {9,1,"RecvGoCity"},
 {9,2,"RecvSysMsg"},
-{9,3,"RecvNpcDataSync",ROM_RecvSKIP},
+{9,3,"RecvNpcDataSync",ROM_UserAttrSyncCmd},
 {9,4,"RecvUserNineSyncCmd",ROM_RecvGUIDSkip},
 {9,5,"RecvUserActionNtf 9_5",ROM_RecvCHARIDSkip},
 {9,6,"RecvUserBuffNineSyncCmd",ROM_RecvGUIDSkip},
@@ -985,7 +1013,7 @@ ROM_Packets = {
 {5,13,"AddMapNpc"},
 {5,16,"MoveTo"},
 {3,1,"OldUserAttrSyncCmd"},
-{5,1,"UserAttrSyncCmd"},
+{5,1,"UserAttrSyncCmd",ROM_UserAttrSyncCmd},
 {5,27,"SkillBroadcast",ROM_RecvCHARIDSkip},
 {5,12,"MapOtherUserIn"},
 {5,23,"MapChange"},
