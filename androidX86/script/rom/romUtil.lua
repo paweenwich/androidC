@@ -855,7 +855,7 @@ function ROM_GetBestScoreMonFromList(mons)
         end;
     end);
 	if retNpc ~= nil then
-		LogDebug("ROM_GetBestScoreMonFromList: " .. CreatureToString(retNpc));
+		--LogDebug("ROM_GetBestScoreMonFromList: " .. CreatureToString(retNpc));
 	end;
     return retNpc;
 end;
@@ -1275,8 +1275,7 @@ function ROM_DataGetName(id)
     return "DATA_" .. id;
 end;
 
-function ROM_GetCreatureNameFromID(id)
-    local creature = SceneCreatureProxy.FindCreature(id);
+function ROM_GetCreatureName(creature)
     if creature == nil then return "Creature(NULL)" end;
 
     local creatureType = creature:GetCreatureType();
@@ -1298,12 +1297,19 @@ function ROM_GetCreatureNameFromID(id)
     end;    
 end;
 
+function ROM_GetCreatureNameFromID(id)
+    local creature = SceneCreatureProxy.FindCreature(id);
+    return ROM_GetCreatureName(creature);
+end;
+
 function ROM_PropGetName(props,id)
-    for i, v in pairs(props.configs) do 
-        if i == id then
-            return v.name or "PROP_" .. id;
-        end;
-    end;        
+    if props then
+        for i, v in pairs(props.configs) do 
+            if i == id then
+                return v.name or "PROP_" .. id;
+            end;
+        end;        
+    end;
     return "PROP_" .. id;
 end;
 
