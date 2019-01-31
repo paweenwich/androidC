@@ -1246,36 +1246,6 @@ end;
 	end)
 ]]	
 
-function ROM_CreateSendPackets()
-    local fileName = "/data/local/tmp/loadbufferx/AScript.Net.Protos.Proto_Include.lua";
-    local lines = lines_from(fileName);
-	LogDebug(" " .. fileName .. " lines=" .. #lines);
-	local ret = "";
-	for i=1,#lines do
-		local line = lines[i];
-        local id1,id2 = string.match(line,"%[(%d+)%].*{(.*)}");
-        if id1 and id2 then
-            --LogDebug(id1 .. " ");
-            for item in string.gmatch(id2, "[^,]*") do
-                local k,v = string.match(item,"%[(%d+)%] = ([A-Za-z0-9._]*)");
-                if k and v then
-                    --LogDebug("" .. k .. " " .. v);
-                    ret = ret .. "{" .. tostring(id1) .. "," .. tostring(k) .. ",\"" .. tostring(v) .. "\"},\n"; 
-                end;
-            end
-            
-            --LogDebug(line);
-        end;
-		--[[local id1,id2 = string.match(line, 'self:Listen%((%d+)%s*,%s*(%d+)');
-		if id1 ~= nil then
-			line2 = lines[i+1];
-			local funcName = string.match(line2, 'self:(%a+)%(');
-			ret = ret .. "{" .. tostring(id1) .. "," .. tostring(id2) .. ",\"" .. tostring(funcName) .. "\"},\n"; 
-		end;]]
-        
-	end;
-    return ret;
-end;
 --LogDebug("\n" .. ROM_CreateSendPackets());
 LogDebug("ROM Loaded 1.03");
 

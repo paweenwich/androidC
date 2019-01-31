@@ -1049,7 +1049,7 @@ ROM_Packets = {
 {1,7,"RecvSelectRoleUserCmd"},
 {1,8,"RecvLoginResultUserCmd"},
 {1,9,"RecvDeleteCharUserCmd"},
-{1,10,"RecvHeartBeatUserCmd"},
+{1,10,"RecvHeartBeatUserCmd",ROM_RecvSKIP},
 {1,11,"RecvServerTimeUserCmd"},
 {1,12,"RecvGMDeleteCharUserCmd"},
 {1,13,"RecvClientInfoUserCmd"},
@@ -1066,7 +1066,7 @@ ROM_Packets = {
 
 {12,1,"RecvAddMapItem",ROM_RecvAddMapItem},
 {12,2,"RecvPickupItem",ROM_RecvPLAYERGUIDSkip},
-{12,3,"RecvAddMapUser",ROM_RecvSKIP},
+{12,3,"RecvAddMapUser"},
 {12,4,"RecvAddMapNpc"},
 {12,5,"RecvAddMapTrap"},
 {12,6,"RecvAddMapAct"},
@@ -1103,8 +1103,8 @@ ROM_Packets = {
 
 {9,1,"RecvGoCity"},
 {9,2,"RecvSysMsg"},
-{9,3,"RecvNpcDataSync",ROM_UserAttrSyncCmd},
-{9,4,"RecvUserNineSyncCmd",ROM_RecvGUIDSkip},
+{9,3,"RecvNpcDataSync",ROM_RecvNpcDataSync},
+{9,4,"RecvUserNineSyncCmd",ROM_RecvUserNineSyncCmd},
 {9,5,"RecvUserActionNtf 9_5",ROM_RecvCHARIDSkip},
 {9,6,"RecvUserBuffNineSyncCmd",ROM_RecvGUIDSkip},
 {9,7,"RecvExitPosUserCmd"},
@@ -1499,7 +1499,7 @@ ROM_Packets = {
 {31,5,"RecvTutorGetGrowRewardCmd"},
 
 {25,1,"RecvFirstActionUserEvent"},
-{25,2,"RecvDamageNpcUserEvent",ROM_RecvUSERIDSkip},
+{25,2,"RecvDamageNpcUserEvent",ROM_RecvDamageNpcUserEvent},
 {25,3,"RecvNewTitle"},
 {25,4,"RecvAllTitle"},
 {25,5,"RecvUpdateRandomUserEvent"},
@@ -1568,7 +1568,7 @@ ROM_Packets = {
 {5,27,"SkillBroadcast",ROM_RecvCHARIDSkip},
 {5,12,"MapOtherUserIn"},
 {5,23,"MapChange"},
-{5,18,"MapOtherUserOut",ROM_RecvSKIP},
+{5,18,"MapOtherUserOut",ROM_MapOtherUserOut},
 {5,38,"MapObjectData"},
 
 {5,32,"NpcDie"},

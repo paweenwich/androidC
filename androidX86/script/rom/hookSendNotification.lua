@@ -150,8 +150,8 @@ function HOOK_AccessTarget(self, target, custom, customType)
 end;
 
 function ROM_RecvSKIP()
-	--return true;
-	return false;
+	return true;
+	--return false;
 end;
 function ROM_RecvAddMapItem(data)
 	--LogDebug("items=" .. MyTostring(data.items));
@@ -179,18 +179,51 @@ function ROM_RecvPLAYERGUIDSkip(data)
 --	return data.playerguid ~= Game.Myself.data.id;
 end;
 
-function ROM_UserAttrSyncCmd(data)
+function ROM_MapOtherUserOut(data)
+	--SceneObjectProxy.RemoveObjs(data.list,data.delay_del,data.fadeout)
+	local status,err = pcall(function()
+		local ret = "";
+		if(data.list ~= nil and #data.list >0) then
+			for i = 1, #data.list do
+				local id = data.list[i];
+				ret = ret .. " " .. ROM_GetCreatureNameFromID(id);
+			end
+		end
+		if data.delay_del ~= nil then
+			ret = ret .. " delay_del=" .. tostring(data.delay_del);
+		end;
+		if data.fadeout ~= nil then
+			ret = ret .. " fadeout=" .. tostring(data.fadeout);
+		end;
+		
+		LogDebug("RECV< MapOtherUserOut" .. ret);
+		--LogDebug(singleLine(tostring(data)));
+	end);
+    if status == false then
+        LogDebug("ERROR: " .. singleLine(tostring(err)));
+        return false
+    end;
+    return true;
+end;
+
+function ROM_UserAttrSyncCmd(data,funcName)
+	funcName = funcName or "UserAttrSyncCmd";
     local status,err = pcall(function()
         local ret = "";
         local props = Game.Myself.data.props;
         local creature = Game.Myself;
         if data.guid ~= nil then
             creature = SceneCreatureProxy.FindCreature(data.guid);
-            props = creature.data.props;
+			if creature ~= nil then
+				props = creature.data.props;
+			end;
             --LogDebug(CreatureToString(creature));
         end;
         if creature~= nil then
             ret = ROM_GetCreatureName(creature) .. " ";
+		else	
+			LogDebug(singleLine(data));
+			ret = "CREATURE[" .. (data.guid or "") .. "] ";
         end;
         if data.attrs ~= nil then
             for i = 1, #data.attrs do
@@ -201,19 +234,53 @@ function ROM_UserAttrSyncCmd(data)
                 end;
             end
         end;
+		if data.pointattrs ~= nil then
+            for i = 1, #data.pointattrs do
+                sdata = data.pointattrs[i];
+                if creature~= nil then
+                    --ret = ret .. tostring(sdata.type) .. "=" .. tostring(sdata.value) .. " ";
+                    ret = ret .. ROM_PropGetName(props,sdata.type) .. "=" .. tostring(sdata.value) .. " ";
+                end;
+            end
+		end;
         if data.datas ~= nil then
             for i = 1, #data.datas do
                 sdata = data.datas[i];
                 ret = ret .. ROM_DataGetName(sdata.type) .. "=" .. tostring(sdata.value) .. " ";
             end
         end;
-        LogDebug("RECV: AttrSync " .. ret);
+        LogDebug("RECV< " .. funcName .. " " .. ret);
     end);
     if status == false then
         LogDebug("ERROR: " .. singleLine(tostring(err)));
         return false
     end;
     return true;
+end;
+function ROM_RecvNpcDataSync(data)
+	return ROM_UserAttrSyncCmd(data,"NpcDataSync");
+end;
+function ROM_RecvUserNineSyncCmd(data)
+	return ROM_UserAttrSyncCmd(data,"UserNineSyncCmd");
+end;
+
+function ROM_RecvDamageNpcUserEvent(data)
+    local status,err = pcall(function()
+		local id = data.npcguid
+		local userid = data.userid
+		LogDebug("RECV< RecvDamageNpcUserEvent " .. ROM_GetCreatureNameFromID(userid) .. " HIT " .. ROM_GetCreatureNameFromID(id));
+	end);
+    if status == false then
+        LogDebug("ERROR: " .. singleLine(tostring(err)));
+        return false
+    end;
+    return true;
+	
+	--local creature = self:getCreature(id)
+	--local sceneUI = creature and creature:GetSceneUI() or nil
+	--if(sceneUI)then
+	--	sceneUI.roleBottomUI:SetIsBeHit(true,creature)
+	--end	
 end;
 
 ROM_DoFile("/data/local/tmp/script/romPackets.lua");
