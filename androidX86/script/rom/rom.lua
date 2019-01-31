@@ -58,87 +58,7 @@ ROM_DoFile("/data/local/tmp/script/hookSendNotification.lua");
 function ROM_Reload()
 	return ROM_DoFile("/data/local/tmp/script/rom.lua");
 end;
---[[
-if AI_Myself~=nil then
-	function AI_Myself:_Idle(time, deltaTime, creature)
-		--LogDebug("AI_Myself:_Idle " .. time .. ' ' .. deltaTime);
-		self:_NotifyAngleY(time, deltaTime, creature)
-		return AI_Myself.super._Idle(self, time, deltaTime, creature)
-	end
-	function AI_Myself:SearchAutoBattleLockTarget(creature, skillInfo)
-		LogDebug("AI_Myself:SearchAutoBattleLockTarget " .. skillInfo:GetSpeakName(creature));
-		--LogDebug(MyTostring(creature));
-		--LogDebug(MyTostring(skillInfo));
-		local lockID = self.autoAI_Battle.lockID
-		if 0 == lockID then
-			return nil
-		end
-		LogDebug("AI_Myself:SearchAutoBattleLockTarget " .. lockID);
-	--return self.autoAI_Battle:SearchLockTarget(creature, skillInfo), lockID
-	return self.autoAI_Battle:SearchLockTarget(creature, skillInfo), 10003
-	end
-end;
 
-if MainViewHeadPage~=nil then
-	function MainViewHeadPage:clickMyHead()
-		LogDebug("Click");
-		self:sendNotification(UIEvent.JumpPanel,{view = PanelConfig.Charactor});
-	end
-	--LogDebug(MyTostring(MainViewHeadPage));
-else	
-	LogDebug("MainViewHeadPage==nil");
-end;
-
-if NCreature ~= nil then
-    LogDebug("Mod NCreature");
-    function NCreature:Server_SetDirCmd(mode,dir,noSmooth)
-        --helplog(string.format("Server SetDirCmd Player:%s Dir:%s", self.data.name, dir));
-        self.ai:PushCommand(FactoryAICMD.GetSetAngleYCmd(mode,dir,noSmooth), self)
-    end
-    --function NCreature:GetClickable()
-    --    LogDebug("NCreature:GetClickable()");
-        --LogDebug(MyTostring(self.data));
-        --LogDebug(MyTostring(self.assetRole));
-        --self:Hide();
-    --    return not self.data:NoAccessable()
-    --end
-    
-end;
-
-if EventManager~=nil and MyselfEvent ~= nil then
---    EventManager.Me():RemoveEventListener(MyselfEvent.HpChange,onHPChange,nil);
---    EventManager.Me():AddEventListener(MyselfEvent.HpChange,onHPChange,nil);
---    LogDebug("AddEventListener");
-end;    
-
-if Game~=nil and Game.LogicManager_Myself_Props ~= nil and Game.me~=nil then
-    LogDebug(tostring(Game.me.functionSystemManager.logicManager));
-    LogDebug(tostring(Game.LogicManager));
-    LogDebug(tostring(Game.LogicManager_Myself_Props));
-    LogDebug(tostring(Game.LogicManager_Myself_Props.UpdateHp));
-    LogDebug("Before");
-    --LogDebug(tostring(Game.LogicManager_Player_Props));
-    --LogDebug(tostring(Game.me.functionSystemManager.logicManager.logicCreature.playerPropsManager));
-    --function Game.LogicManager_Myself_Props:UpdateHp(ncreature,propName,oldValue,p)
-    --    LogDebug("onHPChange " .. oldValue .. ' ' .. p:GetValue());
-    --    LogicManager_Myself_Props.super.UpdateHp(self,ncreature,propName,oldValue,p)
-    --    EventManager.me:PassEvent(MyselfEvent.HpChange,p:GetValue())
-    --end
-    function Game.LogicManager_Creature:Update(time, deltaTime)
-        self:UpdateNpc(time,deltaTime)
-        self:UpdatePets(time,deltaTime)
-        self:UpdatePlayer(time,deltaTime)
-        self:UpdateMyself(time,deltaTime)
-
-        self.roleDressManager:Update(time, deltaTime)
-        self.hatredManager:Update(time, deltaTime)
-    end
-    --LogDebug(tostring(Game.me.functionSystemManager.logicManager));    
-    LogDebug("After");
-    LogDebug(tostring(Game.LogicManager_Myself_Props.UpdateHp));
-    LogDebug("LogicManager_Myself_Props");
-end;
-]]
 if FunctionChangeScene~= nil then
     LogDebug("Mod FunctionChangeScene");
 	function FunctionChangeScene:EnterScene()
@@ -886,6 +806,23 @@ function ROM_HasBuffFromSkillID(skillID)
     return Game.Myself:HasBuffs(buffs);
 end;
 
+function ROM_MyCheat()
+    local button = myButton["Cheat"];
+    local label = UIUtil.FindGO("Label",button);
+    local uiLabel = label:GetComponent(UILabel);
+    if Game.Myself.myCheat == nil then
+        Game.Myself.myCheat = false;
+    end;
+    if Game.Myself.myCheat then
+        Game.Myself.myCheat = false;
+        uiLabel.effectStyle = UILabel.Effect.None;
+    else
+        Game.Myself.myCheat = true;
+        uiLabel.effectColor = ColorUtil.NGUILabelRed;
+        uiLabel.effectStyle = UILabel.Effect.Outline;
+    end;
+end;
+
 function ROM_MyTick()
     local button = myButton["Tick"];
     local label = UIUtil.FindGO("Label",button);
@@ -1184,12 +1121,12 @@ function ROM_CommandGOTO(mapID,pos,finish)
         local tempVector3 = LuaVector3.zero;
         tempVector3:Set(x,y,z);
         tempArgs.targetPos = tempVector3;      
-        LogDebug("targetPos=" .. tostring(targetPos));
+        LogDebug("ROM_CommandGOTO: targetPos=" .. tostring(tempVector3));
         tempArgs.callback = function(cmd, event)
-            LogDebug("cmd=" .. MyTostring(cmd));
-            LogDebug("event=" .. MyTostring(event));
+            LogDebug("ROM_CommandGOTO: cmd=" .. MyTostring(cmd));
+            LogDebug("ROM_CommandGOTO: event=" .. MyTostring(event));
             if MissionCommandMove.CallbackEvent.TeleportFailed == event then
-                LogDebug("event=TeleportFailed");
+                LogDebug("ROM_CommandGOTO: event=TeleportFailed");
                 Game.Myself:Client_MoveTo( tempVector3 );
             end
             if event == 2 then
@@ -1226,6 +1163,7 @@ if g_mainView ~= nil then
 		{name="Quest", pos=Vector3(0.05,0.49,0), func= ROM_Quest},
 		{name="Tick", pos=Vector3(0.05,0.42,0), func= ROM_MyTick},
 		{name="Dlg", pos=Vector3(0.05,0.35,0), func= ROM_MyDlg},
+        {name="Cheat", pos=Vector3(0.05,0.28,0), func= ROM_MyCheat},
 	};
 	for i=1,#buttons do
 		local btn = buttons[i];

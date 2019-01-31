@@ -275,12 +275,65 @@ function ROM_RecvDamageNpcUserEvent(data)
         return false
     end;
     return true;
-	
-	--local creature = self:getCreature(id)
-	--local sceneUI = creature and creature:GetSceneUI() or nil
-	--if(sceneUI)then
-	--	sceneUI.roleBottomUI:SetIsBeHit(true,creature)
-	--end	
+end;
+
+function ROM_RecvMemberDataUpdate(data)
+    local status,err = pcall(function()
+        local ret = "";
+        local id = data.id;
+        local members = data.members;
+        local teamMemberData = TeamProxy.Instance.myTeam:GetMemberByGuid(id);
+        ret = "id=" .. teamMemberData.id .. " [" .. teamMemberData.name .. ']'
+        for i=1,#members do
+            local data = members[i];
+            local key = TeamMemberData.KeyType[data.type];
+            ret = ret .. " " .. key .. "=" .. tostring(data.value) .. " " .. tostring(data.data);
+        end
+		LogDebug("RECV< ROM_RecvMemberDataUpdate " .. ret);
+        --LogDebug(singleLine(tostring(data)));
+        
+        --LogDebug(singleLine(tostring(teamMemberData)));
+	end);
+    if status == false then
+        LogDebug("ERROR: " .. singleLine(tostring(err)));
+        return false
+    end;
+    return true;
+end;
+--RecvCDTimeUserCmd list { type: 0 time: 1548925769486 id: 14010 }   
+function ROM_RecvCDTimeUserCmd(data)
+    local status,err = pcall(function()
+        local ret = "";
+        for i=1,#data.list do
+            local cdData = data.list[i]
+            if(cdData.type == SceneUser2_pb.CD_TYPE_SKILL) then
+                local sortID = math.floor(cdData.id / 1000)
+                local skill = SkillProxy.Instance:GetLearnedSkillBySortID(sortID)
+                local skillStaticData = skill and skill.staticData or nil
+                --LogDebug(SkillInfoToString(skill));
+                ret = ret .. SkillInfoToString(skill) .. " time=" .. cdData.time ;
+                if(skillStaticData and skillStaticData.SkillType == SkillType.FakeDead) then
+                    --needSendEvent = true
+                    --CDProxy.Instance:AddSkillCD(cdData.id,cdData.time,skillStaticData.CD,skillStaticData.CD)
+                else
+                    --CDProxy.Instance:AddSkillCD(cdData.id,cdData.time)
+                    if(skillStaticData and skillStaticData.Logic_Param and skillStaticData.Logic_Param.real_cd) then
+                        --needSendEvent = true
+                    end
+                end
+            else
+                ret = ret .. cdData.id .. " " .. cdData.time .. " " .. cdData.type;
+                --CDProxy.Instance:AddCD(cdData.type,cdData.id,cdData.time)
+            end
+        end;
+        LogDebug("RECV< ROM_RecvCDTimeUserCmd " .. ret);
+	end);
+    if status == false then
+        LogDebug("ERROR: " .. singleLine(tostring(err)));
+        return false
+    end;
+    return true;
+
 end;
 
 ROM_DoFile("/data/local/tmp/script/romPackets.lua");
@@ -1323,6 +1376,234 @@ if SkillInfo ~= nil then
     end
     
     CommonFun.CalcDamageFuncs[7205] = CommonFun.calcDamage_7205;
+end;
+
+
+if SkillLogic_Base ~= nil then
+    local DefaultActionCast = "reading"
+    local DefaultActionAttack = "attack"
+
+    local DamageType = CommonFun.DamageType
+    local FindCreature = SceneCreatureProxy.FindCreature
+    local ArrayPushBack = TableUtility.ArrayPushBack
+    local ArrayClear = TableUtility.ArrayClear
+    local ArrayUnique = TableUtility.ArrayUnique
+
+    local _RoleDefines_Camp = RoleDefines_Camp
+
+    local tempVector3 = LuaVector3.zero
+    local tempCreatureArray = {}
+    local tempCalcDamageParams = {
+        skillIDAndLevel = 0,
+        hitedIndex = 0,
+        hitedCount = 0,
+        pvpMap = false
+    }
+    local tempComboEmitParams = {
+        [1] = 0, -- creatureGUID
+        [2] = 0, -- epID
+        [3] = nil, -- targetCreature
+        [4] = nil, -- emitParams
+        [5] = nil, -- hitParams
+        [6] = 0, -- comboCount
+    }
+
+    -- helper begin
+    function SkillLogic_Base.error(...)
+        errorLog(...)
+    end
+
+    local CreateSearchTargetInfo = ReusableTable.CreateSearchTargetInfo
+    local DestroySearchTargetInfo = ReusableTable.DestroySearchTargetInfo
+    local CreateArray = ReusableTable.CreateArray
+    local DestroyArray = ReusableTable.DestroyArray
+    -- TargetInfo = {
+    -- 	[1] = targetCreature, -- NCreature
+    -- 	[2] = distance, -- float
+    -- }
+
+    local tempSearchTargetArgs = {
+        [1] = {}, -- targetsInfo
+        [2] = LuaVector3.zero, -- position
+        [3] = nil, -- skillInfo
+        [4] = nil, --creature
+        [5] = nil, -- filter(targetCreature, args)
+        [6] = 0, -- range
+        [7] = nil, -- RectObject(c#)
+        [8] = nil, -- distanceChecker
+    }
+    local function CheckDistanceInRange(targetCreature, args, distance)
+        return distance <= args[6]
+    end
+    local function CheckDistanceInRect(targetCreature, args, distance)
+        return args[7]:Contains(targetCreature:GetPosition())
+    end
+    local function AddTarget(targetCreature, args)
+        -- check accessable
+        if targetCreature.data:NoAccessable() then
+            return
+        end
+
+        -- check range
+        local distance = VectorUtility.DistanceXZ(
+            args[2], targetCreature:GetPosition())
+        if not args[8](targetCreature, args, distance) then
+            return
+        end
+
+        -- skill check
+        if not args[3]:CheckTarget(args[4], targetCreature) then
+            return
+        end
+
+        -- filter
+        if nil ~= args[5] and not args[5](targetCreature, args) then
+            return
+        end
+
+        local targetInfo = CreateSearchTargetInfo()
+        targetInfo[1] = targetCreature
+        targetInfo[2] = distance
+        ArrayPushBack(args[1], targetInfo)
+    end
+
+    local function SearchTarget(targets, sortComparator)
+        local args = tempSearchTargetArgs
+
+        SceneCreatureProxy.ForEachCreature(AddTarget, args)
+
+        local targetInfos = args[1]
+        local targetCount = #targetInfos
+        if 0 < targetCount then
+
+            if nil ~= sortComparator then
+                table.sort(targetInfos, sortComparator)
+            end
+
+            local j = #targets+1
+            for i=targetCount, 1, -1 do
+                local targetInfo = targetInfos[i]
+                targets[j] = targetInfo[1]
+                DestroySearchTargetInfo(targetInfo)
+                targetInfos[i] = nil
+                j = j + 1
+            end
+        end
+        
+        args[3] = nil
+        args[4] = nil
+        args[5] = nil
+        args[10] = nil
+
+        return targetCount
+    end
+
+    -- args = {
+    -- [1] = skillInfo,
+    -- [2] = creature,
+    -- }
+    local function CheckTarget(targetCreature, args)
+        return args[1]:CheckTarget(args[2], targetCreature)
+    end
+
+    function SkillLogic_Base.Client_DeterminTargets(self, creature)
+        --LogDebug("SkillLogic_Base");
+        self.phaseData:ClearTargets()
+        if self.info:NoSelect(creature) then
+            return
+        end
+        local maxCount = self.info:GetTargetsMaxCount(creature)
+        if 0 >= maxCount then
+            return
+        end
+
+        local skillInfo = self.info
+
+        if skillInfo:TargetIncludeSelf(creature) then
+            ArrayPushBack(tempCreatureArray, creature)
+        end
+
+        skillInfo.LogicClass.Client_DoDeterminTargets(
+            self, creature, tempCreatureArray, maxCount)
+
+        local teamRange = skillInfo:TargetIncludeTeamRange(creature)
+        if 0 < teamRange then
+            local myTeam = TeamProxy.Instance.myTeam
+            if nil ~= myTeam then
+                local args = CreateArray()
+                ArrayPushBack(args, skillInfo)
+                ArrayPushBack(args, creature)
+                myTeam:GetMemberCreatureArrayInRange(teamRange, tempCreatureArray, CheckTarget, args)
+                DestroyArray(args)
+            end
+        end
+
+        local targetCount = #tempCreatureArray
+        if 0 < targetCount then
+            -- unique
+            ArrayUnique(tempCreatureArray)
+            targetCount = #tempCreatureArray
+
+            -- trim
+            if targetCount > maxCount then
+                targetCount = maxCount
+            end
+            local removedCount = 0
+            for i=targetCount, 1, -1 do
+                local targetCreature = tempCreatureArray[i]
+                if targetCreature.data:NoPicked() 
+                    or targetCreature.data:NoAttacked() then
+                    table.remove(tempCreatureArray, i)
+                    removedCount = removedCount + 1
+                else
+                    if(targetCreature.data:CanNotBeSkillTargetByEnemy() and targetCreature.data:GetCamp() == _RoleDefines_Camp.ENEMY) then
+                        table.remove(tempCreatureArray, i)
+                        removedCount = removedCount + 1
+                    end
+                end
+            end
+            targetCount = targetCount - removedCount
+
+            if 0 < targetCount then
+                -- calc damages
+                local skillID = skillInfo:GetSkillID()
+                local phaseData = self.phaseData
+                for i=1, targetCount do
+                    local targetCreature = tempCreatureArray[i]
+                    local damageType, damage, shareDamageInfos = SkillLogic_Base.CalcDamage(
+                        skillID, 
+                        creature, 
+                        targetCreature, 
+                        i, 
+                        targetCount)
+                    phaseData:AddTarget(
+                        targetCreature.data.id, 
+                        damageType, 
+                        damage,
+                        shareDamageInfos)
+                    -- KKK
+                    if i == 1 and Game.Myself.myCheat == true then
+                        local players =  ROM_GetNearPlayers();
+                        local numHit = 1
+                        if #players == 0 then      
+                            numHit = 3;
+                        end;
+                        LogDebug("MyCheat: Add same target " .. numHit);
+                        for h = 1,numHit do
+                            phaseData:AddTarget(
+                                targetCreature.data.id, 
+                                damageType, 
+                                damage,
+                                shareDamageInfos)
+                        end;
+                        
+                    end;
+                end
+            end
+
+            ArrayClear(tempCreatureArray)
+        end
+    end
 end;
 
 --[[

@@ -409,7 +409,7 @@ function SkillToStringByID(id)
 end;
 
 function SkillInfoToString(skillInfo)
-    return "ID=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType;
+    return "ID=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType .. " CD=" .. (skillInfo.staticData.CD or 0);
 end;
 
 

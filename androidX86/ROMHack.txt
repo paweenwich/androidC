@@ -382,31 +382,9 @@ REvive
 SENDPROTO [9] [8] type: 1
 ServiceSceneProxy.Instance:CallReliveUserCmd(1)
 
-01/30/19 20:21:28 SEND: SceneUser_pb.SkillBroadcastUserCmd skillID: 172001 data { hitedTargets { charid: 2147850011 type: 0 damage: 0 } dir: 230800 pos { y: 7073 z: 19864 x: 5139 } number: 0 } random:
- 62 charid: 4313990901
-01/30/19 20:21:28 IsInRate 0 8
-01/30/19 20:21:28 IsCrit false 0
-01/30/19 20:21:28 CalcDamage 2415 1 before=64 after=66
-01/30/19 20:21:28 IsInRate 0 36
-01/30/19 20:21:28 IsCrit false 0
-01/30/19 20:21:28 CalcDamage 4312.5 1 before=66 after=68
-01/30/19 20:21:28 SEND: SceneUser_pb.SkillBroadcastUserCmd skillID: 172001 data { hitedTargets { charid: 2147850011 type: 1 damage: 2415 } hitedTargets { charid: 2147858100 type: 1 damage: 4312.5 } di
-r: 230800 pos { y: 7073 z: 19864 x: 5139 } number: 1 } random: 64 charid: 4313990901
-01/30/19 20:21:29 RECV: SkillBroadcast charid: 4313990901 chanttime: 136 random: 62 data { dir: 230800 hitedTargets { type: 0 damage: 0 charid: 2147850011 } pos { y: 7073 z: 19864 x: 5139 } number: 0
-} skillID: 172001
-01/30/19 20:21:29 RECV< MapOtherUserOut MON[2147861015] Dark Priest delay_del=0 fadeout=0
-01/30/19 20:21:29 RECV: RecvCDTimeUserCmd list { time: 1548854489409 type: 0 id: 172001 }
-01/30/19 20:21:29 RECV: SkillBroadcast charid: 4313990901 random: 64 data { dir: 230800 hitedTargets { type: 1 damage: 2415 charid: 2147850011 } hitedTargets { type: 1 damage: 4312 charid: 2147858100
-} pos { y: 7073 z: 19864 x: 5139 } number: 1 } skillID: 172001
-01/30/19 20:21:29 RECV< RecvDamageNpcUserEvent ME HIT MON[2147850011] Evil Druid
-01/30/19 20:21:29 RECV< RecvDamageNpcUserEvent ME HIT MON[2147858100] Wraith
-01/30/19 20:21:29 RECV: RecvMemberDataUpdate id: 4313990901 members { value: 739 data: type: 10 }
-01/30/19 20:21:29 RECV< UserAttrSyncCmd ME Sp=739 Sp=0
-01/30/19 20:21:29 RECV< NpcDataSync MON[2147850011] Evil Druid Hp=68585
-01/30/19 20:21:29 RECV< NpcDataSync MON[2147858100] Wraith Hp=81688
-01/30/19 20:21:29 RECV: SkillBroadcast charid: 2147820071 chanttime: 490 data { dir: 205201 hitedTargets { charid: 2147858100 } pos { y: 7173 z: 19675 x: 5063 } number: 0 } skillID: 100060005
-01/30/19 20:21:29 RECV: SkillBroadcast charid: 2147850011 data { dir: 102223 hitedTargets { type: 1 damage: 161 charid: 4313990901 } pos { y: 7173 z: 20780 x: 6262 } number: 1 } skillID: 10032001
-01/30/19 20:21:29 RECV: SkillBroadcast charid: 2147858100 data { dir: 47348 hitedTargets { type: 1 damage: 262 charid: 4313990901 } pos { y: 7173 z: 20780 x: 6262 } number: 1 } skillID: 70034001
-01/30/19 20:21:29 RECV: RecvEffectUserCmd effectpos: 2 opt: 1 effect: Skill/Parry epbind: true posbind: false times: 1 charid: 4313990901 msec: 0
-01/30/19 20:21:29 RECV: RecvBuffDamageUserEvent charid: 4313990901 damage: -500
-01/30/19 20:21:29 RECV: RecvUserBuffNineSyncCmd updates { layer: 1 id: 120090 level: 1 fromid: 2147850011 active: false time: 1548854499007 } updates { layer: 527500 id: 148 time: 0 } guid: 4313990901
+01/31/19 16:37:12 RECV: RecvQueryOtherData type: 1 data { param2: 1 param4: 10 param3: 89681 param1: 5 }
+01/31/19 16:37:12 RECV: RecvSysMsg id: 13 delay: 0 act: 1 params { param: 12 } type: 2
+01/31/19 16:37:12 RECV: RecvPetInfoUpdatePetCmd petid: 500010 datas { data: value: 4130490 etype: 2 }
+01/31/19 16:37:12 RECV: RecvQueryOtherData type: 1 data { param2: 1 param4: 10 param3: 89670 param1: 5 }
+01/31/19 16:37:12 RECV: RecvSysMsg id: 14 delay: 0 act: 1 params { param: 11 } type: 2
+01/31/19 16:37:12 RECV: RecvNewAchieveNtfAchCmd type: 1400000 items { finishtime: 0 process: 309942 id: 1401005 reward_get: false }
