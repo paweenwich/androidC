@@ -483,8 +483,9 @@ myAIRules = {
 --    {name="Holy Light Strike", func=ROM_SkillTarget},  	
 };
 
+
 cleanSkill = {
-	"Turn","Heal"
+	"Turn","Heal","Bolt"
 };
 
 ROM_Config = {};
@@ -528,6 +529,7 @@ end;
 function ROM_Test(g)
     LogDebug("----- ROM_Test --------");
     LogDebug(CreatureToString(Game.Myself));
+--[[    
     local props = Game.Myself.data.props;
     tableForEach(props.configs,function(i,v)
 		if (type(i) == 'number') then
@@ -560,7 +562,7 @@ function ROM_Test(g)
 	--tableForEach(UDEnum,function(i,v)
 	--	LogDebug("" .. tostring(GetKey(v)) .. " " .. tostring(v));
 	--end);
-	
+]]	
     
     --DumpMyself();
     local mons = ROM_GetAllNPC();	
@@ -733,6 +735,8 @@ function ROM_Test(g)
 	LogDebug("players=" .. #players);
 	local mons = ROM_GetMonsterByGroupID(10030);
 	LogDebug("mons=" .. #mons);
+    --ROM_DumpBag();
+    --ROM_UseItem("Fly Wing");
     UIUtil.FloatMsgByText("Test Done 1");	
 		
     if true then
@@ -1000,6 +1004,12 @@ function ROM_IsNear(pos1,pos2,range)
 	return distance <= range
 end;
 
+function ROM_DistanceToCreature(creature)
+    local myPos = Game.Myself:GetPosition();	
+    local toPos = creature:GetPosition();	
+    return LuaVector3.Distance(myPos, toPos);
+end;
+
 function ROM_IsMeNear(mapID,pos,range)
 	range = range or 2;
 	local currentMapID = Game.MapManager:GetMapID();
@@ -1011,7 +1021,7 @@ function ROM_IsMeNear(mapID,pos,range)
 end;
 
 function ROM_GetOriginalPos(ID)
-	local oriMonster = Table_MonsterOrigin[ ID] or {};
+	local oriMonster = ROM_tabMonsterOrigin[ID] or Table_MonsterOrigin[ ID] or {};
 	local oriPos = nil;
 	--local tmpPos = {};
 	if oriMonster == nil or #oriMonster == 0 then
@@ -1201,7 +1211,13 @@ if g_mainView ~= nil then
 			button:SetActive(true);       
 			--LogDebug("pos=" .. MyTostring(button.transform.position));
 			g_mainView:AddClickEvent(button, function (g)
-				btn.func(g);
+                local status,err = pcall(function()
+                    btn.func(g);
+                end);
+                if status == false then
+                    LogDebug("ERROR: " .. singleLine(tostring(err)));
+                    return false
+                end;
 			end);        
 		end;
 	end;

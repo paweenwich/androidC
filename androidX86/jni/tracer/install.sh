@@ -1,11 +1,12 @@
 ##!/system/bin/sh
 if [ $# -ne 2 ] ; then
-    echo './install.sh I|U|S filename'
+    echo './install.sh I|U|S|D filename'
     exit 1
 fi
 
 #find correct directory
 DIRECTORY=/data/app-lib/com.gravity.romg-2
+INSTALLDIR=/data/local/tmp
 if [ ! -d "$DIRECTORY" ]; then
     # Control will enter here if $DIRECTORY exists.
     DIRECTORY=/data/app-lib/com.gravity.romg-1
@@ -31,4 +32,16 @@ if [ "$1" = "U" ] ; then
     cp $2 $DIRECTORY/$2
 fi
 
+if [ "$1" = "D" ] ; then
+    #check directory exist
+    if [ ! -d "$INSTALLDIR/script" ]; then
+	mkdir $INSTALLDIR/script
+	chmod 777 $INSTALLDIR/script
+    fi
+    if [ ! -d "$INSTALLDIR/loadbufferx" ]; then
+	mkdir $INSTALLDIR/loadbufferx
+	chmod 777 $INSTALLDIR/loadbufferx
+    fi
+    chmod 777 /data/local/tmp
+fi
 

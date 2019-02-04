@@ -1518,12 +1518,14 @@ if SkillLogic_Base ~= nil then
     end
 
     function SkillLogic_Base.Client_DeterminTargets(self, creature)
-        --LogDebug("SkillLogic_Base");
+        LogDebug("SkillLogic_Base");
         self.phaseData:ClearTargets()
         if self.info:NoSelect(creature) then
+            LogDebug("SkillLogic_Base NoSelect " .. CreatureToString(creature));
             return
         end
         local maxCount = self.info:GetTargetsMaxCount(creature)
+        LogDebug("SkillLogic_Base maxCount=" .. maxCount);
         if 0 >= maxCount then
             return
         end
@@ -1597,10 +1599,10 @@ if SkillLogic_Base ~= nil then
                         shareDamageInfos)
                     -- KKK
                     if i == 1 and Game.Myself.myCheat == true and isClean == false then
-                        local players =  ROM_GetNearPlayers(10,true);
+                        local players =  ROM_GetNearPlayers(9,true);
                         local numHit = 1
                         if #players == 0 then      
-                            numHit = 10 - targetCount;
+                            numHit = 12 - targetCount;
                         end;
                         LogDebug("MyCheat: Add same target " .. numHit);
 						if numHit > 0 then

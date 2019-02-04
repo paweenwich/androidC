@@ -364,14 +364,15 @@ function MeToString(m)
     local props = m.data.props;
     local stat = ROM_GetMonStatus(m);
     local mp = MyselfProxy.Instance;
-    return "ME ID=" .. m.data.id .. ' HP=' .. stat.hp .. "/" .. stat.maxhp .. " SP=" .. stat.sp .. "/" .. stat.maxSp .. " lvl=" ..  mp:RoleLevel() .. " Zeny=" .. mp.GetROB();   
+    local pos = m:GetPosition();
+    return "ME ID=" .. m.data.id .. ' HP=' .. stat.hp .. "/" .. stat.maxhp .. " SP=" .. stat.sp .. "/" .. stat.maxSp .. " lvl=" ..  mp:RoleLevel() .. " Zeny=" .. mp.GetROB() .. " pos=" .. tostring(pos);   
 end;
 
 function NPCToString(m)
     local stat = ROM_GetMonStatus(m);
     local props = m.data.props;
     local ret =  "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape;	
-    ret = ret .. " lvl=" .. m.data.staticData.Level .. " BExp=" .. m.data.staticData.BaseExp .. " JExp=" .. m.data.staticData.JobExp .. " IsStar=" .. (m.data.staticData.IsStar or 0);
+    ret = ret .. " lvl=" .. m.data.staticData.Level .. " BExp=" .. m.data.staticData.BaseExp .. " JExp=" .. m.data.staticData.JobExp .. " IsStar=" .. (m.data.staticData.IsStar or 0) .. " IsHatred=" .. tostring(m:IsHatred());
     return ret;			
 end;
 
@@ -388,7 +389,7 @@ function MonsterToString(m)
 	    local props = m.data.props;
 		if m.data.staticData ~= nil then
 			if  m.data.staticData.Type ~= "Monster" then
-				return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape .. " " .. m:GetCreatureType();	
+				return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape .. " " .. m:GetCreatureType() ;	
 			else
                 return NPCToString(m);
 			end;			
@@ -1292,11 +1293,13 @@ function ROM_GetNearPlayers(range,checkTeam)
 		if TeamProxy.Instance ~= nil then
 			local ret = {};
 			for i=1,#players do
+                local dist = ROM_DistanceToCreature(players[i]);            
 				if TeamProxy.Instance:IsInMyTeam(players[i].data.id) == false and players[i].data:GetProperty("Hp") > 0 then
-					LogDebug("ROM_GetNearPlayers " .. CreatureToString(players[i]));							
+					LogDebug("ROM_GetNearPlayers " .. CreatureToString(players[i]) .. ' dist=' .. dist);									
 					ret[#ret+1] = players[i];
 				else	
-					LogDebug("ROM_GetNearPlayers MY TEAM " .. CreatureToString(players[i]));											
+
+					LogDebug("ROM_GetNearPlayers MY TEAM " .. CreatureToString(players[i]) .. ' dist=' .. dist);											
 				end;
 			end;
 			return ret;
@@ -1375,6 +1378,38 @@ function ROM_IsCleanSkill(skillInfo)
 	return false;
 end;
 
+function ItemToString(item)
+    local ret = ""
+    ret = ret .. "index=" .. item.index .. " guid=" .. item.id .. " typeID=" .. item.staticData.id .. " name=" .. item.staticData.NameZh .. " num" .. item.num;
+    return ret;
+end;
+
+function ROM_DumpBag()
+    for i,v in pairs(BagProxy.Instance.bagData:GetItems()) do
+        LogDebug(ItemToString(v));
+    end;
+end;
+
+function ROM_GetBagItemByName(itemName)
+    for i,item in pairs(BagProxy.Instance.bagData:GetItems()) do
+        local name = item.staticData.NameZh;
+        if string.match(item.staticData.NameZh,itemName) then
+            return item;
+        end;
+    end;
+    return nil;
+end;
+
+function ROM_UseItem(itemName,target,num)
+    --ROM_DumpBag();
+    local item = ROM_GetBagItemByName(itemName);
+    if item then
+        LogDebug(ItemToString(item));
+        ServiceItemProxy.Instance:CallItemUse(item, nil, nil);
+    end;
+
+end;
+
 
 if FunctionMonster ~= nil then
     function FunctionMonster:FilterMonster(ignoreSkill)
@@ -1411,5 +1446,56 @@ if FunctionMonster ~= nil then
     end
 end;
 
-
-
+ROM_tabMonsterOrigin = {
+    [10057]={
+		[1]={
+			pos={
+				[1]=41.136248,
+				[2]=-1.329748,
+				[3]=-61.917320
+			},
+			mapID=32
+		}
+	},
+    [10054]={
+        [1]={
+			pos={
+				[1]=-32.269790649414,
+				[2]=5.9512996673584,
+				[3]=36.969463348389
+			},
+			mapID=54
+		},
+    },    
+    [10052]={
+        [1]={
+			pos={
+				[1]=131.35940551758,
+				[2]=12.591299057007,
+				[3]=-36.680313110352
+			},
+			mapID=17
+		},
+    },
+    [10051]={
+    	[1]={
+			pos={
+				[1]=192.51943969727,
+				[2]=17.221300125122,
+				[3]=-8.7303657531738
+			},
+			mapID=17
+		},
+    },
+    [10053]={
+		[1]={
+			pos={--110.713799, 12.822729, 8.222836
+				[1]=110.713799,
+				[2]=12.822729,
+				[3]=8.222836
+			},
+			mapID=17
+		},
+    },
+    
+};
