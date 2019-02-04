@@ -1378,6 +1378,17 @@ if SkillInfo ~= nil then
     CommonFun.CalcDamageFuncs[7205] = CommonFun.calcDamage_7205;
 end;
 
+if MiniMapWindow then
+	if MiniMapWindow.ORG_Show == nil then
+		LogDebug("Hook MiniMapWindow.Show");
+		MiniMapWindow.ORG_Show = MiniMapWindow.Show;
+	end;
+	function MiniMapWindow:Show()
+		self:ORG_Show();
+		LogDebug("MiniMapWindow:Show()2");
+	end
+end;
+
 
 if SkillLogic_Base ~= nil then
     local DefaultActionCast = "reading"
@@ -1518,6 +1529,9 @@ if SkillLogic_Base ~= nil then
         end
 
         local skillInfo = self.info
+		
+		local isClean = ROM_IsCleanSkill(skillInfo);
+		LogDebug(SkillInfoToString(skillInfo) .. ' isClean=' .. tostring(isClean));
 
         if skillInfo:TargetIncludeSelf(creature) then
             ArrayPushBack(tempCreatureArray, creature)
@@ -1582,20 +1596,22 @@ if SkillLogic_Base ~= nil then
                         damage,
                         shareDamageInfos)
                     -- KKK
-                    if i == 1 and Game.Myself.myCheat == true then
-                        local players =  ROM_GetNearPlayers();
+                    if i == 1 and Game.Myself.myCheat == true and isClean == false then
+                        local players =  ROM_GetNearPlayers(10,true);
                         local numHit = 1
                         if #players == 0 then      
-                            numHit = 3;
+                            numHit = 10 - targetCount;
                         end;
                         LogDebug("MyCheat: Add same target " .. numHit);
-                        for h = 1,numHit do
-                            phaseData:AddTarget(
-                                targetCreature.data.id, 
-                                damageType, 
-                                damage,
-                                shareDamageInfos)
-                        end;
+						if numHit > 0 then
+							for h = 1,numHit do
+								phaseData:AddTarget(
+									targetCreature.data.id, 
+									damageType, 
+									damage,
+									shareDamageInfos)
+							end;
+						end;
                         
                     end;
                 end

@@ -127,9 +127,9 @@ function ROM_WalkToNPC(mapID,npcID,finish)
             LogDebug("cmd=" .. MyTostring(cmd));
             LogDebug("event=" .. MyTostring(event));
             if 2 == event then
-                LogDebug("ROM_WalkToNPC2 continue");
+                --LogDebug("ROM_WalkToNPC2 continue");
                 --ROM_WalkToNPC(Game.MapManager:GetMapID(),boardNPC);
-                ROM_WalkToNPC2(mapID,npcID,finish);
+                --ROM_WalkToNPC2(mapID,npcID,finish);
             end
         end        
     end;
@@ -386,9 +386,16 @@ function ROM_DoAutoQuest()
 				end;
 			elseif q.wantedData.Content == "gather" then
 				ListField(q,"",{},"    ");  
-				if q.params.monster ~= nil then
-					-- goto that monster
-					ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
+				if q.params.monster ~= nil or q.params.groupId then				
+					if q.params.monster ~= nil then
+						LogDebug("ROM_DoAutoQuest: gather monster " .. q.params.monster);					
+						ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
+					else
+						LogDebug("ROM_DoAutoQuest: gather groupId " .. q.params.groupId);
+						local mons = ROM_GetMonsterByGroupID(q.params.groupId);
+						LogDebug("ROM_DoAutoQuest: gather select " .. mons[1].id);
+						ROM_CommandVisitMonster(q.wantedData.MapId,mons[1].id);
+					end;
 				else
 					-- goto board to submit quest 
 					ROM_WalkToNPC(mapid,q.params.npc);

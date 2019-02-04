@@ -471,6 +471,7 @@ myAIRules = {
 			return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
 		end
 	},    
+	{name="Auto", func=ROM_SkillTarget},    
 
 
 --    {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
@@ -480,6 +481,10 @@ myAIRules = {
 --	{name="Heal", func=ROM_Heal,frachp=0.6},  -- bless    
 --	{name="Turn", func=ROM_TurnUndead, frachp=0.6},  
 --    {name="Holy Light Strike", func=ROM_SkillTarget},  	
+};
+
+cleanSkill = {
+	"Turn","Heal"
 };
 
 ROM_Config = {};
@@ -723,6 +728,11 @@ function ROM_Test(g)
 		--ROM_WalkToNPCPos(quest.params.npc);
 	end;
     --ROM_WalkToNPCPos(1067);
+	
+	local players = ROM_GetNearPlayers(6,true);
+	LogDebug("players=" .. #players);
+	local mons = ROM_GetMonsterByGroupID(10030);
+	LogDebug("mons=" .. #mons);
     UIUtil.FloatMsgByText("Test Done 1");	
 		
     if true then
@@ -1004,31 +1014,47 @@ function ROM_GetOriginalPos(ID)
 	local oriMonster = Table_MonsterOrigin[ ID] or {};
 	local oriPos = nil;
 	--local tmpPos = {};
-	if #oriMonster == 0 then
+	if oriMonster == nil or #oriMonster == 0 then
 		return nil;
 	end;
-	local randIndex = math.random(#oriMonster);
+	LogDebug("ROM_GetOriginalPos " .. ID .. " " ..  #oriMonster);
+	local randIndex = 1;
+	
+	if #oriMonster > 1 then
+		randIndex = math.random(#oriMonster);
+	end;
 	oriPos = oriMonster[randIndex];
 	LogDebug("ROM_GetOriginalPos " .. ID .. " randIndex=" .. randIndex .. " oriPos=" .. tostring(oriPos));        
 	return oriPos;
 end;
 
+function ROM_GetMonsterByGroupID(groupID)
+	local ret = {};
+	for i,v in pairs(Table_Monster) do
+		if v.GroupID == groupID and v.id < 20000 then
+			ret[#ret + 1] = v;
+			--LogDebug(MyTostring(v));
+		end;
+	end;
+	return ret;
+end;
+
 function ROM_CommandVisitMonster(mapID,monID)
-		local oriMonster = Table_MonsterOrigin[ monID] or {};
+		--local oriMonster = Table_MonsterOrigin[ monID] or {};
 		-- this will have mapID which contain that monsters
-		LogDebug(MyTostring(oriMonster));
-		local oriPos = nil;
-        local tmpPos = {};
-		for i=1,#oriMonster do
-			if(oriMonster[i].mapID == mapID)then
+		--LogDebug(MyTostring(oriMonster));
+		local oriPos = ROM_GetOriginalPos(monID);
+        --local tmpPos = {};
+		--for i=1,#oriMonster do
+		--	if(oriMonster[i].mapID == mapID)then
 				--oriPos = oriMonster[i].pos;
-                tmpPos[#tmpPos+1] = oriMonster[i].pos;
+        --       tmpPos[#tmpPos+1] = oriMonster[i].pos;
                 --break;
-			end
-		end
-        local randIndex = math.random(#tmpPos);
-        oriPos = tmpPos[randIndex];
-        LogDebug("randIndex=" .. randIndex .. " oriPos=" .. tostring(oriPos));        
+		--	end
+		--end
+        --local randIndex = math.random(#tmpPos);
+        --oriPos = tmpPos[randIndex];
+        LogDebug("ROM_CommandVisitMonster oriPos=" .. MyTostring(oriPos));        
 		if(oriPos)then
 			local cmdArgs = {
 				targetMapID = mapID,
@@ -1075,6 +1101,8 @@ function ROM_CommandVisitMonster(mapID,monID)
 				Game.Myself:Client_SetMissionCommand( cmd );
 				--self:PassEvent(WorldMapMenuEvent.StartTrace);
 			end
+		else	
+			LogDebug("ROM_CommandVisitMonster " .. monID .. " original pos not found");
 		end
 end;
 

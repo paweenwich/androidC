@@ -1284,10 +1284,25 @@ function ROM_GetNearestTown(mapID)
     return nil;
 end;
 
-function ROM_GetNearPlayers(range)
+function ROM_GetNearPlayers(range,checkTeam)
     range = range or 10;
+	checkTeam = checkTeam or false;
     local players = NSceneUserProxy.Instance:FindNearUsers(Game.Myself:GetPosition(),range,nil);
-    return players;
+	if checkTeam then
+		if TeamProxy.Instance ~= nil then
+			local ret = {};
+			for i=1,#players do
+				if TeamProxy.Instance:IsInMyTeam(players[i].data.id) == false and players[i].data:GetProperty("Hp") > 0 then
+					LogDebug("ROM_GetNearPlayers " .. CreatureToString(players[i]));							
+					ret[#ret+1] = players[i];
+				else	
+					LogDebug("ROM_GetNearPlayers MY TEAM " .. CreatureToString(players[i]));											
+				end;
+			end;
+			return ret;
+		end;
+	end;
+	return players;    
 end;
 
 function ROM_DataGetName(id)
@@ -1348,6 +1363,16 @@ function ROM_PropGetName(props,id)
         end;        
     end;
     return "PROP_" .. id;
+end;
+
+function ROM_IsCleanSkill(skillInfo)
+	local skillName = skillInfo.staticData.NameZh;
+	for i=1,#cleanSkill do
+		if string.match(skillName, cleanSkill[i]) then
+			return true;
+		end;
+	end;
+	return false;
 end;
 
 
