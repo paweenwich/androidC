@@ -483,7 +483,11 @@ myAIRules = {
 --    {name="Holy Light Strike", func=ROM_SkillTarget},  	
 };
 
-
+ignoreMonList = {
+    60132, -- name=Sumina
+    10084, -- name=Abysmal Knight
+    10081, -- name=Gargoyle
+}
 cleanSkill = {
 	"Turn","Heal","Bolt"
 };
@@ -501,8 +505,8 @@ ROM_Config[4313990901] = {
     },
     myMonsterRules ={
         {func= ROM_FindStaticMonster},  -- priority to static monster
-        {func= ROM_FindNearestMonsterEx2, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
-		--{func= ROM_FindNearestMonsterEx2, monlist={}, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+        --{func= ROM_FindNearestMonsterEx2, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+		{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
     },
     myAIRules = {
         {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
@@ -511,14 +515,13 @@ ROM_Config[4313990901] = {
         {name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
         {name="WalkToRange", func=ROM_WalkToRange,range=6},  		
         {name="Heal", func=ROM_Heal,frachp=0.7},  -- bless    
-		{name="Holy Light Strike", func=ROM_SkillTarget, 
-			filter = function(mon) 
-				local players =  ROM_GetNearPlayers(15,true);
-				return #players == 0
-			end
-		},    
+		{name="Holy Light Strike", func=ROM_SkillTarget, filter = ROM_NoPlayerAround},    
         {name="Turn", func=ROM_TurnUndead, frachp=0.6},  
-        {name="Holy Light Strike", func=ROM_SkillTarget},  	
+        {name="Holy Light Strike", func=ROM_SkillTarget,
+            filter = function(mon) 
+                return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
+            end
+        },  	
     },
 }
 --4313990901
@@ -745,9 +748,19 @@ function ROM_Test(g)
 	if wq then
 		LogDebug(QuestToString(wq));
 	end;
+    LogDebug("-- ROM_GetAcceptedQuest ----");
+    local wq = ROM_GetAcceptedQuest();
+	if wq then
+		LogDebug(QuestToString(wq));
+	end;
+    LogDebug("-- END ----");
     --ROM_DumpBag();
     --ROM_UseItem("Fly Wing");
     UIUtil.FloatMsgByText("Test Done 1");	
+    tableForEach(UIManagerProxy.Instance.modalLayer, function(_, layerType)
+        logDebug(tostring(layerType));
+        GameFacade.Instance:sendNotification(UIEvent.CloseUI,layerType);    
+    end);
 		
     if true then
         return;

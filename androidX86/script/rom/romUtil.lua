@@ -833,8 +833,12 @@ end;
 
 function ROM_FindNearestMonsterEx2(tab)
     local monlist = tab.monlist or myMonsterList;
+    local ignoreList = tab.ignore or {};
     local filterFunc = function(mon)
         if #monlist == 0 or TableUtil.HasValue(monlist,mon.data.staticData.id) then
+            if TableUtil.HasValue(ignoreList,mon.data.staticData.id) then
+                return false;
+            end;
             if tab.filter ~= nil then
                 return tab.filter(mon);
                 --LogDebug(MonsterToString(mon));
@@ -860,7 +864,7 @@ function ROM_GetBestScoreMonFromList(mons)
 		local pos = npc:GetPosition();
         local distance = LuaVector3.Distance(myPos,pos);
 		local players = NSceneUserProxy.Instance:FindNearUsers(pos,10,nil);
-		local score = distance + (#players * 5);
+		local score = distance + (#players * 10);
         if score < minScore then
             retNpc = npc;
             minScore = score;
@@ -870,6 +874,11 @@ function ROM_GetBestScoreMonFromList(mons)
 		--LogDebug("ROM_GetBestScoreMonFromList: " .. CreatureToString(retNpc));
 	end;
     return retNpc;
+end;
+
+function ROM_NoPlayerAround(mon)
+    local players =  ROM_GetNearPlayers(15,true);
+    return #players == 0
 end;
 
 function ROM_GetNearestMonFromList(mons)
@@ -1534,5 +1543,15 @@ ROM_tabMonsterOrigin = {
 			mapID=19
 		},
     },
-	
+    [10057]={
+		[1]={
+			pos={
+				[1]=-49.490476,
+				[2]=-4.939921,
+				[3]=-10.082882
+			},
+			mapID=22
+		},
+    },
+    
 };

@@ -352,6 +352,18 @@ e: 1 key: mark_team_wanted } params { value: 1016 key: npc } } } } step: 5 actio
  
  02/05/19 02:21:00 quest { questid: 54550001 charid: 4299674004 questdata { config { Auto: 0 Class: 0 QuestName: Mutated Cramp SubGroup: 0 Type: wanted FailJump: 0 TraceInfo: WhetherTrace: 1 FirstClass
 : 0 Level: 0 RewardGroup: 0 Name: Mutated Cramp FinishJump: 0 Content: GM Map: 0 params { params { value: 2 key: etype } params { value: effect key: type } } } } action: 2 }
+
+02/06/19 09:27:38 RECV< ROM_RecvUpdateWantedQuestTeamCmd ACCEPTED step=7 questid=55070001 MY TEAM[4300736919] τÑ₧τºÿτÜäµëïµÄî
+02/06/19 09:27:38 quest { step: 7 action: 1 questid: 55070001 charid: 4300736919 questdata { config { Level: 0 RewardGroup: 0 Name: Mystical Palms FinishJump: 0 Content: visit Map: 0 params { params {
+ value: 1 key: ifAccessFc } params { value: 1 key: mark_team_wanted } params { value: 1016 key: npc } } Auto: 0 Class: 0 QuestName: Mystical Palms SubGroup: 4 Type: wanted FailJump: 0 TraceInfo: Go to
+ the Mission Board of a nearby city to submit quests WhetherTrace: 0 FirstClass: 0 } } }
+02/06/19 09:27:39 RECV: RecvMemberPosUpdate id: 4313990901 pos { y: 119 z: 7770 x: -7129 }
+02/06/19 09:27:40 RECV< ROM_RecvMemberDataUpdate id=4313990901 [α╕₧α╕▓α╕ùα╣ëα╕¡α╣üα╕ùα╣ë] mapid=47  raid=0  guildraidindex=0
+
+2/06/19 10:25:23 Found quest id=54620001,type=wanted,map=37,step=1,acceptlv=88,traceTitle=ΦíÇµƒôτÜäµòÖσáé,traceInfo=Go to Glast Heim Churchyard to take a picture of the Ruins┬╖Sage's End,process=0,fi
+ishcount=4,questDataStepType=selfie,scope=cityScope,orderId=54620001,instanceID=162630,questListType=1,whetherTrace=1,time=1549404000,params.distance=5,params.cameraId=9,params.button=µïìτàº,params.i
+emIcon=74,
+2/06/19 10:25:23 RECV< ROM_RecvUpdateWantedQuestTeamCmd ACCEPTED step=3 questid=54620001 MY TEAM[4300736919] ΦíÇµƒôτÜäµòÖσáé
  
  ]]
 		if data.quest.action == 1 then 
@@ -360,6 +372,27 @@ e: 1 key: mark_team_wanted } params { value: 1016 key: npc } } } } step: 5 actio
 				ret = ret .. "ACCEPTED step=" .. data.quest.step;
 				if data.quest.step == 0 then
 					shouldAccept = true;
+                else
+                    -- check if we can update step also
+                    local q = ROM_GetAcceptedQuest();
+                    if q and q.id == data.quest.questid then
+                        LogDebug("Found quest " .. QuestToString(q));
+                        if q.questDataStepType == "visit" then
+                            ROM_VisitNearestNPC(q.params.npc);
+                            ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
+                             ROM_DelayCall(3000,
+                                function(param) 
+                                    LogDebug("ROM_RecvUpdateWantedQuestTeamCmd auto close UI");
+                                    GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);                                    
+                                end,
+                            nil);
+                        end;
+                        if q.questDataStepType == "selfie" then
+                            ServiceNUserProxy.Instance:CallStateChange(ProtoCommon_pb.ECREATURESTATUS_SELF_PHOTO);
+                            ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 
+                            ServiceNUserProxy.Instance:CallStateChange(0);
+                        end;
+                    end;
 				end;
 			else
 				ret = ret .. "ACCEPT";
@@ -368,6 +401,18 @@ e: 1 key: mark_team_wanted } params { value: 1016 key: npc } } } } step: 5 actio
 			if shouldAccept then
 				ROM_VisitNearestNPC(1016);
 				ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,data.quest.questid);
+                ROM_DelayCall(3000,
+                    function(param) 
+                        LogDebug("ROM_RecvUpdateWantedQuestTeamCmd auto close UI");
+                        tableForEach(UIManagerProxy.Instance.modalLayer, function(_, layerType)
+                            logDebug(tostring(layerType));
+                            GameFacade.Instance:sendNotification(UIEvent.CloseUI,layerType);    
+                        end);
+                        --UIManagerProxy.Instance:
+                        --GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.FloatLayer);                                    
+                        --GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.PopUpLayer);
+                    end,
+                nil);                
 			end;
 			
 		elseif 	data.quest.action == 2 then 
@@ -381,6 +426,15 @@ e: 1 key: mark_team_wanted } params { value: 1016 key: npc } } } } step: 5 actio
 					ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 				
 					--ServiceQuestProxy.Instance:CallQuestList(SceneQuest_pb.EQUESTLIST_CANACCEPT,101);
 					ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_SUBMIT,q.id);
+                    ROM_DelayCall(3000,
+                        function(param) 
+                            LogDebug("ROM_RecvUpdateWantedQuestTeamCmd auto close UI");
+                            tableForEach(UIManagerProxy.Instance.modalLayer, function(_, layerType)
+                                logDebug(tostring(layerType));
+                                GameFacade.Instance:sendNotification(UIEvent.CloseUI,layerType);    
+                            end);
+                        end,
+                    nil);                
 				end;
 			end;
 			--ROM_DoAutoQuest();
