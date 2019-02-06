@@ -193,10 +193,13 @@ function ROM_SubmitQuest()
     return false;
 end;
 
-function ROM_VisitNearestNPC()
-	local nearestNPC, nearestDist = ROM_GetNearestNPC();
-	ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
+function ROM_VisitNearestNPC(npcID)
+	local nearestNPC, nearestDist = ROM_GetNearestNPC(npcID);
+	if nearestNPC ~= nil then
+		ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
+	end;
 end;
+
 
 
 function ROM_AcceptQuest()
@@ -240,7 +243,6 @@ function ROM_GetAcceptedQuest()
     return nil;
 end;
 
-
 function ROM_ClickNearestNPC(autoClose)
     autoClose = autoClose or false;
     LogDebug("ROM_ClickNearestNPC: " .. tostring(autoClose));
@@ -268,6 +270,20 @@ function ROM_ClickNearestNPC(autoClose)
     else
         LogDebug("ROM_ClickNearestNPC: not found");
 	end;	
+end;
+
+function ROM_GetSubmitableQuest()
+	local wantedQuest = QuestProxy.Instance:getWantedQuest();
+    for i=1,#wantedQuest do
+        local wq = wantedQuest[i];
+        --local wd = wq.wantedData;
+		local traceInfo = wq.traceInfo or "";
+		if string.match(traceInfo, "Mission Board") then	
+			--LogDebug(QuestToString(wq));
+			return wq;
+		end;
+    end;
+	return nil;
 end;
 
 function ROM_DoAutoQuest()

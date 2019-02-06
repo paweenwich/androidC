@@ -372,14 +372,20 @@ function NPCToString(m)
     local stat = ROM_GetMonStatus(m);
     local props = m.data.props;
     local ret =  "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape;	
-    ret = ret .. " lvl=" .. m.data.staticData.Level .. " BExp=" .. m.data.staticData.BaseExp .. " JExp=" .. m.data.staticData.JobExp .. " IsStar=" .. (m.data.staticData.IsStar or 0) .. " IsHatred=" .. tostring(m:IsHatred());
+    --ret = ret .. " lvl=" .. m.data.staticData.Level .. " BExp=" .. m.data.staticData.BaseExp .. " JExp=" .. m.data.staticData.JobExp .. " IsStar=" .. (m.data.staticData.IsStar or 0) .. " IsHatred=" .. tostring(m:IsHatred());
     return ret;			
 end;
 
 function PlayerToString(m)
     local stat = ROM_GetMonStatus(m);
     local props = m.data.props;
-    return "ID=" .. m.data.id .. ' PLAYER HP=' .. stat.hp;	
+	return ROM_GetCreatureName(m) .. ' HP=' .. stat.hp;	
+	--[[if TeamProxy.Instance:IsInMyTeam(m.data.id) then
+		return "MY TEAM ID=" .. m.data.id .. ' PLAYER HP=' .. stat.hp;	
+	else
+		return "ID=" .. m.data.id .. ' PLAYER HP=' .. stat.hp;	
+	end]]
+    
 end;
 
 function MonsterToString(m)
@@ -389,9 +395,13 @@ function MonsterToString(m)
 	    local props = m.data.props;
 		if m.data.staticData ~= nil then
 			if  m.data.staticData.Type ~= "Monster" then
-				return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape .. " " .. m:GetCreatureType() ;	
+				return NPCToString(m);
+				--return "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape .. " " .. m:GetCreatureType() ;	
 			else
-                return NPCToString(m);
+                --return NPCToString(m);
+				local ret =  "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape;	
+				ret = ret .. " lvl=" .. m.data.staticData.Level .. " BExp=" .. m.data.staticData.BaseExp .. " JExp=" .. m.data.staticData.JobExp .. " IsStar=" .. (m.data.staticData.IsStar or 0) .. " IsHatred=" .. tostring(m:IsHatred());
+				return ret;
 			end;			
 		else
             return PlayerToString(m);
@@ -1096,18 +1106,20 @@ function ROM_GetNPCPointByID(npcID)
     return nil;
 end;    
 
-function ROM_GetNearestNPC()
+function ROM_GetNearestNPC(npcid)
 	local minDist = 100000;
     local ret = nil;
     local mons = ROM_GetAllNPC();
     local myPos = Game.Myself:GetPosition();
 	--local exitPoints =  Game.MapManager:GetExitPointArray();	
 	tableForEach(mons, function(i, v)
-		local distance = LuaVector3.Distance(myPos, v:GetPosition());
-        if distance < minDist then
-            ret = v;
-            minDist = distance;
-        end;
+		if npcid == nil or v.data.staticData.id == npcid then
+			local distance = LuaVector3.Distance(myPos, v:GetPosition());
+			if distance < minDist then
+				ret = v;
+				minDist = distance;
+			end;
+		end;
 	end);
     return ret,minDist;	
 end;
@@ -1331,7 +1343,12 @@ function ROM_GetCreatureName(creature)
 
     local creatureType = creature:GetCreatureType();
     if creatureType == Creature_Type.Player then
-        return "PLAYER[" .. creature.data.id .. "]";
+		if TeamProxy.Instance:IsInMyTeam(creature.data.id) then
+			return "MY TEAM[" .. creature.data.id .. "]";
+		else
+			return "PLAYER[" .. creature.data.id .. "]";
+		end
+        
     end;
     if creatureType == Creature_Type.Pet then
         return "PET[" .. creature.data.id .. "]";
@@ -1479,10 +1496,10 @@ ROM_tabMonsterOrigin = {
     },
     [10051]={
     	[1]={
-			pos={
-				[1]=192.51943969727,
-				[2]=17.221300125122,
-				[3]=-8.7303657531738
+			pos={--210.169942, 12.480402, -48.204506
+				[1]=211.169942,
+				[2]=12.480402,
+				[3]=-46.204506
 			},
 			mapID=17
 		},
@@ -1497,5 +1514,25 @@ ROM_tabMonsterOrigin = {
 			mapID=17
 		},
     },
-    
+    [10056]={
+		[1]={
+			pos={
+				[1]=46.774910,
+				[2]=0.057374,
+				[3]=-37.507874
+			},
+			mapID=19
+		},
+    },
+    [10057]={
+		[1]={
+			pos={---1.691658, -1.313200, -79.897491
+				[1]=-1.691658,
+				[2]=-1.322711,
+				[3]=-79.897491
+			},
+			mapID=19
+		},
+    },
+	
 };

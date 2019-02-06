@@ -502,6 +502,7 @@ ROM_Config[4313990901] = {
     myMonsterRules ={
         {func= ROM_FindStaticMonster},  -- priority to static monster
         {func= ROM_FindNearestMonsterEx2, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+		--{func= ROM_FindNearestMonsterEx2, monlist={}, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
     },
     myAIRules = {
         {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
@@ -510,6 +511,12 @@ ROM_Config[4313990901] = {
         {name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
         {name="WalkToRange", func=ROM_WalkToRange,range=6},  		
         {name="Heal", func=ROM_Heal,frachp=0.7},  -- bless    
+		{name="Holy Light Strike", func=ROM_SkillTarget, 
+			filter = function(mon) 
+				local players =  ROM_GetNearPlayers(15,true);
+				return #players == 0
+			end
+		},    
         {name="Turn", func=ROM_TurnUndead, frachp=0.6},  
         {name="Holy Light Strike", func=ROM_SkillTarget},  	
     },
@@ -701,7 +708,10 @@ function ROM_Test(g)
     --UIUtil.FloatMsgByText("Players=" .. #players);	
     --ServicePlayerProxy.Instance:CallChangeMap("", 0, 0, 0, 8)
     
-    local nearestNPC, nearestDist = ROM_GetNearestNPC();
+    local nearestNPC, nearestDist = ROM_GetNearestNPC(1016);
+	if nearestNPC then
+		LogDebug(CreatureToString(nearestNPC) .. " " .. nearestDist);
+	end;
     --Game.Myself:Client_LockTarget(nearestNPC);
     --ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
     --ServiceQuestProxy.Instance:CallRunQuestStep(300010075, nil, nil, 0); 
@@ -730,11 +740,11 @@ function ROM_Test(g)
 		--ROM_WalkToNPCPos(quest.params.npc);
 	end;
     --ROM_WalkToNPCPos(1067);
-	
-	local players = ROM_GetNearPlayers(6,true);
-	LogDebug("players=" .. #players);
-	local mons = ROM_GetMonsterByGroupID(10030);
-	LogDebug("mons=" .. #mons);
+	LogDebug("-- submitable quest --");
+	local wq = ROM_GetSubmitableQuest();
+	if wq then
+		LogDebug(QuestToString(wq));
+	end;
     --ROM_DumpBag();
     --ROM_UseItem("Fly Wing");
     UIUtil.FloatMsgByText("Test Done 1");	

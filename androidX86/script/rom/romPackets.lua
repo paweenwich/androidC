@@ -1465,7 +1465,7 @@ ROM_Packets = {
 {51,21,"RecvQueryUserTeamInfoTeamCmd"},
 {51,22,"RecvSetMemberOptionTeamCmd"},
 {51,23,"RecvQuestWantedQuestTeamCmd"},
-{51,24,"RecvUpdateWantedQuestTeamCmd"},
+{51,24,"RecvUpdateWantedQuestTeamCmd",ROM_RecvUpdateWantedQuestTeamCmd},
 {51,25,"RecvAcceptHelpWantedTeamCmd"},
 {51,26,"RecvUpdateHelpWantedTeamCmd"},
 {51,27,"RecvQueryHelpWantedTeamCmd"},

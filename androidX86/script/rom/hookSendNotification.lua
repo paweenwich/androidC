@@ -335,6 +335,70 @@ function ROM_RecvCDTimeUserCmd(data)
     return true;
 
 end;
+function ROM_RecvUpdateWantedQuestTeamCmd(data)
+    local status,err = pcall(function()
+        local ret = "";
+--[[		02/05/19 01:19:25 RECV: RecvUpdateWantedQuestTeamCmd quest { questid: 54670001 charid: 4300736919 questdata { config { Auto: 0 Class: 0 QuestName: Book of Evil Druid SubGroup: 0 Type: wanted FailJump:
+ 0 TraceInfo: WhetherTrace: 1 FirstClass: 0 Level: 0 RewardGroup: 0 Name: Book of Evil Druid FinishJump: 0 Content: GM Map: 0 params { params { value: 2 key: etype } params { value: effect key: type }
+ } } } action: 1 }
+ 
+ 02/05/19 01:44:38 quest { questid: 54660001 charid: 4300736919 questdata { config { Auto: 0 Class: 0 QuestName: An Experiment SubGroup: 0 Type: wanted FailJump: 0 TraceInfo: Go to the Mission Board of
+ a nearby city to submit quests WhetherTrace: 0 FirstClass: 0 Level: 0 RewardGroup: 0 Name: An Experiment FinishJump: 0 Content: visit Map: 0 params { params { value: 1 key: ifAccessFc } params { valu
+e: 1 key: mark_team_wanted } params { value: 1016 key: npc } } } } step: 5 action: 1 }
+
+ 02/05/19 01:33:56 RECV: RecvUpdateWantedQuestTeamCmd quest { questid: 54670001 charid: 4300736919 questdata { config { Auto: 0 Class: 0 QuestName: Book of Evil Druid SubGroup: 0 Type: wanted FailJump:
+ 0 TraceInfo: WhetherTrace: 1 FirstClass: 0 Level: 0 RewardGroup: 0 Name: Book of Evil Druid FinishJump: 0 Content: GM Map: 0 params { params { value: 2 key: etype } params { value: effect key: type }
+ } } } action: 2 }
+ 
+ 02/05/19 02:21:00 quest { questid: 54550001 charid: 4299674004 questdata { config { Auto: 0 Class: 0 QuestName: Mutated Cramp SubGroup: 0 Type: wanted FailJump: 0 TraceInfo: WhetherTrace: 1 FirstClass
+: 0 Level: 0 RewardGroup: 0 Name: Mutated Cramp FinishJump: 0 Content: GM Map: 0 params { params { value: 2 key: etype } params { value: effect key: type } } } } action: 2 }
+ 
+ ]]
+		if data.quest.action == 1 then 
+			local shouldAccept = false
+			if data.quest.step then
+				ret = ret .. "ACCEPTED step=" .. data.quest.step;
+				if data.quest.step == 0 then
+					shouldAccept = true;
+				end;
+			else
+				ret = ret .. "ACCEPT";
+				shouldAccept = true;
+			end;
+			if shouldAccept then
+				ROM_VisitNearestNPC(1016);
+				ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_ACCEPT,data.quest.questid);
+			end;
+			
+		elseif 	data.quest.action == 2 then 
+			ret = ret .. "SUBMIT";
+			local q = ROM_GetSubmitableQuest();
+			if q then
+				LogDebug(QuestToString(q))
+				if q.id == data.quest.questid then
+					ROM_VisitNearestNPC(1016);
+					ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 				
+					ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 				
+					--ServiceQuestProxy.Instance:CallQuestList(SceneQuest_pb.EQUESTLIST_CANACCEPT,101);
+					ServiceQuestProxy.Instance:CallQuestAction(SceneQuest_pb.EQUESTACTION_SUBMIT,q.id);
+				end;
+			end;
+			--ROM_DoAutoQuest();
+			-- check if we can auto submit
+		else
+			ret = ret .. "ACTION" .. data.quest.action;
+		end;
+		
+		ret = ret .. " questid=" .. data.quest.questid .. " " .. ROM_GetCreatureNameFromID(data.quest.charid) .. " " .. data.quest.questdata.config.QuestName;
+        LogDebug("RECV< ROM_RecvUpdateWantedQuestTeamCmd " .. ret);
+		LogDebug(singleLine(tostring(data)));
+	end);
+    if status == false then
+        LogDebug("ERROR: " .. singleLine(tostring(err)));
+        return false
+    end;
+    return true;
+end;
 
 ROM_DoFile("/data/local/tmp/script/romPackets.lua");
 
@@ -1601,10 +1665,15 @@ if SkillLogic_Base ~= nil then
                     if i == 1 and Game.Myself.myCheat == true and isClean == false then
                         local players =  ROM_GetNearPlayers(9,true);
                         local numHit = 1
+						local numNeed = math.floor(targetCreature.data:GetProperty("Hp") / damage) + 1						
                         if #players == 0 then      
-                            numHit = 12 - targetCount;
+							if numNeed > 30 then
+								numHit = 30 - targetCount;
+							else	
+								numHit = numNeed - targetCount;
+							end
                         end;
-                        LogDebug("MyCheat: Add same target " .. numHit);
+                        LogDebug("MyCheat: Add same target " .. numHit .. "/" .. numNeed .. " ".. targetCreature.data:GetProperty("Hp") .. " " .. damage);
 						if numHit > 0 then
 							for h = 1,numHit do
 								phaseData:AddTarget(

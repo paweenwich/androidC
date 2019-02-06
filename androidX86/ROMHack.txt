@@ -388,3 +388,16 @@ ServiceSceneProxy.Instance:CallReliveUserCmd(1)
 01/31/19 16:37:12 RECV: RecvQueryOtherData type: 1 data { param2: 1 param4: 10 param3: 89670 param1: 5 }
 01/31/19 16:37:12 RECV: RecvSysMsg id: 14 delay: 0 act: 1 params { param: 11 } type: 2
 01/31/19 16:37:12 RECV: RecvNewAchieveNtfAchCmd type: 1400000 items { finishtime: 0 process: 309942 id: 1401005 reward_get: false }
+
+02/05/19 01:54:37 RECV: RecvQueryOtherData type: 1 data { param4: 10 param2: 0 param3: 655932 param1: 3 }
+02/05/19 01:54:37 RECV: RecvSysMsg id: 13 delay: 0 act: 1 params { param: 946 } type: 2
+02/05/19 01:54:37 RECV: RecvPetInfoUpdatePetCmd petid: 500110 datas { data: value: 17381778 etype: 2 }
+02/05/19 01:54:37 RECV: RecvQueryOtherData type: 1 data { param4: 10 param2: 0 param3: 655490 param1: 3 }
+02/05/19 01:54:37 RECV: RecvSysMsg id: 14 delay: 0 act: 1 params { param: 442 } type: 2
+02/05/19 01:54:37 RECV: RecvQuestStepUpdate step: 1 data { process: 7 config { Auto: 0 Class: 0 QuestName: Song of Wraith SubGroup: 0 Type: wanted FailJump: 0 TraceInfo: Go to Glast Heim Churchyard, d
+efeat [num] [monsterName] WhetherTrace: 1 FirstClass: 0 Level: 0 RewardGroup: 0 Name: Song of Wraith FinishJump: 0 Content: kill Map: 37 params { params { value: 10080 key: monster } params { value: 2
+5 key: num } params { value: 2 key: uniqueid } } } } id: 54560001
+02/05/19 01:54:37 RECV: RecvManualUpdate update { version: 1549336754 items { data_params: data_params: data_params: storeid: 0 unlock: true quests { rewardget: true finish: true process: 0 id: 320 }
+quests { rewardget: false finish: false process: 1329 id: 317 } store: false id: 10080 params: 0 params: 0 params: 0 status: 3 } type: 6 }
+02/05/19 01:54:37 RECV: RecvQueryOtherData type: 1 data { param4: 10 param2: 0 param3: 654635 param1: 3 }
+02/05/19 01:54:37 RECV: RecvQueryOtherData type: 1 data { param4: 10 param2: 0 param3: 654236 param1: 3 }
