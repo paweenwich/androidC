@@ -443,7 +443,12 @@ function ROM_DoAutoQuest()
 				LogDebug("Before ROM_AcceptQuest");		
 				ROM_AcceptQuest();
             else
-                
+                ROM_DelayCall(3000,
+                    function(param) 
+                        LogDebug("ROM_DoAutoQuest auto close UI");
+                        ROM_CloseAllModal();
+                    end,
+                nil);   
 			end;
 		end;
 	end;

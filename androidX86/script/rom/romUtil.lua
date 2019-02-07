@@ -862,12 +862,17 @@ function ROM_GetBestScoreMonFromList(mons)
     tableForEach(mons,function(i,v)
         local npc = v;
 		local pos = npc:GetPosition();
-        local distance = LuaVector3.Distance(myPos,pos);
-		local players = NSceneUserProxy.Instance:FindNearUsers(pos,10,nil);
-		local score = distance + (#players * 10);
-        if score < minScore then
-            retNpc = npc;
-            minScore = score;
+        --local distance = LuaVector3.Distance(myPos,pos);
+        
+        local canArrive,path = NavMeshUtils.CanArrived(myPos, pos, WorldTeleport.DESTINATION_VALID_RANGE, true, nil);        
+        if canArrive then
+            local cost = NavMeshUtils.GetPathDistance(path);
+            local players = NSceneUserProxy.Instance:FindNearUsers(pos,10,nil);
+            local score = cost + (#players * 10);
+            if score < minScore then
+                retNpc = npc;
+                minScore = score;
+            end;
         end;
     end);
 	if retNpc ~= nil then
@@ -1434,6 +1439,21 @@ function ROM_UseItem(itemName,target,num)
         ServiceItemProxy.Instance:CallItemUse(item, nil, nil);
     end;
 
+end;
+
+function ROM_CloseAllModal()
+    tableForEach(UIManagerProxy.Instance.modalLayer, function(_, layerType)
+        --logDebug(tostring(layerType));
+        GameFacade.Instance:sendNotification(UIEvent.CloseUI,layerType);    
+    end);
+end;
+
+function ROM_GetMapName(id)
+    if Table_Map[id] then
+        return Table_Map[id].NameEn .. "(" .. id .. ")";
+    else
+        return "MAP" .. id;
+    end;
 end;
 
 
