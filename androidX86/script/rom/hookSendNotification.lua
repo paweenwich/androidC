@@ -404,13 +404,11 @@ emIcon=74,
                 ROM_DelayCall(3000,
                     function(param) 
                         LogDebug("ROM_RecvUpdateWantedQuestTeamCmd auto close UI");
-                        tableForEach(UIManagerProxy.Instance.modalLayer, function(_, layerType)
+                        ROM_CloseAllModal();
+                        --[[tableForEach(UIManagerProxy.Instance.modalLayer, function(_, layerType)
                             logDebug(tostring(layerType));
                             GameFacade.Instance:sendNotification(UIEvent.CloseUI,layerType);    
-                        end);
-                        --UIManagerProxy.Instance:
-                        --GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.FloatLayer);                                    
-                        --GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.PopUpLayer);
+                        end);]]
                     end,
                 nil);                
 			end;
@@ -1716,13 +1714,13 @@ if SkillLogic_Base ~= nil then
                         damage,
                         shareDamageInfos)
                     -- KKK
-                    if i == 1 and Game.Myself.myCheat == true and isClean == false then
+                    if i == 1 and Game.Myself.myCheat == true and isClean == false and damage > 0 then
                         local players =  ROM_GetNearPlayers(9,true);
-                        local numHit = 1
+                        local numHit = 3
 						local numNeed = math.floor(targetCreature.data:GetProperty("Hp") / damage) + 1						
                         if #players == 0 then      
-							if numNeed > 30 then
-								numHit = 30 - targetCount;
+							if numNeed > 50 then
+								numHit = 50 - targetCount;
 							else	
 								numHit = numNeed - targetCount;
 							end

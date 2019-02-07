@@ -399,12 +399,12 @@ end;
 
 function ROM_WalkToRange(tab)
     local range = tab.range or 6;
-    
+    local filter = tab.filter or function(mon) return true end;
     local npc = ROM_GetMonsterLockTarget();
     if npc == nil then
         npc = ROM_FindBestMonster();
     end;
-    if npc ~= nil then
+    if npc ~= nil and filter() then
         --ListField(npc,"",{},"  ");  
         local myPos = Game.Myself:GetPosition();
         local targetPosition = npc:GetPosition();
@@ -455,7 +455,7 @@ myMonsterList = {
 };
 
 myMonsterRules = {
---    {func= ROM_FindMiniBoss}, -- priority to miniboss
+    {func= ROM_FindMiniBoss}, -- priority to miniboss
     {func= ROM_FindStaticMonster},  -- priority to static monster
 --    {func= ROM_FindNearestMonsterEx, param=myMonsterList},  -- selected monster
     {func= ROM_FindNearestMonsterEx2, monlist={}},  -- selected monster
@@ -466,6 +466,7 @@ myAIRules = {
 	{name="Bash", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
     {name="Endure", func=ROM_BuffNoTarget, ignoreLockTarget=true},
 --	{name="Shield Charge", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
+    {name="Crasher", func=ROM_SkillTarget},
 	{name="Auto", func=ROM_SkillTarget, 
 		filter = function(mon) 
 			return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
@@ -513,7 +514,7 @@ ROM_Config[4313990901] = {
         {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
         {name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
         {name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
-        {name="WalkToRange", func=ROM_WalkToRange,range=6},  		
+        {name="WalkToRange", func=ROM_WalkToRange, filter = ROM_NoPlayerAround, range=6},  		
         {name="Heal", func=ROM_Heal,frachp=0.7},  -- bless    
 		{name="Holy Light Strike", func=ROM_SkillTarget, filter = ROM_NoPlayerAround},    
         {name="Turn", func=ROM_TurnUndead, frachp=0.6},  
@@ -538,7 +539,7 @@ end;
 
 function ROM_Test(g)
     LogDebug("----- ROM_Test --------");
-    LogDebug(CreatureToString(Game.Myself));
+    LogDebug(CreatureToString(Game.Myself) .. " mapID=" .. Game.MapManager:GetMapID());
 --[[    
     local props = Game.Myself.data.props;
     tableForEach(props.configs,function(i,v)
@@ -612,7 +613,12 @@ function ROM_Test(g)
     LogDebug("Monster List count=" .. #mons);
     local mons = ROM_GetAllMonster();
     tableForEach(mons,function(i,v)
-        LogDebug(CreatureToString(v));
+        local myPos = Game.Myself:GetPosition();
+        local npc = v;
+		local pos = npc:GetPosition();
+        local canArrive,path = NavMeshUtils.CanArrived(myPos, pos, WorldTeleport.DESTINATION_VALID_RANGE, true, nil);        
+        local cost = NavMeshUtils.GetPathDistance(path);
+        LogDebug(CreatureToString(v) .. ' ' .. tostring(canArrive) .. ' cost=' .. tostring(cost));
     end);
 	
     local npcList = Game.MapManager:GetNPCPointArray();
@@ -636,7 +642,7 @@ function ROM_Test(g)
         --if(v and v.ID and v.position)then
         --    local npcData = Table_Npc[v.ID];
         --    if npcData  then
-                LogDebug("" .. i .. " " .. MyTostring(v));
+                LogDebug("" .. i .. " to " .. ROM_GetMapName(v.nextSceneID) .. " " .. MyTostring(v));
         --    end;
         --end;
     end);
@@ -756,11 +762,21 @@ function ROM_Test(g)
     LogDebug("-- END ----");
     --ROM_DumpBag();
     --ROM_UseItem("Fly Wing");
+    --local t = Game.WorldTeleport:CanArriveMap(Game.MapManager:GetMapID(),1)
+    --LogDebug(tostring(t));
+    for i,v in pairs(MapOutterTeleport[Game.MapManager:GetMapID()]) do
+        if v.transitNPCToMap ~= nil then
+            --LogDebug(ROM_GetMapName(i) .. " " .. MyTostring(v));
+        else
+            --[5]={[1]={[4]={totalCost=122.6325302124,nextEP=2}}}
+            --[1]={[1]={[5]={totalCost=24}}}
+            local ep,v1 = next(v, nil);
+            local retep,val = next(v1,nil);
+            --LogDebug(ROM_GetMapName(i) .. " exit=" .. ep .. " returnExit=" .. retep .. " " .. MyTostring(val));
+        end;
+        
+    end;
     UIUtil.FloatMsgByText("Test Done 1");	
-    tableForEach(UIManagerProxy.Instance.modalLayer, function(_, layerType)
-        logDebug(tostring(layerType));
-        GameFacade.Instance:sendNotification(UIEvent.CloseUI,layerType);    
-    end);
 		
     if true then
         return;
@@ -969,7 +985,9 @@ function ROM_Quest()
     UIUtil.FloatMsgByText("Auto Quest " .. tostring(Game.Myself.ai.autoQuest_Rom:IsEnable()));
 end;
 
-
+if farmData == nil then
+farmData = {};
+end;
 function ROM_MyDlg()
 		local viewdata = {
 		viewname = "DialogView",
@@ -979,11 +997,13 @@ function ROM_MyDlg()
 	viewdata.addfunc = {
 		{
 			event = function (npcinfo,param)
-				UIUtil.FloatMsgByText("[" .. tostring(param) .. "]");	
+                farmData.mapID = Game.MapManager:GetMapID();
+                farmData.pos = Game.Myself:GetPosition():Clone();
+				UIUtil.FloatMsgByText(MyTostring(farmData));	
 			end,
-			eventParam = {"haha"},
+			--eventParam = {"haha"},
 			closeDialog = true,
-			NameZh = "Funct1",
+			NameZh = "RememberPos",
 			
 		},
 		{
@@ -1005,13 +1025,12 @@ function ROM_MyDlg()
 		},
 		{
 			event = function (npcinfo)
-				LogDebug("npcinfo=" .. tostring(npcinfo));
-                LogDebug("currentMapID=" .. Game.MapManager:GetMapID());
-				LogDebug("done");
+                if farmData.pos then
+                    ServicePlayerProxy.Instance:CallMoveTo(farmData.pos[1], farmData.pos[2], farmData.pos[3])	
+                end;
 			end,
 			closeDialog = true,
-			--NameZh = ZhString.FunctionDialogEvent_Upgrade,
-			NameZh="UNK",
+			NameZh="Test",
 			
 		},
 	};
