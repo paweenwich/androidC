@@ -471,7 +471,7 @@ myAIRules = {
 			return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
 		end
 	},    
-	{name="Auto", func=ROM_SkillTarget},    
+--	{name="Auto", func=ROM_SkillTarget},    
 
 
 --    {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
@@ -505,8 +505,8 @@ ROM_Config[4313990901] = {
     },
     myMonsterRules ={
         {func= ROM_FindStaticMonster},  -- priority to static monster
-        --{func= ROM_FindNearestMonsterEx2, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
-		{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+        {func= ROM_FindNearestMonsterEx2, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+		--{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
     },
     myAIRules = {
         {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
@@ -538,7 +538,7 @@ end;
 
 function ROM_Test(g)
     LogDebug("----- ROM_Test --------");
-    LogDebug(CreatureToString(Game.Myself));
+    LogDebug(CreatureToString(Game.Myself) .. " mapID=" .. Game.MapManager:GetMapID());
 --[[    
     local props = Game.Myself.data.props;
     tableForEach(props.configs,function(i,v)
@@ -756,11 +756,11 @@ function ROM_Test(g)
     LogDebug("-- END ----");
     --ROM_DumpBag();
     --ROM_UseItem("Fly Wing");
+	local transitNPC, transitMap, transitNPCToMap = Game.WorldTeleport:GetTransitNPCInfo(Game.MapManager:GetMapID(),19);
+	LogDebug(tostring(transitNPC));
+	LogDebug(tostring(transitMap));
+	LogDebug(tostring(transitNPCToMap));
     UIUtil.FloatMsgByText("Test Done 1");	
-    tableForEach(UIManagerProxy.Instance.modalLayer, function(_, layerType)
-        logDebug(tostring(layerType));
-        GameFacade.Instance:sendNotification(UIEvent.CloseUI,layerType);    
-    end);
 		
     if true then
         return;
