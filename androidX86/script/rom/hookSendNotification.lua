@@ -1505,6 +1505,18 @@ if MiniMapWindow then
 	end
 end;
 
+if CreatureDataWithPropUserdata then
+    function CreatureDataWithPropUserdata:WeakFreeze()
+        
+        if(self.weakFreezeBuffs and self.weakFreezeBuffs.count > 0) then
+            LogDebug("WeakFreeze true " .. self.weakFreezeBuffs.count);
+            return true
+        end
+        --LogDebug("WeakFreeze false");
+        return false
+    end
+end;
+
 
 if SkillLogic_Base ~= nil then
     local DefaultActionCast = "reading"
