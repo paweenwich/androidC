@@ -743,15 +743,6 @@ if class ~= nil then
 					ROM_CommandGOTO(Game.Myself.autoMapID,Game.Myself.autoPos);
 					return true;
 				end;
---[[                local myPos = Game.Myself:GetPosition();
-				
-                local distance = LuaVector3.Distance(myPos, Game.Myself.autoPos);
-				LogDebug("AutoAI_Rom: dist=" .. distance);
-                if distance > 2 then
-                    LogDebug("AutoAI_Rom: Move to auto pos");
-                    Game.Myself:Client_MoveTo(Game.Myself.autoPos, nil, nil, nil, nil, nil);
-					return true;
-                end;]]
 			else	
 				--LogDebug("Game.Myself.autoPos not set");
             end;

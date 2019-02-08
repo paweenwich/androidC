@@ -1727,7 +1727,7 @@ if SkillLogic_Base ~= nil then
                         shareDamageInfos)
                     -- KKK
                     if i == 1 and Game.Myself.myCheat == true and isClean == false and damage > 0 then
-                        local players =  ROM_GetNearPlayers(9,true);
+                        local players =  ROM_GetNearPlayers(10,true);
                         local numHit = 3
 						local numNeed = math.floor(targetCreature.data:GetProperty("Hp") / damage) + 1						
                         if #players == 0 then      

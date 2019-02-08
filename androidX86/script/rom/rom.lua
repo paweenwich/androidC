@@ -412,7 +412,13 @@ function ROM_WalkToRange(tab)
         --LogDebug("ROM_WalkToRange: dist=" .. distance);
         if distance > range then
             LogDebug("ROM_WalkToRange walk to target");
-            Game.Myself:Client_MoveTo(targetPosition, nil, nil, nil, nil, range);
+			Game.AreaTrigger_ExitPoint:SetDisable(true)
+            Game.Myself:Client_MoveTo(targetPosition, nil, 
+				function(self,param)
+					Game.AreaTrigger_ExitPoint:SetDisable(false)
+					LogDebug("ROM_WalkToRange done");
+				end, 
+			nil, nil, range);
             return true;
         end;
     else
@@ -455,10 +461,10 @@ myMonsterList = {
 };
 
 myMonsterRules = {
-    {func= ROM_FindMiniBoss}, -- priority to miniboss
+--    {func= ROM_FindMiniBoss}, -- priority to miniboss
     {func= ROM_FindStaticMonster},  -- priority to static monster
 --    {func= ROM_FindNearestMonsterEx, param=myMonsterList},  -- selected monster
-    {func= ROM_FindNearestMonsterEx2, monlist={}},  -- selected monster
+    {func= ROM_FindNearestMonsterEx2, monlist={},selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
 };
 
 myAIRules = {
@@ -466,6 +472,7 @@ myAIRules = {
 	{name="Bash", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
     {name="Endure", func=ROM_BuffNoTarget, ignoreLockTarget=true},
 --	{name="Shield Charge", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
+	{name="Auto", func=ROM_SkillTarget},    
     {name="Crasher", func=ROM_SkillTarget},
 	{name="Auto", func=ROM_SkillTarget, 
 		filter = function(mon) 
@@ -1207,7 +1214,7 @@ function ROM_CommandGOTO(mapID,pos,finish)
             LogDebug("ROM_CommandGOTO: event=" .. MyTostring(event));
             if MissionCommandMove.CallbackEvent.TeleportFailed == event then
                 LogDebug("ROM_CommandGOTO: event=TeleportFailed");
-                Game.Myself:Client_MoveTo( tempVector3 );
+                --Game.Myself:Client_MoveTo( tempVector3 );
             end
             if event == 2 then
 				if ROM_IsMeNear(mapID,tempVector3) then
