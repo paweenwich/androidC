@@ -380,6 +380,7 @@ emIcon=74,
                         if q.questDataStepType == "visit" then
                             ROM_VisitNearestNPC(q.params.npc);
                             ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
+							ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, 6); 
                              ROM_DelayCall(3000,
                                 function(param) 
                                     LogDebug("ROM_RecvUpdateWantedQuestTeamCmd auto close UI");
@@ -1501,8 +1502,44 @@ if MiniMapWindow then
 	end;
 	function MiniMapWindow:Show()
 		self:ORG_Show();
-		LogDebug("MiniMapWindow:Show()2");
+		LogDebug("MiniMapWindow:Show() " .. tostring(self));
 	end
+	
+	function MiniMapWindow:UpdateMonstersPoses(datas, isRemoveOther)
+		self:HelpUpdatePoses(self.monsterMap,
+			datas,
+			MiniMapWindow._CreateMonsterPoints,
+			MiniMapWindow._UpdateMonsterPoints,
+			MiniMapWindow._RemoveMonsterPoints,
+			isRemoveOther);
+	end
+	
+	function MiniMapWindow:_CreateMonsterPoints( data )
+		local MonsterPoint_Path = ResourcePathHelper.UICell("MiniMapSymbol_Monster")
+		if(Slua.IsNull(self.gameObject))then
+			return;
+		end
+
+		local go = Game.AssetManager_UI:CreateSceneUIAsset( MonsterPoint_Path, self.s_symbolParent );
+		self:_UpdateMonsterPoints(go, data);
+		LogDebug("_CreateMonsterPoints " .. MonsterPoint_Path);
+		LogDebug("\n" .. GameObjectToString(go));
+		return go;
+	end	
+	-- player Map begin
+	function MiniMapWindow:_CreatePlayerPoints( data )
+		if(not self:ObjIsNil(self.gameObject))then
+			local symbolName = data:GetParama("Symbol");
+			local depth = data:GetParama("depth");
+			local symbol = self:GetMapSymbol(symbolName, 7, 0.7);
+
+			symbol:GetComponent(UISprite).depth = 21 + depth;
+			symbol:SetActive(true);
+			LogDebug("_CreatePlayerPoints");
+			return symbol;
+		end
+	end
+	
 end;
 
 if CreatureDataWithPropUserdata then
@@ -1731,8 +1768,8 @@ if SkillLogic_Base ~= nil then
                         local numHit = 3
 						local numNeed = math.floor(targetCreature.data:GetProperty("Hp") / damage) + 1						
                         if #players == 0 then      
-							if numNeed > 50 then
-								numHit = 50 - targetCount;
+							if numNeed > 999 then
+								numHit = 999 - targetCount;
 							else	
 								numHit = numNeed - targetCount;
 							end

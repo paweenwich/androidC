@@ -432,6 +432,23 @@ function ROM_MonFullHP(npc)
     return monStatus.frachp > 0.99 
 end;
 
+function ROM_NearestAvoidMonDist(refPos)
+	local list = avoidMonList or {};
+	local isAvoid = function(mon)
+		return TableUtil.HasValue(list,mon.data.staticData.id)
+	end;
+	local mons = ROM_GetAllMonster(isAvoid);
+	local minDist = 100000;
+	for i,v in pairs(mons) do
+		local pos = v:GetPosition();
+		local dist = LuaVector3.Distance(refPos,pos);
+		if dist < minDist then
+			minDist = dist;
+		end;
+	end;
+	return minDist;
+end;
+
 myMonsterList = {
 
 	10004, -- name=Tarou
@@ -469,16 +486,16 @@ myMonsterRules = {
 
 myAIRules = {
     {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
-	{name="Bash", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
+--	{name="Bash", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
     {name="Endure", func=ROM_BuffNoTarget, ignoreLockTarget=true},
 --	{name="Shield Charge", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
-	{name="Auto", func=ROM_SkillTarget},    
+	{name="Auto", func=ROM_SkillTarget, filter = ROM_NoPlayerAround},    
     {name="Crasher", func=ROM_SkillTarget},
-	{name="Auto", func=ROM_SkillTarget, 
-		filter = function(mon) 
-			return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
-		end
-	},    
+--	{name="Auto", func=ROM_SkillTarget, 
+--		filter = function(mon) 
+--			return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
+--		end
+--	},    
 --	{name="Auto", func=ROM_SkillTarget},    
 
 
@@ -495,7 +512,18 @@ ignoreMonList = {
     60132, -- name=Sumina
     10084, -- name=Abysmal Knight
     10081, -- name=Gargoyle
+	17301, -- name=Weak Puppet
+	20022, -- name=Dark Illusion
+	18055, -- name=Dark Illusion [
 }
+
+avoidMonList = {
+	10084, -- name=Abysmal Knight
+	20022, -- name=Dark Illusion
+	18055, -- name=Dark Illusion [
+}
+
+
 cleanSkill = {
 	"Turn","Heal","Bolt"
 };
@@ -513,8 +541,8 @@ ROM_Config[4313990901] = {
     },
     myMonsterRules ={
         {func= ROM_FindStaticMonster},  -- priority to static monster
-        {func= ROM_FindNearestMonsterEx2, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
-		--{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+        --{func= ROM_FindNearestMonsterEx2, monlist={}, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+		{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
     },
     myAIRules = {
         {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
@@ -543,10 +571,12 @@ if Game and Game.Myself and Game.Myself.data then
     end;
 end;
 
-
 function ROM_Test(g)
     LogDebug("----- ROM_Test --------");
     LogDebug(CreatureToString(Game.Myself) .. " mapID=" .. Game.MapManager:GetMapID());
+	LogDebug("--- Follower ---- ");
+	local followers = Game.Myself:Client_GetAllFollowers();
+	LogDebug(MyTostring(followers));
 --[[    
     local props = Game.Myself.data.props;
     tableForEach(props.configs,function(i,v)
@@ -584,7 +614,7 @@ function ROM_Test(g)
     
     --DumpMyself();
     local mons = ROM_GetAllNPC();	
-    LogDebug("NPC List count=" .. #mons);
+    LogDebug("---- NPC List count=" .. #mons .. " -----");
     --tableForEach(mons,function(i,v)
 	for monIndex = 1,#mons do
 		local v = mons[monIndex];
@@ -633,10 +663,8 @@ function ROM_Test(g)
     tableForEach(npcList, function(i, v)
         if(v and v.ID and v.position)then
             local npcData = Table_Npc[v.ID];
-            if npcData  then
-                if npcData.id == 1125 then
-                    --LogDebug(MyTostring(npcData));
-                end;
+            if npcData then
+				LogDebug(MyTostring(npcData));
             end;
         end;
     end);
@@ -699,8 +727,8 @@ function ROM_Test(g)
 	--local npcData = Table_Npc[1016];
 	--ListField(npcData,"",{}," ");
 	
-	local nearestNPC, nearestDist = ROM_GetNearestNPC();	
-	LogDebug(MonsterToString(nearestNPC));
+	--local nearestNPC, nearestDist = ROM_GetNearestNPC();	
+	--LogDebug(MonsterToString(nearestNPC));
 --[[    
     LogDebug("--Table_Skill--");
     tableForEach(Table_Skill, function(i, v)
@@ -723,11 +751,12 @@ function ROM_Test(g)
     --local players = ROM_GetNearPlayers();
     --UIUtil.FloatMsgByText("Players=" .. #players);	
     --ServicePlayerProxy.Instance:CallChangeMap("", 0, 0, 0, 8)
-    
-    local nearestNPC, nearestDist = ROM_GetNearestNPC(1016);
+	LogDebug("--- nearest NPC -----");    
+    local nearestNPC, nearestDist = ROM_GetNearestNPC();
 	if nearestNPC then
 		LogDebug(CreatureToString(nearestNPC) .. " " .. nearestDist);
 	end;
+	ROM_TeleportTo(22);	-- pay dun 2 = 22
     --Game.Myself:Client_LockTarget(nearestNPC);
     --ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
     --ServiceQuestProxy.Instance:CallRunQuestStep(300010075, nil, nil, 0); 
@@ -779,11 +808,23 @@ function ROM_Test(g)
             --[1]={[1]={[5]={totalCost=24}}}
             local ep,v1 = next(v, nil);
             local retep,val = next(v1,nil);
-            --LogDebug(ROM_GetMapName(i) .. " exit=" .. ep .. " returnExit=" .. retep .. " " .. MyTostring(val));
+            LogDebug(ROM_GetMapName(i) .. " exit=" .. ep .. " returnExit=" .. retep .. " " .. MyTostring(val));
         end;
         
     end;
+	LogDebug("--- teleport able ---- ");
+	for _, v in pairs(Table_Map) do
+		--if v.Range == self.areaID and v.Money then
+		if v.Money and v.MoneyType == 1 then	-- we can transport if v.MoneyType == 1 
+			LogDebug(MapInfoToString(v));
+		end
+	end
+	
     UIUtil.FloatMsgByText("Test Done 1");	
+	--local followingTeammatesID = UIModelKaplaTransmit.Ins():GetFollowingTeammates()
+	--ServiceNUserProxy.Instance:CallGoToGearUserCmd(self.mapInfo.id, SceneUser2_pb.EGoToGearType_Team, followingTeammatesID)
+	
+	--ServiceNUserProxy.Instance:CallGoToGearUserCmd(18, SceneUser2_pb.EGoToGearType_Single, nil);
 		
     if true then
         return;
@@ -1069,16 +1110,25 @@ function ROM_IsMeNear(mapID,pos,range)
 	return false;
 end;
 
-function ROM_GetOriginalPos(ID)
+function ROM_GetOriginalPoses(ID)
 	local oriMonster = ROM_tabMonsterOrigin[ID] or Table_MonsterOrigin[ ID] or {};
 	local oriPos = nil;
 	--local tmpPos = {};
 	if oriMonster == nil or #oriMonster == 0 then
 		return nil;
 	end;
+	LogDebug("ROM_GetOriginalPoses " .. ID .. " " ..  #oriMonster);
+	return oriMonster;
+end;
+
+function ROM_GetOriginalPos(ID)
+	local oriMonster = ROM_GetOriginalPoses(ID)
+	if oriMonster == nil then
+		return nil;
+	end;
+	local oriPos = nil;
 	LogDebug("ROM_GetOriginalPos " .. ID .. " " ..  #oriMonster);
 	local randIndex = 1;
-	
 	if #oriMonster > 1 then
 		randIndex = math.random(#oriMonster);
 	end;
