@@ -479,6 +479,71 @@ SENDPROTO [5] [27] random: 0 skillID: 20004001 data { pos { z: 120400 y: 5179 x:
 	Game.Myself:Client_UseSkillHandler(0, phaseData)]]
 end;
 
+function ROM_GetMapNPCs()
+    local npcList = Game.MapManager:GetNPCPointArray();
+	local ret = {};
+    tableForEach(npcList, function(i, v)
+        if(v and v.ID and v.position and v.Icon)then
+            local npcData = Table_Npc[v.ID];
+            if npcData  then
+				--LogDebug(MyTostring(npcData) .. " " .. v.ID .. " " .. tostring(v.position));
+				--LogDebug(MyTostring(v));
+				ret[#ret + 1] = v;
+            end;
+        end;
+    end);
+	return ret;
+end;
+
+function ROM_TeleportTo(mapID)
+	local isFree = ActivityEventProxy.Instance:IsFreeTransferMap(mapID,UIMapMapList.transmitType)
+	LogDebug("ROM_TeleportTo: " .. mapID .. ' ' ..tostring(isFree));
+	-- check if we have teleport NPC nearby
+	local targetPos = nil;	
+	local teleportNPC = 1000
+    local telnpc = ROM_GetNPCPointByID(teleportNPC);
+    if telnpc then
+        -- found then just walk to it
+        --return ROM_WalkToNPC(Game.MapManager:GetMapID(),teleportNPC);
+		targetPos = telnpc:GetPosition();
+		LogDebug("ROM_TeleportTo: teloport NPC = " .. CreatureToString(telnpc));	
+	else	
+		local nearestNPC, nearestDist = ROM_GetNearestNPC();
+		if nearestNPC == nil then
+			local npcs = ROM_GetMapNPCs();
+			-- find nearest
+			local mindist = 1000;
+			local minNPC = nil;
+			local myPos = Game.Myself:GetPosition();
+			for i, v in pairs(npcs) do 		
+				local pos = --[[Vector3]] LuaVector3(v.position[1],v.position[2],v.position[3]);
+				local distance = LuaVector3.Distance(myPos,pos);
+				if distance < mindist then
+					mindist = distance;
+					minNPC = v;
+					targetPos = pos;
+				end;
+			end;
+			LogDebug("ROM_TeleportTo: Map's NPC = " .. MyTostring(minNPC) .. ' ' .. mindist);	
+		else
+			targetPos = nearestNPC:GetPosition();
+			LogDebug("ROM_TeleportTo: Visiable NPC = " .. CreatureToString(nearestNPC) .. ' ' .. nearestDist);	
+		end;	
+    end;
+	if targetPos then
+		Game.AreaTrigger_ExitPoint:SetDisable(true)
+		Game.Myself:Client_MoveTo(targetPos, nil, 
+			function(self,param)
+				Game.AreaTrigger_ExitPoint:SetDisable(false)
+				LogDebug("ROM_TeleportTo: walk to nearest NPC done");
+				ROM_VisitNearestNPC();		
+				ServiceNUserProxy.Instance:CallGoToGearUserCmd(mapID, SceneUser2_pb.EGoToGearType_Single, nil)				
+			end, 
+		nil, nil, 1);
+		--Game.AreaTrigger_ExitPoint:SetDisable(false)
+	end;
+end;
+
 
 LogDebug("romAutoQuest.lua 1.0");
 	

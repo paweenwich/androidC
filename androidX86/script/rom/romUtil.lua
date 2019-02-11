@@ -85,7 +85,8 @@ function UserDataToString(value)
 	return ret;
 end;
 
-function PropToString(obj,prefix,order)
+function PropToString(obj,prefix,order,ignore)
+	ignore = ignore or {};
 	if obj == nil then	
 		return "";
 	end;
@@ -102,7 +103,7 @@ function PropToString(obj,prefix,order)
 
 	tableForEach(obj, function(i, v)	
 		if ((type(i) == 'string') or (type(i) == 'number')) and ((type(v) == 'string') or (type(v) == 'number')) then
-			if TableUtil.HasValue(order,tostring(i)) == false then	
+			if TableUtil.HasValue(order,tostring(i)) == false and TableUtil.HasValue(ignore,tostring(i)) == false then	
 				ret = ret .. prefix .. tostring(i) .. "=" .. tostring(v) .. ",";
 			end;
 		end;
@@ -316,6 +317,15 @@ function DumpSelf(self)
     LogDebug("activeScene " .. MyTostring(activeScene));
 end;
 
+function MapInfoToString(mapInfo)
+	--[[
+	02/09/19 08:36:42 {AdventureValue = -1, CallZh = Payon, Camera = 1, Desc = A hill city where the previous king was said to have lived in seclusion, EnterCond = {}, IndexRange = {}, LvRange = {}, MapAr
+ea = 18, MapScale = 80, MapTips = 1, MapUi = 7, Mode = 1, Money = 400, MoneyType = 1, MonsterRatio = {}, NameEn = payon, NameZh = Payon, Position = {6, 11}, Range = 4004, SceneAnimation = 1, ShowInLis
+t = 1, Type = 6, id = 18}
+	]]
+	local ret = "MAP" .. PropToString(mapInfo," ",{"id","NameZh","Type","Range"},{"SceneAnimation","Desc","CallZh","NameEn","AdventureValue","ShowInList","LvRange","Camera"});
+	return ret;
+end;
 
 function QuestToString(wq)
     local listType = "";
@@ -830,6 +840,12 @@ function ROM_FindNearestMonsterEx2(tab)
             if TableUtil.HasValue(ignoreList,mon.data.staticData.id) then
                 return false;
             end;
+			-- check avoid monster
+			local avoidDist = ROM_NearestAvoidMonDist(mon:GetPosition())
+			if avoidDist < 16 then
+				return false;
+			end;
+			
             if tab.filter ~= nil then
                 return tab.filter(mon);
                 --LogDebug(MonsterToString(mon));
