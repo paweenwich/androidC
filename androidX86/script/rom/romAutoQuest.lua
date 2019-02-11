@@ -89,8 +89,7 @@ function ROM_WalkToNPC(mapID,npcID,finish)
     finish = finish or function() LogDebug("ROM_WalkToNPC Finish"); end;
     
     -- check nearest NPC
-    --LogDebug("ROM_WalkToNPC2: MapID=" .. Game.MapManager:GetMapID() .. " [" .. Game.MapManager:GetMapName() .. "]");
-    LogDebug("ROM_WalkToNPC2: From " .. Game.MapManager:GetMapID() .. " ->" .. mapID .. " npc=" .. npcID);
+    LogDebug("ROM_WalkToNPC: From " .. Game.MapManager:GetMapID() .. " ->" .. mapID .. " npc=" .. npcID);
     local nearestNPC, nearestDist = ROM_GetNearestNPC();
     if nearestNPC ~= nil then
         if nearestNPC.data.staticData.id == npcID and  nearestDist < 5 then
@@ -122,16 +121,26 @@ function ROM_WalkToNPC(mapID,npcID,finish)
         end        
     else
         LogDebug("ROM_WalkToNPC: NPC not found on map");
-        -- just walk to that map and continue
-        tempArgs.callback = function(cmd, event)
-            LogDebug("cmd=" .. MyTostring(cmd));
-            LogDebug("event=" .. MyTostring(event));
-            if 2 == event then
-                --LogDebug("ROM_WalkToNPC2 continue");
-                --ROM_WalkToNPC(Game.MapManager:GetMapID(),boardNPC);
-                --ROM_WalkToNPC2(mapID,npcID,finish);
-            end
-        end        
+        --if ROM_IsTeleportable(mapID) then
+        --    LogDebug("ROM_WalkToNPC: try teleport");
+        --    ROM_TeleportTo(mapID);
+        --    return false;
+        --else
+            -- find nearest town map
+            --local nMapID = ROM_tabTeleport[mapID]
+            --if nMapID then
+                --LogDebug("ROM_WalkToNPC: try teleport " .. nMapID);
+                --ROM_TeleportTo(nMapID);
+            --else
+                -- just walk to that map and continue
+                tempArgs.callback = function(cmd, event)
+                    LogDebug("cmd=" .. MyTostring(cmd));
+                    LogDebug("event=" .. MyTostring(event));
+                    if 2 == event then
+                    end
+                end 
+            --end;
+        --end;
     end;
 	local cmd = MissionCommandFactory.CreateCommand(tempArgs, MissionCommandMove);
 	if(cmd)then
@@ -355,22 +364,26 @@ function ROM_DoAutoQuest()
                     if ROM_WalkToBoard() then
                         ROM_ClickNearestNPC(true);
                     end;
-					--ROM_WalkToNPC(mapid,q.params.npc);
 				end;
 			elseif q.wantedData.Content == "selfie" then
 				ListField(q,"",{},"    ");  
 				if q.wantedData.MapId ~= nil then
 					LogDebug("target pos = " .. MyTostring(q.staticData.Params.tarpos));
 					LogDebug("target pos = " .. MyTostring(q.pos));
-					ROM_CommandGOTO(q.wantedData.MapId,q.pos,function()
-                        ROM_DelayCall(2000,function()
-                            LogDebug("ROM_DoAutoQuest: take photo");
-                            ServiceNUserProxy.Instance:CallStateChange(ProtoCommon_pb.ECREATURESTATUS_SELF_PHOTO);
-                            ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 
-                            ServiceNUserProxy.Instance:CallStateChange(0);
+                    --if ROM_IsTeleportable(q.wantedData.MapId) then
+                    --    LogDebug("ROM_DoAutoQuest: try teleport");
+                    --    ROM_TeleportTo(q.wantedData.MapId);
+                    --    return false;
+                    --else
+                        ROM_CommandGOTO(q.wantedData.MapId,q.pos,function()
+                            ROM_DelayCall(2000,function()
+                                LogDebug("ROM_DoAutoQuest: take photo");
+                                ServiceNUserProxy.Instance:CallStateChange(ProtoCommon_pb.ECREATURESTATUS_SELF_PHOTO);
+                                ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 
+                                ServiceNUserProxy.Instance:CallStateChange(0);
+                            end);
                         end);
-                    end);
-                    
+                    --end;
 				else
 					LogDebug("Should not be here");
 				end                            
@@ -493,6 +506,19 @@ function ROM_GetMapNPCs()
         end;
     end);
 	return ret;
+end;
+
+function ROM_IsTeleportable(mapID)
+	for _, v in pairs(Table_Map) do
+		--if v.Range == self.areaID and v.Money then
+		if v.Money and v.MoneyType == 1 then	-- we can transport if v.MoneyType == 1 
+			LogDebug(MapInfoToString(v));
+            if mapID == v.id then   
+                return true;
+            end;
+		end
+	end
+    return false;
 end;
 
 function ROM_TeleportTo(mapID)

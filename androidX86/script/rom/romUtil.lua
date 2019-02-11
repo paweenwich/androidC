@@ -875,7 +875,7 @@ function ROM_GetBestScoreMonFromList(mons)
         local canArrive,path = NavMeshUtils.CanArrived(myPos, pos, WorldTeleport.DESTINATION_VALID_RANGE, true, nil);        
         if canArrive then
             local cost = NavMeshUtils.GetPathDistance(path);
-            if cost < 25 then
+            if cost < 30 then
                 local players = NSceneUserProxy.Instance:FindNearUsers(pos,10,nil);
                 local score = cost + (#players * 10);
                 if score < minScore then
@@ -1286,6 +1286,16 @@ function ROM_CreatePacketCommandFromFile(fileName)
 	return ret;
 end;
 
+function ROM_MapDist(map1,map2)
+    local pos1 = Table_Map[map1].Position;
+    local pos2 = Table_Map[map2].Position;
+    if pos1 ~= _EmptyTable and pos2 ~= _EmptyTable then
+        local dist = (pos1[1]-pos2[1])*(pos1[1]-pos2[1])  + (pos1[2]-pos2[2])*(pos1[2]-pos2[2]);
+        return dist;
+    end;
+    return 100000;
+end;
+
 function ROM_GetNearestTown(mapID)
     mapID = mapID or Game.MapManager:GetMapID();
     local currentMapID = mapID; --15;
@@ -1313,7 +1323,7 @@ function ROM_GetNearestTown(mapID)
         end;
         if nearestMapID > 0 then
             LogDebug("ROM_GetNearestTown: " .. Table_Map[mapID].NameEn .. " -> " .. Table_Map[nearestMapID].NameEn);
-            return nearestMapID;
+            return nearestMapID, minDist;
         else
             LogDebug("ROM_GetNearestTown: " .. Table_Map[mapID].NameEn .. " -> NOT FOUND");
             return nil;
@@ -1467,6 +1477,27 @@ function ROM_GetMapName(id)
     end;
 end;
 
+function ROM_AmITeamLeader()
+    local leaderTeamMemberData = TeamProxy.Instance.myTeam:GetNowLeader()
+	if leaderTeamMemberData ~= nil then
+		local myselfID = Game.Myself.data.id
+		return leaderTeamMemberData.id == myselfID
+	end
+	return false
+end;
+
+function ROM_HasFollowers()
+	local followers = Game.Myself:Client_GetAllFollowers();
+    local count = 0;
+    for i,v in pairs(followers) do
+        count = count + 1;
+    end;
+    return count > 0
+end;
+
+function ROM_GetMaxFollowerDist()
+end;
+
 
 if FunctionMonster ~= nil then
     function FunctionMonster:FilterMonster(ignoreSkill)
@@ -1502,6 +1533,10 @@ if FunctionMonster ~= nil then
         return self.monsterList
     end
 end;
+
+ROM_tabTeleport = {
+    [22]=20,
+}
 
 ROM_tabMonsterOrigin = {
     [10057]={

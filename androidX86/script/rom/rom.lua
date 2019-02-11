@@ -523,7 +523,8 @@ ignoreMonList = {
     10081, -- name=Gargoyle
 	17301, -- name=Weak Puppet
 	20022, -- name=Dark Illusion
-	18055, -- name=Dark Illusion [
+	18055, -- name=Dark Illusion 
+    40015, -- mimic
 }
 
 avoidMonList = {
@@ -549,9 +550,9 @@ ROM_Config[4313990901] = {
         10080, --  name=Wraith Type=Monster
     },
     myMonsterRules ={
-        {func= ROM_FindStaticMonster},  -- priority to static monster
+        --{func= ROM_FindStaticMonster},  -- priority to static monster
         --{func= ROM_FindNearestMonsterEx2, monlist={}, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
-		{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+		{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
     },
     myAIRules = {
         {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
@@ -582,8 +583,8 @@ end;
 
 function ROM_Test(g)
     LogDebug("----- ROM_Test --------");
-    LogDebug(CreatureToString(Game.Myself) .. " mapID=" .. Game.MapManager:GetMapID());
-	LogDebug("--- Follower ---- ");
+    LogDebug(CreatureToString(Game.Myself) .. " mapID=" .. Game.MapManager:GetMapID()  .. ' leader=' .. tostring(ROM_AmITeamLeader()));
+	LogDebug("--- Follower ---- " .. tostring(ROM_HasFollowers()));
 	local followers = Game.Myself:Client_GetAllFollowers();
 	LogDebug(MyTostring(followers));
 --[[    
@@ -1128,13 +1129,24 @@ function ROM_IsMeNear(mapID,pos,range)
 	return false;
 end;
 
-function ROM_GetOriginalPoses(ID)
+function ROM_GetOriginalPoses(ID,mapID)
 	local oriMonster = ROM_tabMonsterOrigin[ID] or Table_MonsterOrigin[ ID] or {};
 	local oriPos = nil;
 	--local tmpPos = {};
 	if oriMonster == nil or #oriMonster == 0 then
 		return nil;
 	end;
+    if mapID then
+        local tmpPos = {};
+        for i=1,#oriMonster do
+            if(oriMonster[i].mapID == mapID)then
+                --oriPos = oriMonster[i].pos;
+               tmpPos[#tmpPos+1] = oriMonster[i];
+            end
+        end
+        LogDebug("ROM_GetOriginalPoses " .. ID .. " " ..  #tmpPos);
+        return tmpPos;
+    end
 	LogDebug("ROM_GetOriginalPoses " .. ID .. " " ..  #oriMonster);
 	return oriMonster;
 end;
@@ -1147,9 +1159,9 @@ function ROM_GetOriginalPos(ID)
 	local oriPos = nil;
 	LogDebug("ROM_GetOriginalPos " .. ID .. " " ..  #oriMonster);
 	local randIndex = 1;
-	if #oriMonster > 1 then
-		randIndex = math.random(#oriMonster);
-	end;
+	--if #oriMonster > 1 then
+	--	randIndex = math.random(#oriMonster);
+	--end;
 	oriPos = oriMonster[randIndex];
 	LogDebug("ROM_GetOriginalPos " .. ID .. " randIndex=" .. randIndex .. " oriPos=" .. tostring(oriPos));        
 	return oriPos;
@@ -1167,26 +1179,19 @@ function ROM_GetMonsterByGroupID(groupID)
 end;
 
 function ROM_CommandVisitMonster(mapID,monID)
-		--local oriMonster = Table_MonsterOrigin[ monID] or {};
-		-- this will have mapID which contain that monsters
-		--LogDebug(MyTostring(oriMonster));
-		local oriPos = ROM_GetOriginalPos(monID);
-        --local tmpPos = {};
-		--for i=1,#oriMonster do
-		--	if(oriMonster[i].mapID == mapID)then
-				--oriPos = oriMonster[i].pos;
-        --       tmpPos[#tmpPos+1] = oriMonster[i].pos;
-                --break;
-		--	end
-		--end
-        --local randIndex = math.random(#tmpPos);
-        --oriPos = tmpPos[randIndex];
+		local oriPos = ROM_GetOriginalPos(monID,mapID);
         LogDebug("ROM_CommandVisitMonster oriPos=" .. MyTostring(oriPos));        
 		if(oriPos)then
+            local currentMapID = Game.MapManager:GetMapID();
+            local nearestTownID = ROM_GetNearestTown() or 1;
+            --if ROM_MapDist(currentMapID,mapID) > ROM_MapDist(nearestTownID,mapID) then
+            --    LogDebug("ROM_CommandVisitMonster teleport =" .. nearestTownID);        
+            --    ROM_TeleportTo(mapID);
+            --end;
 			local cmdArgs = {
 				targetMapID = mapID,
 				npcID = monID,
-				targetPos = TableUtil.Array2Vector3(oriPos),
+				targetPos = TableUtil.Array2Vector3(oriPos.pos),
                 callback = function(cmd, event)
                     --LogDebug("ROM_CommandVisitMonster callback cmd=" .. MyTostring(cmd));
                     --LogDebug("ROM_CommandVisitMonster callback event=" .. MyTostring(event));
