@@ -850,6 +850,7 @@ function ROM_GetBestScoreMonFromList(mons)
     local minScore = 100000;
     local retNpc = nil;
     local myPos = Game.Myself:GetPosition();
+    local maxDist = 0;
     tableForEach(mons,function(i,v)
         local npc = v;
 		local pos = npc:GetPosition();
@@ -858,16 +859,19 @@ function ROM_GetBestScoreMonFromList(mons)
         local canArrive,path = NavMeshUtils.CanArrived(myPos, pos, WorldTeleport.DESTINATION_VALID_RANGE, true, nil);        
         if canArrive then
             local cost = NavMeshUtils.GetPathDistance(path);
-            local players = NSceneUserProxy.Instance:FindNearUsers(pos,10,nil);
-            local score = cost + (#players * 10);
-            if score < minScore then
-                retNpc = npc;
-                minScore = score;
+            if cost < 25 then
+                local players = NSceneUserProxy.Instance:FindNearUsers(pos,10,nil);
+                local score = cost + (#players * 10);
+                if score < minScore then
+                    retNpc = npc;
+                    minScore = score;
+                    maxDist = cost;
+                end;
             end;
         end;
     end);
 	if retNpc ~= nil then
-		--LogDebug("ROM_GetBestScoreMonFromList: " .. CreatureToString(retNpc));
+		LogDebug("ROM_GetBestScoreMonFromList: maxDist=" .. maxDist);
 	end;
     return retNpc;
 end;

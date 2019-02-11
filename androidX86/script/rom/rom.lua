@@ -1,13 +1,22 @@
 ---- rom.lua ------
+LOGFILENAME = "/data/local/tmp/rom.log";
 if RomFileLogger == nil then
 	RomFileLogger = {};
-	RomFileLogger.f = io.open("/data/local/tmp/rom.log", "a");
+	RomFileLogger.f = io.open(LOGFILENAME, "a");
 	--RomFileLogger.f:setvbuf ("line");
 end;
 RomFileLogger.log = function(data)
 	RomFileLogger.f:write(data .. "\n");
 	RomFileLogger.f:flush();
 end;
+
+RomFileLogger.reset = function()
+    RomFileLogger.f:close();
+	RomFileLogger.f = io.open(LOGFILENAME, "w");
+    RomFileLogger.f:close();
+    RomFileLogger.f = io.open(LOGFILENAME, "a");
+end;
+
 
 function LogDebug(data)
     local logData = os.date("%x %X") .. ' ' .. data;
@@ -513,7 +522,7 @@ ROM_Config[4313990901] = {
     },
     myMonsterRules ={
         {func= ROM_FindStaticMonster},  -- priority to static monster
-        {func= ROM_FindNearestMonsterEx2, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+        {func= ROM_FindNearestMonsterEx2, monlist={}, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
 		--{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
     },
     myAIRules = {
@@ -1040,6 +1049,15 @@ function ROM_MyDlg()
 			NameZh="Test",
 			
 		},
+		{
+			event = function (npcinfo)
+                RomFileLogger.reset();
+			end,
+			closeDialog = true,
+			NameZh="Log Reset",
+		},
+        
+        
 	};
 	--local dialogInfo ={ DialogUtil.GetDialogData(defaultDialogId) };
 	--ListField(dialogInfo,"",{},"      ");
