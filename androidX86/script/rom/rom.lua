@@ -691,6 +691,14 @@ function ROM_Test(g)
         --    end;
         --end;
     end);
+    
+    local exitPoints2 = ROM_GetExitPoints(Game.MapManager:GetMapID());
+    if exitPoints2 then
+        LogDebug("exitPoints2=" .. #exitPoints2);
+        for i,v in pairs(exitPoints2) do
+            LogDebug("" .. i ..  " -> " ..  ROM_GetMapName(v));
+        end;
+    end;
 	
 	
     local mainViewMiniMap = g_mainView.viewMap["MainViewMiniMap"];
@@ -812,7 +820,7 @@ function ROM_Test(g)
     --LogDebug(tostring(t));
     for i,v in pairs(MapOutterTeleport[Game.MapManager:GetMapID()]) do
         if v.transitNPCToMap ~= nil then
-            --LogDebug(ROM_GetMapName(i) .. " " .. MyTostring(v));
+            LogDebug(ROM_GetMapName(i) .. " " .. MyTostring(v));
         else
             --[5]={[1]={[4]={totalCost=122.6325302124,nextEP=2}}}
             --[1]={[1]={[5]={totalCost=24}}}
@@ -829,6 +837,9 @@ function ROM_Test(g)
 			LogDebug(MapInfoToString(v));
 		end
 	end
+    
+    ROM_GetMapIDPath(Game.MapManager:GetMapID(),22);
+    
 	
     UIUtil.FloatMsgByText("Test Done 1");	
 	--local followingTeammatesID = UIModelKaplaTransmit.Ins():GetFollowingTeammates()

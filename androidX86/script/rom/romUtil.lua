@@ -1471,7 +1471,7 @@ end;
 
 function ROM_GetMapName(id)
     if Table_Map[id] then
-        return Table_Map[id].NameEn .. "(" .. id .. ")";
+        return Table_Map[id].CallZh .. "(" .. id .. ")";
     else
         return "MAP" .. id;
     end;
@@ -1495,8 +1495,33 @@ function ROM_HasFollowers()
     return count > 0
 end;
 
-function ROM_GetMaxFollowerDist()
+function ROM_GetExitPoints(mapID)
+    if Table_MapInfo[mapID] and Table_MapInfo[mapID].exitPoints then
+        return Table_MapInfo[mapID].exitPoints;
+    else 
+        return nil;
+    end;
 end;
+
+function ROM_GetMapIDPath(fromMapID, toMapID)
+    local startMapID = fromMapID;
+    for i=1,20 do
+        if startMapID == toMapID then
+            break;
+        end;
+        if MapOutterTeleport[startMapID] and MapOutterTeleport[startMapID][toMapID] then
+            local v = MapOutterTeleport[startMapID][toMapID];
+            local ep,v1 = next(v, nil);
+            local retep,val = next(v1,nil);
+            LogDebug("#" .. i .. " " .. ROM_GetMapName(startMapID) .. " exit=" .. ep .. " returnExit=" .. retep .. " " .. MyTostring(val));   
+            local exits = ROM_GetExitPoints(startMapID)    
+            if exits and exits[ep] then
+                startMapID = exits[ep];
+            end
+        end;
+    end;
+end;
+
 
 
 if FunctionMonster ~= nil then
