@@ -335,6 +335,30 @@ function ROM_RecvCDTimeUserCmd(data)
     return true;
 
 end;
+
+function ROM_RecvDonateListGuildCmd(data)
+    local status,err = pcall(function()
+        local ret = "";
+        for i=1,#data.items do
+            local item = data.items[i]
+            local itemData = Table_Item[item.itemid];
+            local num = BagProxy.Instance:GetAllItemNumByStaticID(itemData.id);
+            ret = ret .. "\n" ..  PropToString(itemData," ",{"id","NameZh","Type"},{"MediaPath","Desc","TFValidDate","ValidDate","Icon"}) .. " num=" .. num .. " itemCount=" .. item.itemcount .. " configid=" .. item.configid;
+            if num > 300 and item.itemcount < 60 then
+                LogDebug("Should contribute");
+                ServiceGuildCmdProxy.Instance:CallApplyRewardConGuildCmd(item.configid);
+                ServiceGuildCmdProxy.Instance:CallDonateGuildCmd(item.configid,item.time);
+            end;
+        end;
+        LogDebug(singleLine(tostring(data)));
+        LogDebug("RECV< ROM_RecvDonateListGuildCmd " .. ret);
+	end);
+    if status == false then
+        LogDebug("ERROR: " .. singleLine(tostring(err)));
+        return false
+    end;
+    return true;
+end;
 function ROM_RecvUpdateWantedQuestTeamCmd(data)
     local status,err = pcall(function()
         local ret = "";

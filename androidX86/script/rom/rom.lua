@@ -150,8 +150,12 @@ function OnMiniMapClick(self)
 end;
 ]]
 function ROM_SkillTarget(tab)
+    --LogDebug("ROM_SkillTarget");
     local skillInfo = ROM_GetMySkillInfoByName(tab.name);
-    if skillInfo == nil then return false end;
+    if skillInfo == nil then 
+        LogDebug("ROM_SkillTarget: skill not found for " .. tab.name);
+        return false 
+    end;
     local skillID = skillInfo.staticData.id;
 	if SkillProxy.Instance:SkillCanBeUsedByID(skillID) == false then
 		local skillItem = SkillProxy.Instance:GetLearnedSkill(skillID)
@@ -159,7 +163,7 @@ function ROM_SkillTarget(tab)
         --return self:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,id) or self:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,CDProxy.CommunalSkillCDSortID)
         local in1 = CDProxy.Instance:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,skillItem.sortID);
         local in2 = CDProxy.Instance:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,CDProxy.CommunalSkillCDSortID);
-		--LogDebug("ROM_SkillTarget: " .. tab.name .. " inCD=" .. tostring(inCD) .. ' ' .. tostring(in1) .. ' ' .. tostring(in2));		
+		LogDebug("ROM_SkillTarget: " .. tab.name .. " inCD=" .. tostring(inCD) .. ' ' .. tostring(in1) .. ' ' .. tostring(in2));		
 		return false;
 	end;
 	
@@ -570,7 +574,31 @@ ROM_Config[4313990901] = {
         },  	
     },
 }
---4313990901
+ROM_Config[4300736919] = {  -- Hunter
+    myMonsterList = {},
+    myMonsterRules ={
+        --{func= ROM_FindStaticMonster},  -- priority to static monster
+        --{func= ROM_FindNearestMonsterEx2, monlist={}, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+		{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+    },
+    myAIRules = {
+        {name="Auto", func=ROM_SkillTarget},    
+--[[        {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
+        {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
+        {name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
+        {name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
+        {name="WalkToRange", func=ROM_WalkToRange, filter = ROM_NoPlayerAround, range=6},  		
+        {name="Heal", func=ROM_Heal,frachp=0.7},  -- bless    
+		{name="Holy Light Strike", func=ROM_SkillTarget, filter = ROM_NoPlayerAround},    
+        {name="Turn", func=ROM_TurnUndead, frachp=0.6},  
+        {name="Holy Light Strike", func=ROM_SkillTarget,
+            filter = function(mon) 
+                return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
+            end
+        },  	]]
+    },
+}
+
 if Game and Game.Myself and Game.Myself.data then
     if ROM_Config[Game.Myself.data.id] ~= nil then
         LogDebug("Use ROM_Config for " .. Game.Myself.data.id);
@@ -587,6 +615,12 @@ function ROM_Test(g)
 	LogDebug("--- Follower ---- " .. tostring(ROM_HasFollowers()));
 	local followers = Game.Myself:Client_GetAllFollowers();
 	LogDebug(MyTostring(followers));
+    
+    LogDebug(" --- Skill --- ");
+    local skills = ROM_GetLearnSkill();
+    tableForEach(skills,function(i,v)
+        LogDebug(SkillToString(v));
+    end);    
 --[[    
     local props = Game.Myself.data.props;
     tableForEach(props.configs,function(i,v)
@@ -851,11 +885,7 @@ function ROM_Test(g)
         return;
     end;
 
-    LogDebug("Skill");
-    local skills = ROM_GetLearnSkill();
-    tableForEach(skills,function(i,v)
-        LogDebug(SkillToString(v));
-    end);
+
     
 
     local npc = ROM_FindBestMonster();
@@ -1094,9 +1124,12 @@ function ROM_MyDlg()
 		},
 		{
 			event = function (npcinfo)
-                if farmData.pos then
-                    ServicePlayerProxy.Instance:CallMoveTo(farmData.pos[1], farmData.pos[2], farmData.pos[3])	
-                end;
+                --if farmData.pos then
+                --    ServicePlayerProxy.Instance:CallMoveTo(farmData.pos[1], farmData.pos[2], farmData.pos[3])	
+                --end;
+                ServiceGuildCmdProxy.Instance:CallDonateListGuildCmd();
+                ServiceGuildCmdProxy.Instance:CallDonateFrameGuildCmd(true);
+                LogDebug("Done");
 			end,
 			closeDialog = true,
 			NameZh="Test",

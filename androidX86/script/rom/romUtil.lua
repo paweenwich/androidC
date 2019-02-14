@@ -430,7 +430,11 @@ function SkillToStringByID(id)
 end;
 
 function SkillInfoToString(skillInfo)
-    return "ID=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType .. " CD=" .. (skillInfo.staticData.CD or 0);
+    if skillInfo then
+        return "ID=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType .. " CD=" .. (skillInfo.staticData.CD or 0);
+    else
+        return "SkillInfoToString(nil)";
+    end;
 end;
 
 
@@ -876,7 +880,7 @@ function ROM_GetBestScoreMonFromList(mons)
         if canArrive then
             local cost = NavMeshUtils.GetPathDistance(path);
             if cost < 30 then
-                local players = NSceneUserProxy.Instance:FindNearUsers(pos,10,nil);
+                local players = NSceneUserProxy.Instance:FindNearUsers(pos,15,nil);
                 local score = cost + (#players * 10);
                 if score < minScore then
                     retNpc = npc;
@@ -991,7 +995,7 @@ function ROM_GetLearnSkill(filter)
 end;
 
 function ROM_GetActiveSkill()
-    return ROM_GetLearnSkill({"Attack","Heal","Buff","FakeDead"});
+    return ROM_GetLearnSkill({"Attack","Heal","Buff","FakeDead","Summon"});
 end;
 
 function ROM_GetMySkillInfoByName(name)

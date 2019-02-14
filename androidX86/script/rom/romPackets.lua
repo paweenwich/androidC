@@ -938,7 +938,7 @@ ROM_Packets = {
 {50,17,"RecvDismissGuildCmd"},
 {50,18,"RecvLevelupGuildCmd"},
 {50,19,"RecvDonateGuildCmd"},
-{50,25,"RecvDonateListGuildCmd"},
+{50,25,"RecvDonateListGuildCmd",ROM_RecvDonateListGuildCmd},
 {50,26,"RecvUpdateDonateItemGuildCmd"},
 {50,27,"RecvDonateFrameGuildCmd"},
 {50,20,"RecvEnterTerritoryGuildCmd"},
