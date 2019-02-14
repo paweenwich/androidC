@@ -502,13 +502,13 @@ myAIRules = {
 --	{name="Bash", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
     {name="Endure", func=ROM_BuffNoTarget, ignoreLockTarget=true},
 --	{name="Shield Charge", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
-	{name="Auto", func=ROM_SkillTarget, filter = ROM_NoPlayerAround},    
-    {name="Crasher", func=ROM_SkillTarget},
---	{name="Auto", func=ROM_SkillTarget, 
---		filter = function(mon) 
---			return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
---		end
---	},    
+	{name="Auto", func=ROM_SkillTarget, filter1 = ROM_NoPlayerAround},    
+--    {name="Crasher", func=ROM_SkillTarget},
+	{name="Auto", func=ROM_SkillTarget, 
+		filter = function(mon) 
+			return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
+		end
+	},    
 --	{name="Auto", func=ROM_SkillTarget},    
 
 
@@ -542,6 +542,8 @@ cleanSkill = {
 	"Turn","Heal","Bolt"
 };
 
+walkBack = false;
+
 ROM_Config = {};
 ROM_Config[4313990901] = {
     myMonsterList = {
@@ -573,6 +575,7 @@ ROM_Config[4313990901] = {
             end
         },  	
     },
+	walkBack = true,
 }
 ROM_Config[4300736919] = {  -- Hunter
     myMonsterList = {},
@@ -597,6 +600,7 @@ ROM_Config[4300736919] = {  -- Hunter
             end
         },  	]]
     },
+	walkBack = false,
 }
 
 if Game and Game.Myself and Game.Myself.data then
@@ -606,6 +610,7 @@ if Game and Game.Myself and Game.Myself.data then
         myMonsterList = conf.myMonsterList;
         myMonsterRules = conf.myMonsterRules;
         myAIRules = conf.myAIRules;
+		walkBack = conf.walkBack;
     end;
 end;
 

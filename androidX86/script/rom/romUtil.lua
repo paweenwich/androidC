@@ -751,7 +751,7 @@ if class ~= nil then
             end;
 			local in2 = CDProxy.Instance:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,CDProxy.CommunalSkillCDSortID);                
             --if Game.Myself.autoPos ~= nil and ROM_FindCurrentMonster() == nil then
-			if Game.Myself.autoPos ~= nil and in2 == false then
+			if Game.Myself.autoPos ~= nil and in2 == false and walkBack then
 				if ROM_IsMeNear(Game.Myself.autoMapID,Game.Myself.autoPos,2) then
 				else
 					ROM_CommandGOTO(Game.Myself.autoMapID,Game.Myself.autoPos);
@@ -764,7 +764,7 @@ if class ~= nil then
 			if in2 then
 				LogDebug("AutoAI_Rom:Prepare() InCD");
 			else
-				LogDebug("AutoAI_Rom:Prepare() nothing to do!");
+				LogDebug("AutoAI_Rom:Prepare() nothing to do! " .. tostring(walkBack));
 			end;
             -- nothing to do
             --self.nextUpdateTime = time + 1.0;
@@ -880,7 +880,8 @@ function ROM_GetBestScoreMonFromList(mons)
         if canArrive then
             local cost = NavMeshUtils.GetPathDistance(path);
             if cost < 30 then
-                local players = NSceneUserProxy.Instance:FindNearUsers(pos,15,nil);
+                --local players = NSceneUserProxy.Instance:FindNearUsers(pos,15,nil);
+				local players = ROM_GetNearPlayers(range,true,pos);
                 local score = cost + (#players * 10);
                 if score < minScore then
                     retNpc = npc;
@@ -900,6 +901,8 @@ function ROM_NoPlayerAround(mon)
     local players =  ROM_GetNearPlayers(15,true);
     return #players == 0
 end;
+
+
 
 function ROM_GetNearestMonFromList(mons)
     local minDist = 100000;
@@ -1336,10 +1339,11 @@ function ROM_GetNearestTown(mapID)
     return nil;
 end;
 
-function ROM_GetNearPlayers(range,checkTeam)
+function ROM_GetNearPlayers(range,checkTeam,pos)
+	pos = pos or Game.Myself:GetPosition();
     range = range or 10;
 	checkTeam = checkTeam or false;
-    local players = NSceneUserProxy.Instance:FindNearUsers(Game.Myself:GetPosition(),range,nil);
+    local players = NSceneUserProxy.Instance:FindNearUsers(pos,range,nil);
 	if checkTeam then
 		if TeamProxy.Instance ~= nil then
 			local ret = {};
