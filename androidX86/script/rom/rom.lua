@@ -585,7 +585,15 @@ ROM_Config[4300736919] = {  -- Hunter
 		{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
     },
     myAIRules = {
-        {name="Auto", func=ROM_SkillTarget},    
+        {name="True Sight", func=ROM_BuffNoTarget}, 
+        {name="Auto", func=ROM_SkillTarget, filter = ROM_NoPlayerAround},    
+        {name="Double Strafe", func=ROM_SkillTarget},    
+        {name="Auto", func=ROM_SkillTarget,
+            filter = function(mon) 
+                return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
+            end
+        },  	
+        
 --[[        {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
         {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
         {name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
@@ -1110,22 +1118,24 @@ function ROM_MyDlg()
 			NameZh = "RememberPos",
 			
 		},
-		{
+--[[		{
 			event = function (npcinfo)
 				FunctionNpcFunc.JumpPanel(PanelConfig.ChangeZoneView, npcinfo)
 			end,
 			closeDialog = true,
 			NameZh = ZhString.ChangeZone_ChangeLine
-		},
+		},]]
 		{
 			event = function (npcinfo)
-				if GuildProxy.Instance:IHaveGuild() then
-					local zoneid = GuildProxy.Instance.myGuildData.zoneid
-					ServiceNUserProxy.Instance:CallJumpZoneUserCmd( npcinfo.data.id , zoneid)
-				end
+                --GameFacade.Instance:sendNotification(UIEvent.ShowUI,{viewname = "AgreementPanel"});
+                --GameFacade.Instance:sendNotification(UIEvent.ShowUI,{viewname = "SystemUnLockView"});
+                local UniqueConfirmView = class("UniqueConfirmView",BaseView)
+                UniqueConfirmView.ViewType = UIViewType.ConfirmLayer;
+                GameFacade.Instance:sendNotification(UIEvent.ShowUI,{viewname = "SystemUnLockView"});
+
 			end,
 			closeDialog = true,
-			NameZh = ZhString.ChangeZone_BackGuildLine
+			NameZh = "Test"
 		},
 		{
 			event = function (npcinfo)
@@ -1137,7 +1147,7 @@ function ROM_MyDlg()
                 LogDebug("Done");
 			end,
 			closeDialog = true,
-			NameZh="Test",
+			NameZh="Guild Donate",
 			
 		},
 		{
