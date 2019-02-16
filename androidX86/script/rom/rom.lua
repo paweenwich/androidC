@@ -440,6 +440,78 @@ function ROM_WalkToRange(tab)
     return false;
 end;
 
+function ROM_Follow(tab)
+	if not TeamProxy.Instance:IHaveTeam() then
+		LogDebug("ROM_Follow: no team");
+		return false
+	end
+	if ROM_AmITeamLeader() then
+		LogDebug("ROM_Follow: I am leader");
+		return false
+	end;
+	local leaderID = ROM_GetTeamLeaderID();
+	LogDebug("ROM_Follow: " .. tostring(leaderID));
+	local leaderCreature = SceneCreatureProxy.FindCreature(leaderID)
+	if leaderCreature == nil then
+		LogDebug("ROM_Follow: leader not found");
+		return false
+	end
+	local leaderPos = leaderCreature:GetPosition();
+	local dist = ROM_DistanceToCreature(leaderCreature);            
+	LogDebug("ROM_Follow: " .. tostring(leaderPos) .. ' dist=' .. dist);
+	if dist > 2 then 
+		Game.Myself:Client_MoveTo(leaderPos, nil, 
+				function(self,param)
+					--Game.AreaTrigger_ExitPoint:SetDisable(false)
+					LogDebug("ROM_Follow done");
+				end, 
+		nil, nil, 0.5);
+		return true;
+	end;
+	return false;
+end;
+
+function ROM_BuffTeam(tab)
+	if not TeamProxy.Instance:IHaveTeam() then
+		LogDebug("ROM_BuffTeam: no team");
+		return false
+	end
+	
+	--local ignoreLockTarget = tab.ignoreLockTarget or false
+    local skillInfo = ROM_GetMySkillInfoByName(tab.name);
+    if skillInfo == nil then 
+		LogDebug("ROM_BuffTeam: skill name found " .. tab.name);
+		return false 
+	end;
+    local skillID = skillInfo.staticData.id;
+	
+	if SkillProxy.Instance:SkillCanBeUsedByID(skillID) == false then
+--		LogDebug("ROM_BuffNoTarget: " .. tab.name .. " skill can not be used");
+		return false;
+	end;
+	local myTeam = TeamProxy.Instance.myTeam;
+	if(myTeam)then
+		local myMembers = myTeam:GetMembersList();
+		for i=1,#myMembers do
+			local memberData = myMembers[i];
+			local id = memberData.id;
+			local creature = SceneCreatureProxy.FindCreature(id);
+			if creature then
+				local dist = ROM_DistanceToCreature(creature);            
+				LogDebug("id=" .. id .. ' dist=' .. dist);
+				if not ROM_HasBuffFromSkillID(skillID,creature) and dist < 5 then
+					LogDebug("ROM_BuffTeam: " .. SkillToStringByID(skillID));
+					Game.Myself:Client_UseSkill(skillID, creature ,nil,nil,true);
+					return true;
+				end;
+			end;
+		end
+	end
+	
+	--
+	return false;	
+end;
+
 function ROM_MonFullHP(npc)
     local monStatus = ROM_GetMonStatus(npc);
     return monStatus.frachp > 0.99 
@@ -462,165 +534,8 @@ function ROM_NearestAvoidMonDist(refPos)
 	return minDist;
 end;
 
-myMonsterList = {
 
-	10004, -- name=Tarou
-    10005,    --Thief Bug      
-    10006,    --Spore   
-    10007,  --Familiar
---    40013,  --Thief Bug Egg
---    110002, --Huge Thief Bug
-	10012, -- name=Rocker
-	10013, -- name=Willow
-	10020, -- name=Pirate Skeleton Type=Monster
---	10017, -- name=Hydra Type=Monster
---  10021, -- name=Poison Spore Type=Monster
---	10019, -- name=Whisper Type=Monster
-    10022, -- name=Skeleton Type=Monster
---  40003, -- name=Yellow Plant Type=Monster
---  10024, -- name=Thara Frog Type=Monster
-	10025, -- name=Marina Type=Monster
---  10023, -- name=Vadon Type=Monster
-	10050, -- name=Soldier Skeleton
-    10037, -- name=Flora Type=Monster    
---	10051, -- name=Matyr	
-	10052, -- name=Mummy
-    10063, -- name=Archer Skeleton
-	
-
-};
-
-myMonsterRules = {
---    {func= ROM_FindMiniBoss}, -- priority to miniboss
-    {func= ROM_FindStaticMonster},  -- priority to static monster
---    {func= ROM_FindNearestMonsterEx, param=myMonsterList},  -- selected monster
-    {func= ROM_FindNearestMonsterEx2, monlist={},selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
-};
-
-myAIRules = {
-    {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
---	{name="Bash", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
-    {name="Endure", func=ROM_BuffNoTarget, ignoreLockTarget=true},
---	{name="Shield Charge", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
-	{name="Auto", func=ROM_SkillTarget, filter1 = ROM_NoPlayerAround},    
---    {name="Crasher", func=ROM_SkillTarget},
-	{name="Auto", func=ROM_SkillTarget, 
-		filter = function(mon) 
-			return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
-		end
-	},    
---	{name="Auto", func=ROM_SkillTarget},    
-
-
---    {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
---	{name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
---	{name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
---	{name="WalkToRange", func=ROM_WalkToRange,range=5},  		
---	{name="Heal", func=ROM_Heal,frachp=0.6},  -- bless    
---	{name="Turn", func=ROM_TurnUndead, frachp=0.6},  
---    {name="Holy Light Strike", func=ROM_SkillTarget},  	
-};
-
-ignoreMonList = {
-    60132, -- name=Sumina
-    10084, -- name=Abysmal Knight
-    10081, -- name=Gargoyle
-	17301, -- name=Weak Puppet
-	20022, -- name=Dark Illusion
-	18055, -- name=Dark Illusion 
-    40015, -- mimic
-}
-
-avoidMonList = {
-	10084, -- name=Abysmal Knight
-	20022, -- name=Dark Illusion
-	18055, -- name=Dark Illusion [
-}
-
-
-cleanSkill = {
-	"Turn","Heal","Bolt"
-};
-
-walkBack = false;
-
-ROM_Config = {};
-ROM_Config[4313990901] = {
-    myMonsterList = {
-    	10052, -- name=Mummy
-        10063, -- name=Archer Skeleton
-        10061, --  name=Bongun
-        10060, --  name=Munak
-        10120, --  name=Evil Druid
-        10121,--  name=Dark Priest
-        10080, --  name=Wraith Type=Monster
-    },
-    myMonsterRules ={
-        --{func= ROM_FindStaticMonster},  -- priority to static monster
-        --{func= ROM_FindNearestMonsterEx2, monlist={}, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
-		{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
-    },
-    myAIRules = {
-        {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
-        {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
-        {name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
-        {name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
-        {name="WalkToRange", func=ROM_WalkToRange, filter = ROM_NoPlayerAround, range=6},  		
-        {name="Heal", func=ROM_Heal,frachp=0.7},  -- bless    
-		{name="Holy Light Strike", func=ROM_SkillTarget, filter = ROM_NoPlayerAround},    
-        {name="Turn", func=ROM_TurnUndead, frachp=0.6},  
-        {name="Holy Light Strike", func=ROM_SkillTarget,
-            filter = function(mon) 
-                return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
-            end
-        },  	
-    },
-	walkBack = true,
-}
-ROM_Config[4300736919] = {  -- Hunter
-    myMonsterList = {},
-    myMonsterRules ={
-        --{func= ROM_FindStaticMonster},  -- priority to static monster
-        --{func= ROM_FindNearestMonsterEx2, monlist={}, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
-		{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
-    },
-    myAIRules = {
-        {name="True Sight", func=ROM_BuffNoTarget}, 
-        {name="Auto", func=ROM_SkillTarget, filter = ROM_NoPlayerAround},    
-        {name="Double Strafe", func=ROM_SkillTarget},    
-        {name="Auto", func=ROM_SkillTarget,
-            filter = function(mon) 
-                return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
-            end
-        },  	
-        
---[[        {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
-        {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
-        {name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
-        {name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
-        {name="WalkToRange", func=ROM_WalkToRange, filter = ROM_NoPlayerAround, range=6},  		
-        {name="Heal", func=ROM_Heal,frachp=0.7},  -- bless    
-		{name="Holy Light Strike", func=ROM_SkillTarget, filter = ROM_NoPlayerAround},    
-        {name="Turn", func=ROM_TurnUndead, frachp=0.6},  
-        {name="Holy Light Strike", func=ROM_SkillTarget,
-            filter = function(mon) 
-                return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
-            end
-        },  	]]
-    },
-	walkBack = false,
-}
-
-if Game and Game.Myself and Game.Myself.data then
-    if ROM_Config[Game.Myself.data.id] ~= nil then
-        LogDebug("Use ROM_Config for " .. Game.Myself.data.id);
-        local conf = ROM_Config[Game.Myself.data.id];
-        myMonsterList = conf.myMonsterList;
-        myMonsterRules = conf.myMonsterRules;
-        myAIRules = conf.myAIRules;
-		walkBack = conf.walkBack;
-    end;
-end;
+ROM_DoFile("/data/local/tmp/script/romConfig.lua");
 
 function ROM_Test(g)
     LogDebug("----- ROM_Test --------");
@@ -965,10 +880,11 @@ function ROM_GetBestQuest()
 	return nil;
 end;
 
-function ROM_HasBuffFromSkillID(skillID)
+function ROM_HasBuffFromSkillID(skillID,player)
+	player = player or Game.Myself;
     local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skillID);
-    local buffs = skillInfo:GetSelfBuffs(Game.Myself);
-    return Game.Myself:HasBuffs(buffs);
+    local buffs = skillInfo:GetSelfBuffs(player);
+    return player:HasBuffs(buffs);
 end;
 
 function ROM_MyCheat()

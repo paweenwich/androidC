@@ -714,7 +714,7 @@ if class ~= nil then
 
 	function AutoAI_Rom:ctor()
         self.enable = false;
-		self.UpdateInterval = 0.25;
+		self.UpdateInterval = 0.0;
 		self.nextUpdateTime = 0
 		LogDebug("AutoAI_Rom:ctor()");
 	end
@@ -1485,13 +1485,16 @@ function ROM_GetMapName(id)
     end;
 end;
 
-function ROM_AmITeamLeader()
+function ROM_GetTeamLeaderID()
     local leaderTeamMemberData = TeamProxy.Instance.myTeam:GetNowLeader()
-	if leaderTeamMemberData ~= nil then
-		local myselfID = Game.Myself.data.id
-		return leaderTeamMemberData.id == myselfID
+	if leaderTeamMemberData then
+		return leaderTeamMemberData.id;
 	end
-	return false
+	return nil;
+end;
+
+function ROM_AmITeamLeader()
+	return ROM_GetTeamLeaderID() == Game.Myself.data.id
 end;
 
 function ROM_HasFollowers()

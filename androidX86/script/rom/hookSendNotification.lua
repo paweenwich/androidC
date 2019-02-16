@@ -556,6 +556,24 @@ function HOOK_NetProtocol_DispatchListener(id1, id2, data)
 end;
 
 if CommonFun ~= nil then
+	function CommonFun.StealMoney(srcUser, targetUser)
+	  LogDebug("CommonFun.StealMoney");	
+	  local skilllv_1 = srcUser:GetLernedSkillLevel(474) ---偷钱
+	  local skilllv_2 = srcUser:GetLernedSkillLevel(473) ---强夺
+	  local Dex = srcUser:GetProperty("Dex")
+	  local Luk = srcUser:GetProperty("Luk")
+	  local Rate = math.min(20,(Dex + Luk)/10)  ----D,L影响成功率
+	  local RateSum = Rate + 5
+
+	  local A = skilllv_1*0.05 +  skilllv_2*0.02
+
+	  if  CommonFun.IsInRate(RateSum, srcUser:GetRandom())  then
+			return  A
+	  end 
+
+	  return 0
+	end
+	
 	function CommonFun.IsInRate(rate, random)
 	  if rate == nil or random == nil then
 		LogDebug("IsInRate false");	
@@ -1531,7 +1549,7 @@ if SkillInfo ~= nil then
     
     CommonFun.CalcDamageFuncs[7205] = CommonFun.calcDamage_7205;
 end;
-
+--[[
 if MiniMapWindow then
 	if MiniMapWindow.ORG_Show == nil then
 		LogDebug("Hook MiniMapWindow.Show");
@@ -1578,7 +1596,7 @@ if MiniMapWindow then
 	end
 	
 end;
-
+]]
 if CreatureDataWithPropUserdata then
     function CreatureDataWithPropUserdata:WeakFreeze()
         
@@ -1720,7 +1738,7 @@ if SkillLogic_Base ~= nil then
     end
 
     function SkillLogic_Base.Client_DeterminTargets(self, creature)
-        LogDebug("SkillLogic_Base");
+        LogDebug("SkillLogic_Base.Client_DeterminTargets");
         self.phaseData:ClearTargets()
         if self.info:NoSelect(creature) then
             LogDebug("SkillLogic_Base NoSelect " .. CreatureToString(creature));
@@ -1743,7 +1761,15 @@ if SkillLogic_Base ~= nil then
 
         skillInfo.LogicClass.Client_DoDeterminTargets(
             self, creature, tempCreatureArray, maxCount)
-
+		--[[		
+		LogDebug("After Client_DoDeterminTargets " .. #tempCreatureArray .. ' ' .. tostring(self.targetCreatureGUID));
+		if skillInfo.staticData.id  == 403001 and #tempCreatureArray == 0 then
+			LogDebug("Cheat Add creature");
+			local c = SceneCreatureProxy.FindCreature(self.targetCreatureGUID);
+			TableUtility.ArrayPushBack(tempCreatureArray, c);
+			LogDebug("After Client_DoDeterminTargets " .. #tempCreatureArray .. ' ' .. tostring(self.targetCreatureGUID));
+		end;]]
+		
         local teamRange = skillInfo:TargetIncludeTeamRange(creature)
         if 0 < teamRange then
             local myTeam = TeamProxy.Instance.myTeam
@@ -1782,6 +1808,7 @@ if SkillLogic_Base ~= nil then
             end
             targetCount = targetCount - removedCount
 
+			--LogDebug("targetCount " .. targetCount);
             if 0 < targetCount then
                 -- calc damages
                 local skillID = skillInfo:GetSkillID()
@@ -1800,6 +1827,17 @@ if SkillLogic_Base ~= nil then
                         damage,
                         shareDamageInfos)
                     -- KKK
+					if skillInfo.staticData.id  == 403001 then
+						LogDebug("SNATCH FOUND");
+						for h = 1,20 do
+						phaseData:AddTarget(
+							targetCreature.data.id, 
+							damageType, 
+							damage,
+							shareDamageInfos)
+						end;	
+
+					end;
                     if i == 1 and Game.Myself.myCheat == true and isClean == false and damage > 0 then
                         local players =  ROM_GetNearPlayers(10,true);
                         local numHit = 3

@@ -30,6 +30,7 @@ rom:
 	adb push script/rom/romAutoQuest.lua /data/local/tmp/script
 	adb push script/rom/romPackets.lua /data/local/tmp/script
 	adb push script/rom/hookSendNotification.lua /data/local/tmp/script
+	adb push script/rom/romConfig.lua /data/local/tmp/script	
 	adb push script/rom/test.lua /data/local/tmp/script
 	adb shell '/data/local/tmp/tracerx86 -tslua /data/local/tmp/script/rom.lua'
 
