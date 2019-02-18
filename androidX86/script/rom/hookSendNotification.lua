@@ -490,6 +490,18 @@ Class: 0 Level: 0 } } step: 6 id: 55030001
     return true;
 end;
 
+function ROM_RecvQueryShopConfigCmd(data)
+    local status,err = pcall(function()
+        LogDebug("RECV< ROM_RecvQueryShopConfigCmd " .. singleLine(tostring(data)));
+        ROM_Alert("ROM_RecvQueryShopConfigCmd");
+	end);
+    if status == false then
+        LogDebug("ERROR: " .. singleLine(tostring(err)));
+        return false
+    end;
+    return true;
+end;
+
 ROM_DoFile("/data/local/tmp/script/romPackets.lua");
 
 function ROM_GetPacket(tab,id1,id2)

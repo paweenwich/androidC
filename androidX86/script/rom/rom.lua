@@ -761,7 +761,7 @@ function ROM_Test(g)
 	if nearestNPC then
 		LogDebug(CreatureToString(nearestNPC) .. " " .. nearestDist);
 	end;
-	ROM_TeleportTo(22);	-- pay dun 2 = 22
+	--ROM_TeleportTo(22);	-- pay dun 2 = 22
     --Game.Myself:Client_LockTarget(nearestNPC);
     --ServiceQuestProxy.Instance:CallVisitNpcUserCmd(nearestNPC.data.id);
     --ServiceQuestProxy.Instance:CallRunQuestStep(300010075, nil, nil, 0); 
@@ -826,6 +826,55 @@ function ROM_Test(g)
 	end
     
     ROM_GetMapIDPath(Game.MapManager:GetMapID(),22);
+    --[[
+02/18/19 14:06:50  1 (table: 0x6a1a2710)
+02/18/19 14:06:50   screen=0
+02/18/19 14:06:50   callTime=3006.1437988281
+02/18/19 14:06:50   shopID=1
+02/18/19 14:06:50   goods (table: 0x6a1a2760)
+02/18/19 14:06:50    92224 (table: 0x6a1a2800)
+02/18/19 14:06:50     discountMax=0
+02/18/19 14:06:50     RemoveDate=4294967295
+02/18/19 14:06:50     des=
+02/18/19 14:06:50     ItemID=5503
+02/18/19 14:06:50     goodsID=5580
+02/18/19 14:06:50     lockType=0
+02/18/19 14:06:50     itemData table: 0x6fd3e2c0 >
+02/18/19 14:06:50     LimitType=64
+02/18/19 14:06:50     PreCost=0
+02/18/19 14:06:50     LevelDes=
+02/18/19 14:06:50     LimitNum=1
+02/18/19 14:06:50     lock=false
+02/18/19 14:06:50     business=0
+02/18/19 14:06:50     source=0
+02/18/19 14:06:50     MenuID=6010
+02/18/19 14:06:50     produceNum=0
+02/18/19 14:06:50     ItemCount=15
+02/18/19 14:06:50     lockArg=ΘÇÜσà│µü⌐σ╛╖σïÆµû»σíö10σ▒éσÉÄΦºúΘöü
+02/18/19 14:06:50     ShopOrder=12
+02/18/19 14:06:50     Discount=100
+02/18/19 14:06:50     actDiscount=0
+02/18/19 14:06:50     id=92224
+02/18/19 14:06:50     BaseLv=0
+02/18/19 14:06:50     class table: 0x6deb8ac0 >
+    ]]
+    ListField(ShopProxy.Instance.info,"",{},"    ");    
+    LogDebug("------ shop info -------");
+    for sid, v0 in pairs(ShopProxy.Instance.info) do
+        local t,v = next(v0, nil);
+        local ret = "type=" .. sid .. " shopID=" .. v.shopID;
+        for _, g in pairs(v.goods) do
+            local itemData = Table_Item[g.ItemID];
+            local gitemData = Table_Item[g.goodsID];
+            --local num = BagProxy.Instance:GetAllItemNumByStaticID(itemData.id);
+            --ret = ret .. "\n" ..  PropToString(itemData," ",{"id","NameZh","Type"},{"MediaPath","Desc","TFValidDate","ValidDate","Icon"}) .. " num=" .. num .. " itemCount=" .. item.itemcount .. " configid=" .. item.configid;
+            
+            ret = ret .. "\n id=" .. g.id .. " ItemID=" .. itemData.id .. " name=" .. itemData.NameZh .. " Type=" .. itemData.Type ..  " ItemCount=" .. g.ItemCount .. " LimitNum=" .. g.LimitNum .. " goodsID=" .. g.goodsID .. ' lock=' .. tostring(g.lock) .. ' [' .. gitemData.NameZh .. ']'
+        end;
+        LogDebug(ret);
+	end
+    
+    
     
 	
     UIUtil.FloatMsgByText("Test Done 1");	
@@ -1070,9 +1119,11 @@ function ROM_MyDlg()
 			event = function (npcinfo)
                 --GameFacade.Instance:sendNotification(UIEvent.ShowUI,{viewname = "AgreementPanel"});
                 --GameFacade.Instance:sendNotification(UIEvent.ShowUI,{viewname = "SystemUnLockView"});
-                local UniqueConfirmView = class("UniqueConfirmView",BaseView)
-                UniqueConfirmView.ViewType = UIViewType.ConfirmLayer;
-                GameFacade.Instance:sendNotification(UIEvent.ShowUI,{viewname = "SystemUnLockView"});
+                --local UniqueConfirmView = class("UniqueConfirmView",BaseView)
+                --UniqueConfirmView.ViewType = UIViewType.ConfirmLayer;
+                --GameFacade.Instance:sendNotification(UIEvent.ShowUI,{viewname = "SystemUnLockView"});
+                --ServiceSessionShopProxy.Instance:CallQueryShopConfigCmd(600, 11);
+                ShopProxy.Instance:CallQueryShopConfig(600, 11); -- just do more checking
 
 			end,
 			closeDialog = true,

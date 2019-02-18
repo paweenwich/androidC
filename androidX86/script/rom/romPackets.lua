@@ -1418,7 +1418,7 @@ ROM_Packets = {
 {55,3,"RecvGetMailAttach"},
 
 {52,1,"RecvBuyShopItem"},
-{52,2,"RecvQueryShopConfigCmd"},
+{52,2,"RecvQueryShopConfigCmd",ROM_RecvQueryShopConfigCmd},
 {52,3,"RecvQueryQuickBuyConfigCmd"},
 {52,4,"RecvQueryShopSoldCountCmd"},
 {52,5,"RecvShopDataUpdateCmd"},

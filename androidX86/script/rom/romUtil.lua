@@ -40,6 +40,10 @@ function singleLine(data)
 	return line;
 end;
 
+function ROM_Alert(mesg)
+    UIUtil.FloatMsgByText(mesg);	
+end;
+
 
 
 
