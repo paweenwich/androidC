@@ -897,11 +897,16 @@ function ROM_GetBestScoreMonFromList(mons)
     return retNpc;
 end;
 
-function ROM_NoPlayerAround(mon)
+function ROM_NoPlayerAround(mon,tab)
     local players =  ROM_GetNearPlayers(15,true);
-    return #players == 0
+	return #players == 0
 end;
 
+function ROM_TargetInRange(mon,tab)
+	local range = tab.range or 4
+	local dist = ROM_DistanceToCreature(mon);
+	return dist <= range
+end;
 
 
 function ROM_GetNearestMonFromList(mons)

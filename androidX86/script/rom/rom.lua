@@ -178,7 +178,7 @@ function ROM_SkillTarget(tab)
 			--LogDebug("ROM_SkillTarget: use locktarget");
 		end;
         if npc ~= nil then
-			if tab.filter ~= nil and tab.filter(npc) == false then
+			if tab.filter ~= nil and tab.filter(npc,tab) == false then
 				return false;
 			end;
             LogDebug("ROM_SkillTarget: " .. skillID .. " " .. MonsterToString(npc));
@@ -250,36 +250,6 @@ function ROM_BuffNoTarget(tab)
         LogDebug("ROM_BuffNoTarget: " .. tab.name .. " Not enough SP " .. myStatus.sp);
     end;
     return false;
-end;
-
-function ROM_Heal(tab)
-	local frac = tab.frachp or 0.6;
-    local skillInfo = ROM_GetMySkillInfoByName(tab.name);
-    if skillInfo == nil then return false end;
-    local skillID = skillInfo.staticData.id;
-	
-	if SkillProxy.Instance:SkillCanBeUsedByID(skillID) == false then
---		LogDebug("ROM_Heal: " .. tab.name .. " skill can not be used");
-		return false;
-	end;
-	
-    local myStatus= ROM_GetMyStatus();
-    local skillNeeded = ROM_GetSkillNeeded(skillID);
-	LogDebug("ROM_Heal: " .. skillNeeded.sp .. " " .. myStatus.frachp);
-	if skillNeeded.sp < myStatus.sp then
-		if myStatus.frachp < frac then
-			--if ROM_HasBuffFromSkillID(skillID) == false then
-			LogDebug("ROM_Heal: " .. SkillToStringByID(skillID));
-			Game.Myself:Client_UseSkill(skillID, Game.Myself ,nil,nil,true);
-			return true;
-		else
---			LogDebug("ROM_Heal: hp high enough");
-		end;
-        --end;
-    else
---        LogDebug("ROM_Heal: Not enough SP");
-    end;
-    return false;			
 end;
 
 function ROM_WillMiss(skillAndLevel,targetUser,value)
@@ -498,9 +468,9 @@ function ROM_BuffTeam(tab)
 			local creature = SceneCreatureProxy.FindCreature(id);
 			if creature then
 				local dist = ROM_DistanceToCreature(creature);            
-				LogDebug("id=" .. id .. ' dist=' .. dist);
+				--LogDebug("id=" .. id .. ' dist=' .. dist);
 				if not ROM_HasBuffFromSkillID(skillID,creature) and dist < 5 then
-					LogDebug("ROM_BuffTeam: " .. SkillToStringByID(skillID));
+					--LogDebug("ROM_BuffTeam: " .. SkillToStringByID(skillID));
 					Game.Myself:Client_UseSkill(skillID, creature ,nil,nil,true);
 					return true;
 				end;
@@ -511,6 +481,61 @@ function ROM_BuffTeam(tab)
 	--
 	return false;	
 end;
+
+function ROM_Heal(tab)
+	local frac = tab.frachp or 0.6;
+    local skillInfo = ROM_GetMySkillInfoByName(tab.name);
+    if skillInfo == nil then return false end;
+    local skillID = skillInfo.staticData.id;
+	
+	if SkillProxy.Instance:SkillCanBeUsedByID(skillID) == false then
+--		LogDebug("ROM_Heal: " .. tab.name .. " skill can not be used");
+		return false;
+	end;
+	
+    local myStatus= ROM_GetMyStatus();
+    local skillNeeded = ROM_GetSkillNeeded(skillID);
+	LogDebug("ROM_Heal: " .. skillNeeded.sp .. " " .. myStatus.frachp);
+	if skillNeeded.sp < myStatus.sp then
+		if myStatus.frachp < frac then
+			--if ROM_HasBuffFromSkillID(skillID) == false then
+			LogDebug("ROM_Heal: " .. SkillToStringByID(skillID));
+			Game.Myself:Client_UseSkill(skillID, Game.Myself ,nil,nil,true);
+			return true;
+		else
+			-- check team
+			if not TeamProxy.Instance:IHaveTeam() then
+				--LogDebug("ROM_Heal: no team");
+				return false
+			end
+			local myTeam = TeamProxy.Instance.myTeam;
+			if(myTeam)then
+				local myMembers = myTeam:GetMembersList();
+				for i=1,#myMembers do
+					local memberData = myMembers[i];
+					local id = memberData.id;
+					local creature = SceneCreatureProxy.FindCreature(id);
+					if creature then
+						local dist = ROM_DistanceToCreature(creature);     
+						local stat = ROM_GetMonStatus(creature);						
+						--LogDebug("ROM_Heal id=" .. id .. ' dist=' .. dist .. );
+						if stat.frachp < frac and dist < 5 and stat.hp > 0 then
+							Game.Myself:Client_UseSkill(skillID, creature ,nil,nil,true);
+							return true;
+						end;
+					end;
+				end
+			end
+
+			
+		end;
+        --end;
+    else
+--        LogDebug("ROM_Heal: Not enough SP");
+    end;
+    return false;			
+end;
+
 
 function ROM_MonFullHP(npc)
     local monStatus = ROM_GetMonStatus(npc);
