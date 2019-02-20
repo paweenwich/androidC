@@ -1514,6 +1514,61 @@ function ROM_AmITeamLeader()
 	return ROM_GetTeamLeaderID() == Game.Myself.data.id
 end;
 
+function ROM_GetMyTeamMapIDAndPosition(id)
+    local myTeam = TeamProxy.Instance.myTeam;
+    if myTeam then
+        local teamMember = myTeam:GetMemberByGuid(id);
+        if teamMember then
+            local memberPos = teamMember.pos	-- default data not accurate
+            local memberCreature = SceneCreatureProxy.FindCreature(id)
+            if memberCreature then
+                memberPos = memberCreature:GetPosition();
+            end
+            return teamMember.mapid, memberPos;
+        end;
+    end;
+    return nil,nil;
+end;
+
+function ROM_IsTeamReady()
+    local currentMapID = Game.MapManager:GetMapID();
+    local followers = Game.Myself:Client_GetAllFollowers();
+    for followID,_ in pairs(followers) do
+        local mapID, pos = ROM_GetMyTeamMapIDAndPosition(followID);
+        if mapID then
+            if currentMapID ~= mapID then
+                LogDebug("ROM_IsTeamReady: different map " .. followID .. " " .. currentMapID .. " ~= " .. mapID);
+                return false;
+            end;
+            local dist = ROM_DistanceToPos(pos);
+            if dist > 2 then
+                LogDebug("ROM_IsTeamReady: too far " .. followID .. " " .. dist);
+                return false;            
+            end;
+        end;
+    end;
+    LogDebug("ROM_IsTeamReady: true");
+    return true;
+--[[	local myTeam = TeamProxy.Instance.myTeam;
+    if(myTeam)then
+        local myMembers = myTeam:GetMembersList();
+        for i=1,#myMembers do
+            local memberData = myMembers[i];
+            local id = memberData.id;
+            local creature = SceneCreatureProxy.FindCreature(id);
+            if creature then
+                local dist = ROM_DistanceToCreature(creature);     
+                local stat = ROM_GetMonStatus(creature);						
+                --LogDebug("ROM_Heal id=" .. id .. ' dist=' .. dist .. );
+                if stat.frachp < frac and dist < 5 and stat.hp > 0 then
+                    Game.Myself:Client_UseSkill(skillID, creature ,nil,nil,true);
+                    return true;
+                end;
+            end;
+        end
+    end]]
+end;
+
 function ROM_HasFollowers()
 	local followers = Game.Myself:Client_GetAllFollowers();
     local count = 0;

@@ -314,29 +314,51 @@ function ROM_DoAutoQuest()
 	local q = ROM_GetAcceptedQuest();
 	if q ~= nil then
 		local questString = QuestToString(q);
-		LogDebug("Has Accepted Wanted Quest " .. questString );
+		LogDebug("ROM_DoAutoQuest: Has Accepted Wanted Quest " .. questString );
+        ListField(q,"",{},"    ");  
 		local traceInfo = q.traceInfo or "";
-		LogDebug("traceInfot " .. traceInfo );
+		LogDebug("ROM_DoAutoQuest: traceInfo=" .. traceInfo );
+        LogDebug("ROM_DoAutoQuest: Content=" .. q.wantedData.Content );
 		if string.match(traceInfo, "Mission Board") then	
-			LogDebug("Mission complete walk to board");
+            if q.params.team_can_finish and q.params.team_can_finish ~= 1 then
+                LogDebug("ROM_DoAutoQuest: Mission Board wait for team to finish");
+                return;
+            end;
+			LogDebug("ROM_DoAutoQuest: Mission complete walk to board");
 			if ROM_WalkToBoard() then
 				-- near board
-				LogDebug("Near board submit");
-				--ROM_SubmitQuest();
-				--LogDebug("Near board refresh");
-				ROM_VisitNearestNPC();
-				ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 				
-				ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 				
-				ServiceQuestProxy.Instance:CallQuestList(SceneQuest_pb.EQUESTLIST_CANACCEPT,101);
-                --ROM_ClickNearestNPC(true);
+                if ROM_IsTeamReady() then
+                    LogDebug("ROM_DoAutoQuest: Near board submit");
+                    --ROM_SubmitQuest();
+                    --LogDebug("Near board refresh");
+                    ROM_VisitNearestNPC();
+                    ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 				
+                    ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 				
+                    ServiceQuestProxy.Instance:CallQuestList(SceneQuest_pb.EQUESTLIST_CANACCEPT,101);
+                    --ROM_ClickNearestNPC(true);
+                else
+                    LogDebug("ROM_DoAutoQuest: Mission Board wait for team");
+                end;
 			end;
 		else
 			--ListField(q,"",{},"    ");  
 			--LogDebug(MyTostring(q));
 			if q.wantedData.Content == "move" then
+                LogDebug("ROM_DoAutoQuest: move");
 				ListField(q,"",{},"    ");
 				if q.wantedData.MapId ~= nil then
-					ROM_WalkToNPC(q.wantedData.MapId,q.params.npc,
+                    if ROM_WalkToNPC(q.wantedData.MapId,q.params.npc) then
+                        if ROM_IsTeamReady() then
+							ROM_VisitNearestNPC();
+							ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
+							GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
+							LogDebug(QuestToString(q));
+							ROM_ClickNearestNPC(true);
+                        else
+                            LogDebug("ROM_DoAutoQuest: visit wait for team");
+                        end;
+                    end;
+					--[[ROM_WalkToNPC(q.wantedData.MapId,q.params.npc,
 						function()
 							ROM_VisitNearestNPC();
 							ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
@@ -345,11 +367,12 @@ function ROM_DoAutoQuest()
 							ROM_ClickNearestNPC(true);
 							--FunctionVisitNpc.me:AccessTarget(nil, nil, nil);		
 						end
-					);
+					);]]
 				else
 					LogDebug("Should not be here");
 				end;
 			elseif q.wantedData.Content == "kill" then
+                LogDebug("ROM_DoAutoQuest: kill");
 				ListField(q,"",{},"    ");  
 				if q.params.monster ~= nil or q.params.groupId then
 					-- goto that monster
@@ -362,10 +385,15 @@ function ROM_DoAutoQuest()
 					-- goto board to submit quest 
 					-- it might possibile that this map does not have board will see
                     if ROM_WalkToBoard() then
-                        ROM_ClickNearestNPC(true);
+                        if ROM_IsTeamReady() then
+                            ROM_ClickNearestNPC(true);
+                        else
+                            LogDebug("ROM_DoAutoQuest: kill (ROM_WalkToBoard) wait for team");
+                        end;
                     end;
 				end;
-			elseif q.wantedData.Content == "selfie" then
+			elseif q.wantedData.Content == "selfie" or q.questDataStepType == "selfie" then
+                LogDebug("ROM_DoAutoQuest: selfie");
 				ListField(q,"",{},"    ");  
 				if q.wantedData.MapId ~= nil then
 					LogDebug("target pos = " .. MyTostring(q.staticData.Params.tarpos));
@@ -375,19 +403,32 @@ function ROM_DoAutoQuest()
                     --    ROM_TeleportTo(q.wantedData.MapId);
                     --    return false;
                     --else
-                        ROM_CommandGOTO(q.wantedData.MapId,q.pos,function()
+                        if ROM_IsMeNear(q.wantedData.MapId,q.pos) then
+                            if ROM_IsTeamReady() then
+                                LogDebug("ROM_DoAutoQuest: selfie take photo");
+                                ServiceNUserProxy.Instance:CallStateChange(ProtoCommon_pb.ECREATURESTATUS_SELF_PHOTO);
+                                ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 
+                                ServiceNUserProxy.Instance:CallStateChange(0);                            
+                            else
+                                LogDebug("ROM_DoAutoQuest: selfie wait for team");
+                            end;
+                        else
+                            ROM_CommandGOTO(q.wantedData.MapId,q.pos);
+                        end;
+                        --[[ROM_CommandGOTO(q.wantedData.MapId,q.pos,function()
                             ROM_DelayCall(2000,function()
                                 LogDebug("ROM_DoAutoQuest: take photo");
                                 ServiceNUserProxy.Instance:CallStateChange(ProtoCommon_pb.ECREATURESTATUS_SELF_PHOTO);
                                 ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 
                                 ServiceNUserProxy.Instance:CallStateChange(0);
                             end);
-                        end);
+                        end);]]
                     --end;
 				else
 					LogDebug("Should not be here");
 				end                            
 			elseif q.wantedData.Content == "remove_item" then
+                LogDebug("ROM_DoAutoQuest: remove_item");
 				ListField(q,"",{},"    ");  
 				if q.params.monster ~= nil then
 					LogDebug("----");
@@ -414,6 +455,7 @@ function ROM_DoAutoQuest()
 					end                            
 				end;
 			elseif q.wantedData.Content == "gather" then
+                LogDebug("ROM_DoAutoQuest: gather");
 				ListField(q,"",{},"    ");  
 				if q.params.monster ~= nil or q.params.groupId then				
 					if q.params.monster ~= nil then
@@ -427,11 +469,22 @@ function ROM_DoAutoQuest()
 					end;
 				else
 					-- goto board to submit quest 
-					ROM_WalkToNPC(mapid,q.params.npc);
+					--ROM_WalkToNPC(mapid,q.params.npc);
 				end;
 			elseif q.wantedData.Content == "visit" then
+                LogDebug("ROM_DoAutoQuest: visit");
 				ListField(q,"",{},"    ");  
-				ROM_WalkToNPC(q.map,q.params.npc,
+                if ROM_WalkToNPC(q.map,q.params.npc) then
+                    if ROM_IsTeamReady() then
+                        ROM_VisitNearestNPC();
+                        ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
+                        GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
+                        LogDebug(QuestToString(q));
+                    else
+                        LogDebug("ROM_DoAutoQuest: visit wait for team");
+                    end;
+                end;
+				--[[ROM_WalkToNPC(q.map,q.params.npc,
 					function()
 						ROM_VisitNearestNPC();
 						ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
@@ -440,7 +493,7 @@ function ROM_DoAutoQuest()
 						--ROM_ClickNearestNPC(true);
 						--FunctionVisitNpc.me:AccessTarget(nil, nil, nil);		
 					end
-				);
+				);]]
 			else
 				LogDebug("Quest type not suppoted");
 			end;

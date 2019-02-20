@@ -1240,7 +1240,7 @@ oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairCo
 				--FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[3003], nil, 1 );
 			end,
 			closeDialog = true,
-			NameZh = "Test"
+			NameZh = "Test Shop"
 		},
 		{
 			event = function (npcinfo)
@@ -1274,23 +1274,10 @@ oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairCo
 		
 		{
 			event = function (npcinfo)
-				local shopID = 912;
-				--local goods = ShopProxy.Instance:GetConfigByTypeId(shopID, 1);
-				--if goods
-				--for _, g in pairs(goods) do
-					--g.lock = false;
-					--local itemData = Table_Item[g.ItemID];
-					--local gitemData = Table_Item[g.goodsID];
-					--if gitemData then
-					--	ret = ret .. "\n id=" .. g.id .. " ItemID=" .. itemData.id .. " name=" .. itemData.NameZh .. " Type=" .. itemData.Type ..  " ItemCount=" .. g.ItemCount .. " LimitNum=" .. g.LimitNum .. " goodsID=" .. g.goodsID .. ' lock=' .. tostring(g.lock) .. ' [' .. gitemData.NameZh .. ']'
-					--else
-					--	ret = ret .. "\n id=" .. g.id .. " ItemID=" .. itemData.id .. " name=" .. itemData.NameZh .. " Type=" .. itemData.Type .. " " .. PropToString(g);
-					--end;			
-				--end;
-				FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[shopID], nil, 1 );
+                ROM_IsTeamReady();
 			end,
 			closeDialog = true,
-			NameZh="Test Shop",
+			NameZh="Test",
 		},
         
         
@@ -1400,26 +1387,35 @@ function ROM_CommandVisitMonster(mapID,monID)
                         if q.params.num == nil then
 							if q.params.item ~= nil then
 								local num = BagProxy.Instance:GetAllItemNumByStaticID(q.params.item[1].id);
-								if num < q.params.item[1].num then
+								if num < q.params.item[1].num then 
 									LogDebug("" .. tostring(num) .. "/" .. tostring(q.params.item[1].num));
 									return 
 								end;
 							end;
                             if  q.params.npc ~= nil then
+                                
                                 LogDebug("ROM_CommandVisitMonster walk to npc");
-                                ROM_WalkToNPC(q.map,q.params.npc,
-                                    function()
-										ROM_VisitNearestNPC();
-                                        ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
-                                        GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
-                                        LogDebug(QuestToString(q));
-                                        ROM_ClickNearestNPC(true);
-                                    end
-                                );
+                                if q.params.team_can_finish and q.params.team_can_finish ~= 1 then 
+                                    LogDebug("ROM_CommandVisitMonster: wait for team 2");                                    
+                                else
+                                    -- might need to wait here
+                                    ROM_WalkToNPC(q.map,q.params.npc,
+                                        function()
+                                            ROM_VisitNearestNPC();
+                                            ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
+                                            GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
+                                            LogDebug(QuestToString(q));
+                                            ROM_ClickNearestNPC(true);
+                                        end
+                                    );
+                                end;
                             end;
-                            LogDebug("Quest done");
-                            --ROM_WalkToNPC(mapID,1016);
-                            ROM_WalkToBoard();
+                            if q.params.team_can_finish and q.params.team_can_finish ~= 1 then 
+                                LogDebug("ROM_CommandVisitMonster: wait for team");                                                        
+                            else
+                                LogDebug("ROM_CommandVisitMonster: Quest done");                            
+                                ROM_WalkToBoard();
+                            end;
                             
                         else 
                             LogDebug("" .. tostring(q.process) .. "/" .. tostring(q.params.num));
