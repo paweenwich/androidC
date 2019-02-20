@@ -421,22 +421,35 @@ function ROM_Follow(tab)
 	end;
 	local leaderID = ROM_GetTeamLeaderID();
 	LogDebug("ROM_Follow: " .. tostring(leaderID));
-	local leaderCreature = SceneCreatureProxy.FindCreature(leaderID)
-	if leaderCreature == nil then
-		LogDebug("ROM_Follow: leader not found");
-		return false
-	end
-	local leaderPos = leaderCreature:GetPosition();
-	local dist = ROM_DistanceToCreature(leaderCreature);            
-	LogDebug("ROM_Follow: " .. tostring(leaderPos) .. ' dist=' .. dist);
-	if dist > 2 then 
-		Game.Myself:Client_MoveTo(leaderPos, nil, 
-				function(self,param)
-					--Game.AreaTrigger_ExitPoint:SetDisable(false)
-					LogDebug("ROM_Follow done");
-				end, 
-		nil, nil, 0.5);
+	local myTeam = TeamProxy.Instance.myTeam;
+	local leader = myTeam:GetMemberByGuid(leaderID);
+	local currentMapID = Game.MapManager:GetMapID()
+	local leaderMapID = leader.mapid	
+	if currentMapID ~= leaderMapID then
+		LogDebug("ROM_Follow: leader on different map " .. leaderMapID .. " ~= " .. currentMapID);
+		--ServiceNUserProxy.Instance:CallGoMapFollowUserCmd(leaderMapID, leaderID)
+		ROM_CommandGOTO(leaderMapID);
 		return true;
+	else	
+		local leaderTeamMember = myTeam:GetMemberByGuid(leaderID);
+		local leaderPos = leaderTeamMember.pos	-- default data not accurate
+		local leaderCreature = SceneCreatureProxy.FindCreature(leaderID)
+		if leaderCreature then
+			leaderPos = leaderCreature:GetPosition();
+		end
+		local dist = ROM_DistanceToPos(leaderPos);
+		--local leaderPos = leaderCreature:GetPosition();
+		--local dist = ROM_DistanceToCreature(leaderCreature);            
+		LogDebug("ROM_Follow: " .. tostring(leaderPos) .. ' dist=' .. dist);
+		if dist > 2 then 
+			Game.Myself:Client_MoveTo(leaderPos, nil, 
+					function(self,param)
+						--Game.AreaTrigger_ExitPoint:SetDisable(false)
+						LogDebug("ROM_Follow done");
+					end, 
+			nil, nil, 0.5);
+			return true, 0;
+		end;
 	end;
 	return false;
 end;
@@ -858,24 +871,37 @@ function ROM_Test(g)
 02/18/19 14:06:50     BaseLv=0
 02/18/19 14:06:50     class table: 0x6deb8ac0 >
     ]]
-    ListField(ShopProxy.Instance.info,"",{},"    ");    
+    --ListField(ShopProxy.Instance.info,"",{},"    ");    
     LogDebug("------ shop info -------");
     for sid, v0 in pairs(ShopProxy.Instance.info) do
-        local t,v = next(v0, nil);
-        local ret = "type=" .. sid .. " shopID=" .. v.shopID;
-        for _, g in pairs(v.goods) do
-            local itemData = Table_Item[g.ItemID];
-            local gitemData = Table_Item[g.goodsID];
-            --local num = BagProxy.Instance:GetAllItemNumByStaticID(itemData.id);
-            --ret = ret .. "\n" ..  PropToString(itemData," ",{"id","NameZh","Type"},{"MediaPath","Desc","TFValidDate","ValidDate","Icon"}) .. " num=" .. num .. " itemCount=" .. item.itemcount .. " configid=" .. item.configid;
-            
-            ret = ret .. "\n id=" .. g.id .. " ItemID=" .. itemData.id .. " name=" .. itemData.NameZh .. " Type=" .. itemData.Type ..  " ItemCount=" .. g.ItemCount .. " LimitNum=" .. g.LimitNum .. " goodsID=" .. g.goodsID .. ' lock=' .. tostring(g.lock) .. ' [' .. gitemData.NameZh .. ']'
-        end;
-        LogDebug(ret);
+		local t,v = next(v0, nil);
+		if v and v.shopID then			
+			local ret = "type=" .. sid .. " shopID=" .. v.shopID;
+			for _, g in pairs(v.goods) do
+				local itemData = Table_Item[g.ItemID];
+				local gitemData = Table_Item[g.goodsID];
+				--local num = BagProxy.Instance:GetAllItemNumByStaticID(itemData.id);
+				--ret = ret .. "\n" ..  PropToString(itemData," ",{"id","NameZh","Type"},{"MediaPath","Desc","TFValidDate","ValidDate","Icon"}) .. " num=" .. num .. " itemCount=" .. item.itemcount .. " configid=" .. item.configid;
+				if gitemData then
+					ret = ret .. "\n id=" .. g.id .. " ItemID=" .. itemData.id .. " name=" .. itemData.NameZh .. " Type=" .. itemData.Type ..  " ItemCount=" .. g.ItemCount .. " LimitNum=" .. g.LimitNum .. " goodsID=" .. g.goodsID .. ' lock=' .. tostring(g.lock) .. ' [' .. gitemData.NameZh .. ']'
+				else
+					ret = ret .. "\n id=" .. g.id .. " ItemID=" .. itemData.id .. " name=" .. itemData.NameZh .. " Type=" .. itemData.Type .. " " .. PropToString(g);
+				end;			
+			end;
+			LogDebug(ret);
+		end;
 	end
-    
-    
-    
+	LogDebug("--- Table_NpcFunction ----");
+	for _, v in pairs(Table_NpcFunction) do
+		if v.Type == "Common_Shop" then
+			LogDebug(PropToString(v) .. ' Parama=' .. MyTostring(v.Parama));
+		end;
+	end;
+    --LogDebug("--- FIND -----")
+	--for _, npc in pairs(Table_Npc) do
+	--	LogDebug("" .. npc.id .. " " .. npc.NameZh .. " " .. PropToString(npc.NpcFunction[1],"NpcFunction."));
+	--end;
+
 	
     UIUtil.FloatMsgByText("Test Done 1");	
 	--local followingTeammatesID = UIModelKaplaTransmit.Ins():GetFollowingTeammates()
@@ -1123,8 +1149,95 @@ function ROM_MyDlg()
                 --UniqueConfirmView.ViewType = UIViewType.ConfirmLayer;
                 --GameFacade.Instance:sendNotification(UIEvent.ShowUI,{viewname = "SystemUnLockView"});
                 --ServiceSessionShopProxy.Instance:CallQueryShopConfigCmd(600, 11);
-                ShopProxy.Instance:CallQueryShopConfig(600, 11); -- just do more checking
+				-- 600,1  general shop
+				-- 600,4  food
+				-- 600,11  toy shop
+				--[[
+				02/19/19 08:29:39 type=904 shopID=1
+ id=100000 ItemID=5250 name=Creste's Royal Medal Type=61 ItemCount=2500 LimitNum=0 goodsID=17542 lock=true [Mask of Darkness Blueprint]
+ 
+ 02/19/19 08:31:22 type=700 shopID=2
+ id=31040 ItemID=100 name=Zeny Type=131 ItemCount=9000 LimitNum=0 goodsID=40330 lock=false [Blade]
 
+ 
+ 02/19/19 08:32:27 type=750 shopID=2
+ id=41040 ItemID=100 name=Zeny Type=131 ItemCount=8600 LimitNum=0 goodsID=42027 lock=false [Mantle]
+ 
+ 02/19/19 08:34:06 type=922 shopID=1
+ id=26080 ItemID=5502 name=Nibelungen Shard Type=61 ItemCount=300 LimitNum=0 goodsID=41234 lock=false [Epic SpiritยทHerist's Bow]
+ 
+ 02/19/19 08:35:37 type=908 shopID=1
+ id=140000 ItemID=150 name=Fighter Coin Type=141 ItemCount=1000 LimitNum=1 goodsID=48566 lock=false [Marchosias' Arrow]
+ id=140010 ItemID=150 name=Fighter Coin Type=141 ItemCount=1500 LimitNum=1 goodsID=48565 lock=false [Marchosias' Gaze]
+ id=140020 ItemID=150 name=Fighter Coin Type=141 ItemCount=1500 LimitNum=1 goodsID=48009 lock=false [Marchosias' Tail]
+ 
+02/19/19 08:39:02 type=800 shopID=1000
+ id=59040 ItemID=110 name=Eden Coin Type=140 ItemCount=1200 LimitNum=0 goodsID=14306 lock=true [Snake hairpin Blueprint]
+ id=59010 ItemID=110 name=Eden Coin Type=140 ItemCount=300 LimitNum=0 goodsID=14302 lock=false [Monkey Circlet Blueprint] 
+ 
+ 02/19/19 08:40:07 type=605 shopID=1
+ id=8000 ItemID=5525 name=Colorful Shell Type=61 ItemCount=10 LimitNum=0 goodsID=900001 lock=false [Green Apple]
+ id=8050 ItemID=5525 name=Colorful Shell Type=61 ItemCount=150 LimitNum=0 goodsID=900004 lock=true [Nutrition Potion]
+ id=8020 ItemID=5525 name=Colorful Shell Type=61 ItemCount=40 LimitNum=0 goodsID=900003 lock=false [Tropical Banana]
+ 
+02/19/19 08:44:24 type=950 shopID=7
+ id=1006000 ItemID=100 name=Zeny Type=131 ItemCount=50000 LimitNum=0 goodsID=46041 lock=true [The Fighter]
+ id=1006050 ItemID=12109 name=Scarlet Dyestuffs Type=70 id=1006050,LimitType=0,business=0,actDiscount=0,lockType=0,produceNum=0,PreCost=710030,ItemCount=1,Discount=100,source=0,MenuID=0,LimitNum=0,Rem
+oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairColorID=2,des=,ShopOrder=6,
+ id=1006020 ItemID=100 name=Zeny Type=131 ItemCount=15000 LimitNum=0 goodsID=46042 lock=true [The Light Shield]
+ id=1006070 ItemID=12116 name=White Dyestuffs Type=70 id=1006070,LimitType=0,business=0,actDiscount=0,lockType=0,produceNum=0,PreCost=710030,ItemCount=1,Discount=100,source=0,MenuID=0,LimitNum=0,Remov 
+ 
+02/19/19 08:46:32 type=912 shopID=1
+ id=190000 ItemID=52624 name=Tattered Time Pointer Type=61 ItemCount=1580 LimitNum=0 goodsID=17569 lock=true [Time Observation Blueprint]
+ id=190010 ItemID=52624 name=Tattered Time Pointer Type=61 ItemCount=15804 LimitNum=0 goodsID=14251 lock=true [Gold Clock Guardian [1] Blueprint]
+ id=190020 ItemID=52624 name=Tattered Time Pointer Type=61 ItemCount=19755 LimitNum=0 goodsID=16026 lock=true [Back in Time Blueprint]
+
+02/19/19 08:50:31 type=3003 shopID=1
+ id=180640 ItemID=110 name=Eden Coin Type=140 ItemCount=20 LimitNum=1 goodsID=52203 lock=false [Immortal Heart]
+ id=180750 ItemID=110 name=Eden Coin Type=140 ItemCount=60 LimitNum=1 goodsID=52505 lock=false [Skel-Bone]
+ id=180740 ItemID=110 name=Eden Coin Type=140 ItemCount=40 LimitNum=1 goodsID=52205 lock=false [Hand of God] 
+ 
+ 02/19/19 08:52:49 type=1502 shopID=160
+ id=1400000 ItemID=53097 name=Gold Snake Eye Type=62 ItemCount=1 LimitNum=0 goodsID=40037 lock=false [Ouroboros Spear]
+ id=1400050 ItemID=53097 name=Gold Snake Eye Type=62 ItemCount=1 LimitNum=0 goodsID=41236 lock=false [Ouroboros Bow]
+ id=1400020 ItemID=53097 name=Gold Snake Eye Type=62 ItemCount=1 LimitNum=0 goodsID=40639 lock=false [Ouroboros Staff]
+ id=1400070 ItemID=53097 name=Gold Snake Eye Type=62 ItemCount=1 LimitNum=0 goodsID=41847 lock=false [Ouroboros Axe]
+ 
+ 02/19/19 11:57:02 type=950 shopID=1
+ id=1000000 ItemID=100 name=Zeny Type=131 ItemCount=10000 LimitNum=0 goodsID=46001 lock=true [The Tech]
+ id=1000130 ItemID=100 name=Zeny Type=131 ItemCount=20000 LimitNum=0 goodsID=46020 lock=true [The Natural]
+ id=1000100 ItemID=100 name=Zeny Type=131 ItemCount=2000 LimitNum=0 goodsID=46014 lock=false [The Monk]
+ 
+02/19/19 11:59:16 type=750 shopID=1
+ id=40000 ItemID=100 name=Zeny Type=131 ItemCount=1400 LimitNum=0 goodsID=43001 lock=false [Eden Team Manteau I]
+ id=40050 ItemID=100 name=Zeny Type=131 ItemCount=4700 LimitNum=0 goodsID=42503 lock=false [Buckler] 
+ 
+ 02/19/19 12:04:03 type=1400 shopID=1
+ id=320 ItemID=100 name=Zeny Type=131 id=320,business=0,discountMax=0,MenuID=0,LevelDes=,ItemID=100,LimitNum=0,RemoveDate=4294967295,produceNum=0,lockArg=,LimitType=0,ShopOrder=45,BaseLv=0,SkillID=500
+51001,source=0,Discount=100,PreCost=0,ItemCount=1000000,lockType=0,actDiscount=0,des=,
+ id=130 ItemID=100 name=Zeny Type=131 id=130,business=0,discountMax=0,MenuID=0,LevelDes=,ItemID=100,LimitNum=0,RemoveDate=4294967295,produceNum=0,lockArg=,LimitType=0,ShopOrder=13,BaseLv=1,SkillID=500
+08001,source=0,Discount=100,PreCost=0,ItemCount=30000,lockType=0,actDiscount=0,des=,
+ id=260 ItemID=100 name=Zeny Type=131 id=260,business=0,discountMax=0,MenuID=0,LevelDes=,ItemID=100,LimitNum=0,RemoveDate=4294967295,produceNum=0,lockArg=,LimitType=0,ShopOrder=37,BaseLv=1,SkillID=500
+29001,source=0,Discount=100,PreCost=0,ItemCount=400000,lockType=0,actDiscount=0,des=,
+ id=70 ItemID=100 name=Zeny Type=131 id=70,business=0,discountMax=0,MenuID=0,LevelDes=,ItemID=100,LimitNum=0,RemoveDate=4294967295,produceNum=0,lockArg=,LimitType=0,ShopOrder=7,BaseLv=1,SkillID=500260
+01,source=0,Discount=100,PreCost=0,ItemCount=30000,lockType=0,actDiscount=0,des=,
+
+02/19/19 14:07:44 type=3004 shopID=1
+ id=1700020 ItemID=52626 name=Edelweiss Type=61 ItemCount=2 LimitNum=20 goodsID=52208 lock=false [Frozen Heart]
+ id=1700030 ItemID=52626 name=Edelweiss Type=61 ItemCount=5 LimitNum=5 goodsID=52412 lock=false [Christmas Garland]
+ id=1700040 ItemID=52626 name=Edelweiss Type=61 ItemCount=10 LimitNum=5 goodsID=52516 lock=false [Christmas Socks]
+02/19/19 14:22:00 type=3007 shopID=1
+ id=180000 ItemID=100 name=Zeny Type=131 ItemCount=300 LimitNum=3 goodsID=550520 lock=true [Yoyo Banana]
+ id=180050 ItemID=100 name=Zeny Type=131 ItemCount=360 LimitNum=4 goodsID=550503 lock=true [Eggshell Chick]
+ id=180020 ItemID=100 name=Zeny Type=131 ItemCount=425 LimitNum=4 goodsID=550522 lock=true [Moai Melon]
+ id=180150 ItemID=100 name=Zeny Type=131 ItemCount=500 LimitNum=4 goodsID=550517 lock=true [Gold Pumpkin] 
+ 				]]
+				
+				
+                --ShopProxy.Instance:CallQueryShopConfig(3004, 2); -- just do more checking
+				ServiceSessionShopProxy.Instance:CallQueryShopConfigCmd(3003, 1);
+				--local npcFunc = ;
+				--FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[3003], nil, 1 );
 			end,
 			closeDialog = true,
 			NameZh = "Test"
@@ -1149,6 +1262,36 @@ function ROM_MyDlg()
 			closeDialog = true,
 			NameZh="Log Reset",
 		},
+		{
+			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[3004], nil, 1 ); end, closeDialog = true, NameZh="Greedy Shop",
+		},
+		{
+			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[850], nil, 1 ); end, closeDialog = true, NameZh="FriendShip Shop",
+		},
+		{
+			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[3003], nil, 1 ); end, closeDialog = true, NameZh="Lucky Shop",
+		},
+		
+		{
+			event = function (npcinfo)
+				local shopID = 912;
+				--local goods = ShopProxy.Instance:GetConfigByTypeId(shopID, 1);
+				--if goods
+				--for _, g in pairs(goods) do
+					--g.lock = false;
+					--local itemData = Table_Item[g.ItemID];
+					--local gitemData = Table_Item[g.goodsID];
+					--if gitemData then
+					--	ret = ret .. "\n id=" .. g.id .. " ItemID=" .. itemData.id .. " name=" .. itemData.NameZh .. " Type=" .. itemData.Type ..  " ItemCount=" .. g.ItemCount .. " LimitNum=" .. g.LimitNum .. " goodsID=" .. g.goodsID .. ' lock=' .. tostring(g.lock) .. ' [' .. gitemData.NameZh .. ']'
+					--else
+					--	ret = ret .. "\n id=" .. g.id .. " ItemID=" .. itemData.id .. " name=" .. itemData.NameZh .. " Type=" .. itemData.Type .. " " .. PropToString(g);
+					--end;			
+				--end;
+				FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[shopID], nil, 1 );
+			end,
+			closeDialog = true,
+			NameZh="Test Shop",
+		},
         
         
 	};
@@ -1165,8 +1308,13 @@ function ROM_IsNear(pos1,pos2,range)
 end;
 
 function ROM_DistanceToCreature(creature)
-    local myPos = Game.Myself:GetPosition();	
+    --local myPos = Game.Myself:GetPosition();	
     local toPos = creature:GetPosition();	
+    return ROM_DistanceToPos(toPos);
+end;
+
+function ROM_DistanceToPos(toPos)
+    local myPos = Game.Myself:GetPosition();	
     return LuaVector3.Distance(myPos, toPos);
 end;
 

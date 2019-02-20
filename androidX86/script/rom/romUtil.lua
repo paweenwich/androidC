@@ -748,9 +748,16 @@ if class ~= nil then
             for i= 1, #myAIRules do
                 local rule = myAIRules[i];
                 --LogDebug("" .. i .. " " .. MyTostring(rule));
-                if rule.func ~= nil and rule.func(rule) then
-					--self.nextUpdateTime = time + 1.0;
-                    return true;
+				
+                if rule.func ~= nil then
+					local success, delay = rule.func(rule);
+					if success then
+						--self.nextUpdateTime = time + 1.0;
+						if delay then
+							self.nextUpdateTime = self.nextUpdateTime + delay;
+						end;
+						return true;
+					end;
                 end;
             end;
 			local in2 = CDProxy.Instance:IsInCD(SceneUser2_pb.CD_TYPE_SKILL,CDProxy.CommunalSkillCDSortID);                
@@ -769,6 +776,7 @@ if class ~= nil then
 				LogDebug("AutoAI_Rom:Prepare() InCD");
 			else
 				LogDebug("AutoAI_Rom:Prepare() nothing to do! " .. tostring(walkBack));
+				self.nextUpdateTime = self.nextUpdateTime + 1.0;
 			end;
             -- nothing to do
             --self.nextUpdateTime = time + 1.0;

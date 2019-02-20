@@ -1773,15 +1773,15 @@ if SkillLogic_Base ~= nil then
 
         skillInfo.LogicClass.Client_DoDeterminTargets(
             self, creature, tempCreatureArray, maxCount)
-		--[[		
+		--[[
 		LogDebug("After Client_DoDeterminTargets " .. #tempCreatureArray .. ' ' .. tostring(self.targetCreatureGUID));
 		if skillInfo.staticData.id  == 403001 and #tempCreatureArray == 0 then
 			LogDebug("Cheat Add creature");
 			local c = SceneCreatureProxy.FindCreature(self.targetCreatureGUID);
 			TableUtility.ArrayPushBack(tempCreatureArray, c);
 			LogDebug("After Client_DoDeterminTargets " .. #tempCreatureArray .. ' ' .. tostring(self.targetCreatureGUID));
-		end;]]
-		
+		end;
+		]]		
         local teamRange = skillInfo:TargetIncludeTeamRange(creature)
         if 0 < teamRange then
             local myTeam = TeamProxy.Instance.myTeam
@@ -1840,7 +1840,7 @@ if SkillLogic_Base ~= nil then
                         shareDamageInfos)
                     -- KKK
 					if skillInfo.staticData.id  == 403001 then
-						LogDebug("SNATCH FOUND");
+						LogDebug("SNATCH FOUND INDEX " .. Game.Myself.data.randomFunc.index);
 						for h = 1,20 do
 						phaseData:AddTarget(
 							targetCreature.data.id, 
@@ -1881,6 +1881,50 @@ if SkillLogic_Base ~= nil then
     end
 end;
 
+if FunctionNpcFunc then
+
+	function FunctionNpcFunc:DoNpcFunc( npcFunctionData, lnpc, param )
+		LogDebug("FunctionNpcFunc:DoNpcFunc");
+		LogDebug(MyTostring(npcFunctionData));
+		LogDebug(MyTostring(lnpc));
+		LogDebug(MyTostring(param));
+		if(npcFunctionData == nil)then
+			return;
+		end
+
+		local event = self:getFunc(npcFunctionData.id);
+		if(not event)then
+			return;
+		end
+
+		-- if not transfer npc, then get now VisitingNPC
+		if(not lnpc)then
+			lnpc = FunctionVisitNpc.Me():GetTarget();
+		end
+
+		-- 实名制认证
+		if(npcFunctionData.id == 5001 or npcFunctionData.id == 5000)then
+			FunctionSecurity.Me():TryDoRealNameCentify( function ()
+				event(lnpc, param, npcFunctionData);
+			end);
+			return;
+		end
+
+		return event(lnpc, param, npcFunctionData);
+	end
+
+end;
+--[[
+if HappyShop then
+	function HappyShop:OnEnter()
+		LogDebug("HappyShop:OnEnter");
+		HappyShop.super.OnEnter(self);
+		self:handleCameraQuestStart()
+		self:InitUI()
+		self:HandleSpecial(true)
+	end
+end;
+]]
 --[[
 
 ]]
