@@ -127,7 +127,7 @@ ROM_Config[4300736919] = {  -- Sniper
         {name="Auto", func=ROM_SkillTarget, filter = ROM_NoPlayerAround},    
         {name="Double Strafe", func=ROM_SkillTarget},    
         {name="Auto", func=ROM_SkillTarget,
-            filter = function(mon) 
+            filter1 = function(mon) 
                 return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
             end
         },

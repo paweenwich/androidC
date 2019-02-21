@@ -1773,15 +1773,15 @@ if SkillLogic_Base ~= nil then
 
         skillInfo.LogicClass.Client_DoDeterminTargets(
             self, creature, tempCreatureArray, maxCount)
-		--[[
-		LogDebug("After Client_DoDeterminTargets " .. #tempCreatureArray .. ' ' .. tostring(self.targetCreatureGUID));
+		
+		--[[LogDebug("After Client_DoDeterminTargets " .. #tempCreatureArray .. ' ' .. tostring(self.targetCreatureGUID));
 		if skillInfo.staticData.id  == 403001 and #tempCreatureArray == 0 then
 			LogDebug("Cheat Add creature");
 			local c = SceneCreatureProxy.FindCreature(self.targetCreatureGUID);
 			TableUtility.ArrayPushBack(tempCreatureArray, c);
 			LogDebug("After Client_DoDeterminTargets " .. #tempCreatureArray .. ' ' .. tostring(self.targetCreatureGUID));
-		end;
-		]]		
+		end;]]
+				
         local teamRange = skillInfo:TargetIncludeTeamRange(creature)
         if 0 < teamRange then
             local myTeam = TeamProxy.Instance.myTeam
