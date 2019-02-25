@@ -834,7 +834,8 @@ function ROM_Test(g)
 	for _, v in pairs(Table_Map) do
 		--if v.Range == self.areaID and v.Money then
 		if v.Money and v.MoneyType == 1 then	-- we can transport if v.MoneyType == 1 
-			LogDebug(MapInfoToString(v));
+			local path = ROM_GetPathToMap(Game.MapManager:GetMapID(),v.id);
+			LogDebug(MapInfoToString(v) .. ' active=' .. tostring(ROM_IsActiveMap(v.id)) .. ' ' .. MyTostring(path));
 		end
 	end
     
@@ -1123,7 +1124,7 @@ function ROM_MyDlg()
 		dialoglist = {"เล่นกันดีๆไท้ได้เหรอ]"},
 	};
 	viewdata.addfunc = {
-		{
+--[[		{
 			event = function (npcinfo,param)
                 farmData.mapID = Game.MapManager:GetMapID();
                 farmData.pos = Game.Myself:GetPosition():Clone();
@@ -1134,7 +1135,7 @@ function ROM_MyDlg()
 			NameZh = "RememberPos",
 			
 		},
---[[		{
+		{
 			event = function (npcinfo)
 				FunctionNpcFunc.JumpPanel(PanelConfig.ChangeZoneView, npcinfo)
 			end,
@@ -1265,16 +1266,25 @@ oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairCo
 		{
 			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[3004], nil, 1 ); end, closeDialog = true, NameZh="Greedy Shop",
 		},
-		{
+--[[		{
 			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[850], nil, 1 ); end, closeDialog = true, NameZh="FriendShip Shop",
-		},
+		},]]
 		{
 			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[3003], nil, 1 ); end, closeDialog = true, NameZh="Lucky Shop",
+		},
+		{
+			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[3001], nil, 1 ); end, closeDialog = true, NameZh="Teleport",
+		},
+		{
+			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[5000], nil, 1 ); end, closeDialog = true, NameZh="Exchange",
 		},
 		
 		{
 			event = function (npcinfo)
-                ROM_IsTeamReady();
+                --FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[5000], nil, 1 );
+				--LOgDebug();
+				--ROM_FindNearestNPC();
+				ROM_TeleportTo(2);
 			end,
 			closeDialog = true,
 			NameZh="Test",
@@ -1290,7 +1300,7 @@ end;
 function ROM_IsNear(pos1,pos2,range)
 	range = range or 2;
 	local distance = LuaVector3.Distance(pos1, pos2);
-	LogDebug("ROM_IsNear: " .. distance .. " " .. tostring(pos1) .. " " .. tostring(pos2));
+	LogDebug("ROM_IsNear: " .. distance .. " " .. tostring(pos1) .. " " .. tostring(pos2) .. ' ' .. range);
 	return distance <= range
 end;
 
@@ -1306,7 +1316,7 @@ function ROM_DistanceToPos(toPos)
 end;
 
 function ROM_IsMeNear(mapID,pos,range)
-	range = range or 2;
+	range = range or 3;
 	local currentMapID = Game.MapManager:GetMapID();
 	if currentMapID == mapID then
 		local myPos = Game.Myself:GetPosition();	
@@ -1445,20 +1455,28 @@ function ROM_CommandVisitNPC(mapID,npcID,npcUID)
 	end
 end;
 
-function ROM_WalkToNPCPos(npcID,finish)
+function ROM_WalkToNPCPos(npcID,mapID,finish)
 	npcID = npcID or 1067;
 	finish = finish or (function() end);
-	local oriPos = ROM_GetOriginalPos(npcID);
+	local oriPoses = ROM_GetOriginalPoses(npcID,mapID);
+	if oriPoses == nil then
+		LogDebug("ROM_WalkToNPCPos: not found " .. npcID .. " " .. mapID );
+		return false;
+	end;
+	--local oriPos = ROM_GetOriginalPos(npcID);
+	local oriPos = oriPoses[1];
 	if oriPos then
 		LogDebug("ROM_WalkToNPCPos: " .. npcID .. " " .. MyTostring(oriPos));
 		-- check current location
 		local npcPos = TableUtil.Array2Vector3(oriPos.pos);
 		if ROM_IsMeNear(oriPos.mapID,npcPos) then
 			finish();
+			return true;
 		else	
 			ROM_CommandGOTO(oriPos.mapID,npcPos,finish);
+			return false;
 		end;
-		return true;
+		
 	else	
 		LogDebug("ROM_WalkToNPCPos: " .. npcID .. " original pos not found");
 		return false;
@@ -1488,7 +1506,8 @@ function ROM_CommandGOTO(mapID,pos,finish)
 				if ROM_IsMeNear(mapID,tempVector3) then
 					finish();
 				else
-					ROM_CommandGOTO(mapID,pos,finish)
+					Game.Myself:Client_MoveTo( tempVector3 );
+				--	ROM_CommandGOTO(mapID,pos,finish)
 				end
             end;
         end

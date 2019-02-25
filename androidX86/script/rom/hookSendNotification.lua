@@ -1874,6 +1874,29 @@ if SkillLogic_Base ~= nil then
                         
                     end;
                 end
+				-- more cheat
+				--[[
+				local mons = ROM_GetAllMonster(filterFunc);   
+				local mon = ROM_GetNearestMonFromList(mons,{tempCreatureArray[1].data.id});
+				if mon then
+					LogDebug("MyCheat: add more " .. mon.data.id)
+					local damageType, damage, shareDamageInfos = SkillLogic_Base.CalcDamage(
+                        skillID, 
+                        creature, 
+                        mon, 
+                        1, 
+                        1)
+					local numHit = 1;
+					for h = 1,numHit do
+						phaseData:AddTarget(
+							mon.data.id, 
+							damageType, 
+							damage,
+							shareDamageInfos)
+					end;
+					
+				end				
+				]]
             end
 
             ArrayClear(tempCreatureArray)

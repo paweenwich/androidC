@@ -920,8 +920,8 @@ function ROM_TargetInRange(mon,tab)
 	return dist <= range
 end;
 
-
-function ROM_GetNearestMonFromList(mons)
+function ROM_GetNearestMonFromList(mons,exclude)
+	exclude = exclude or {};
     local minDist = 100000;
     local retNpc = nil;
     local myPos = Game.Myself:GetPosition();
@@ -930,10 +930,13 @@ function ROM_GetNearestMonFromList(mons)
         local npc = v;
         local distance = LuaVector3.Distance(myPos, npc:GetPosition());
         --LogDebug("ID=" .. v .. " dist=" .. tostring(distance));
-        if distance < minDist then
-            retNpc = npc;
-            minDist = distance;
-        end;
+		if TableUtil.HasValue(exclude,npc.data.id) then
+		else
+			if distance < minDist then
+				retNpc = npc;
+				minDist = distance;
+			end;
+		end;
     end);
     if retNpc ~= nil then
         --LogDebug("ROM_GetNearestMonFromList: found " .. MonsterToString(retNpc) .. " " .. minDist);
@@ -1603,6 +1606,129 @@ function ROM_GetMapIDPath(fromMapID, toMapID)
             end
         end;
     end;
+end;
+
+function ROM_IsActiveMap(mapID)	-- player activate taht map
+	local activeMaps = WorldMapProxy.Instance.activeMaps
+	if activeMaps and activeMaps[mapID] then
+		return activeMaps[mapID] == 1
+	else
+		return false;
+	end
+end
+
+function ROM_IsTeleportableMap(mapID) -- possible to teleport to if activate
+	for _, v in pairs(Table_Map) do
+		if v.Money and v.MoneyType == 1 then -- we can transport if v.MoneyType == 1 
+			if v.id == mapID then
+				return true;
+			end;
+		end
+	end
+	return false;
+end;
+
+function ROM_GetPathToMap(fromMapID,toMapID)
+	local ret = {};
+	-- check if we can teleport to that the target
+	if ROM_IsTeleportableMap(toMapID) and ROM_IsActiveMap(toMapID) then
+		--ret[1] = {func="FindNearestNPC"}
+		ret[1] = {func="Teleport", mapID=toMapID}
+	else	
+		-- need to walk to that map by find nearest town and walk
+		local nearestTown = ROM_GetNearestTown(toMapID);
+		if nearestTown == fromMapID then
+			ret[1] = {func="Walk"}
+		else
+			--ret[1] = {func="FindNearestNPC"}
+			ret[1] = {func="Teleport", mapID=nearestTown}
+			ret[2] = {func="Walk"}
+		end;
+	end;
+	return ret;
+end;
+
+function ROM_TeleportTo(mapID)
+	local currentMapID = Game.MapManager:GetMapID();
+	if mapID == currentMapID then
+		return true;	-- already there
+	end;
+	local path = ROM_GetPathToMap(currentMapID,mapID);
+	local cmd = path[1];
+	if cmd.func == "Walk" then
+		ROM_CommandGOTO(mapID);
+		return false;
+	end;
+	if cmd.func == "Teleport" then
+		local npcID,targetPos,mindist = ROM_FindNearestNPC();
+		if npcID then
+			if ROM_WalkToNPC(currentMapID,npcID) then
+				LogDebug("ROM_TeleportTo: npc reach");
+				ROM_ClickNearestNPC(true);
+				local followers = Game.Myself:Client_GetAllFollowers();
+				--for followID,_ in pairs(followers) do
+				local followingTeammatesID = UIModelKaplaTransmit.Ins():GetFollowingTeammates()
+				if #followingTeammatesID == 0 then
+					ServiceNUserProxy.Instance:CallGoToGearUserCmd(mapID, SceneUser2_pb.EGoToGearType_Single, nil);
+				else
+					ServiceNUserProxy.Instance:CallGoToGearUserCmd(mapID, SceneUser2_pb.EGoToGearType_Team, followingTeammatesID)
+				end;
+				--
+				--
+				--logDebug(MyTostring(followers));
+				--logDebug(MyTostring(followingTeammatesID));
+				return false;
+			end;
+				--function()
+					--ROM_VisitNearestNPC();
+					--ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
+					--GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
+					--LogDebug(QuestToString(q));
+					--ROM_ClickNearestNPC(true);
+				--end
+		end;
+		return false;
+	end;
+	
+end;
+
+function ROM_FindNearestNPC()
+	LogDebug("ROM_FindNearestNPC: start");
+	local npcs = ROM_GetMapNPCsEx();
+	local mindist = 1000;
+	local minNPC = nil;
+	local myPos = Game.Myself:GetPosition();
+	for i, v in pairs(npcs) do 		
+		--local pos = --[[Vector3]] LuaVector3(v.position[1],v.position[2],v.position[3]);
+		--local distance = LuaVector3.Distance(myPos,pos);
+		--if distance < mindist then
+		--	mindist = distance;
+		--	minNPC = v;
+		--	targetPos = pos;
+		--end;
+		--LogDebug(PropToString(v));
+		local npcData = Table_Npc[v.ID];
+		if npcData and npcData.Position and npcData.Icon and npcData.MapIcon then
+			if npcData.Icon ~= "" or npcData.MapIcon ~= "" then
+				local poses = ROM_GetOriginalPoses(v.ID,mapID)
+				if poses then
+					--LogDebug("ROM_FindNearestNPC:found" .. " " .. PropToString(npcData));
+					--LogDebug("ROM_FindNearestNPC:at" .. " " ..MyTostring(poses))
+					--return v.ID, poses[1].pos;
+					local pos = --[[Vector3]] LuaVector3(poses[1].pos[1],poses[1].pos[2],poses[1].pos[3]);
+					local distance = LuaVector3.Distance(myPos,pos);
+					if  distance < mindist then
+						mindist = distance;
+						minNPC = v.ID;
+						targetPos = pos;
+					end;
+				end;
+			end;
+		end;
+	end;
+	LogDebug("ROM_FindNearestNPC:found ".. tostring(minNPC) .. " " .. tostring(targetPos) .. " " .. mindist);
+	LogDebug("ROM_FindNearestNPC: end");
+	return minNPC,targetPos,mindist
 end;
 
 
