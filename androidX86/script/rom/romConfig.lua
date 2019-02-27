@@ -72,7 +72,8 @@ ignoreMonList = {
 avoidMonList = {
 	10084, -- name=Abysmal Knight
 	20022, -- name=Dark Illusion
-	18055, -- name=Dark Illusion [
+	18055, -- name=Dark Illusion 
+    --10081, -- name=Gargoyle
 }
 
 

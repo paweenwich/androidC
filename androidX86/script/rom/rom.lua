@@ -1236,9 +1236,9 @@ oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairCo
 				
 				
                 --ShopProxy.Instance:CallQueryShopConfig(3004, 2); -- just do more checking
-				ServiceSessionShopProxy.Instance:CallQueryShopConfigCmd(3003, 1);
+				--ServiceSessionShopProxy.Instance:CallQueryShopConfigCmd(3003, 1);
 				--local npcFunc = ;
-				--FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[3003], nil, 1 );
+				FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[300], nil, 1 );
 			end,
 			closeDialog = true,
 			NameZh = "Test Shop"
@@ -1252,7 +1252,7 @@ oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairCo
                 ServiceGuildCmdProxy.Instance:CallDonateFrameGuildCmd(true);
                 LogDebug("Done");
 			end,
-			closeDialog = true,
+			--closeDialog = true,
 			NameZh="Guild Donate",
 			
 		},
@@ -1260,7 +1260,7 @@ oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairCo
 			event = function (npcinfo)
                 RomFileLogger.reset();
 			end,
-			closeDialog = true,
+			--closeDialog = true,
 			NameZh="Log Reset",
 		},
 		{
@@ -1278,13 +1278,19 @@ oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairCo
 		{
 			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[5000], nil, 1 ); end, closeDialog = true, NameZh="Exchange",
 		},
+		{
+			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[100], nil, 1 ); end, closeDialog = true, NameZh="Storage",
+		},
+		{
+			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[302], nil, 1 ); end, closeDialog = true, NameZh="DeCompose",
+		},
 		
 		{
 			event = function (npcinfo)
                 --FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[5000], nil, 1 );
 				--LOgDebug();
 				--ROM_FindNearestNPC();
-				ROM_TeleportTo(2);
+				--ROM_TeleportTo(2);
 			end,
 			closeDialog = true,
 			NameZh="Test",
@@ -1316,7 +1322,7 @@ function ROM_DistanceToPos(toPos)
 end;
 
 function ROM_IsMeNear(mapID,pos,range)
-	range = range or 3;
+	range = range or 4;
 	local currentMapID = Game.MapManager:GetMapID();
 	if currentMapID == mapID then
 		local myPos = Game.Myself:GetPosition();	

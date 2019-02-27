@@ -69,7 +69,8 @@ function ROM_WalkToBoard()
         return ROM_WalkToNPC(Game.MapManager:GetMapID(),boardNPC);
     end;
     local nearestTownID = ROM_GetNearestTown() or 1;
-	if ROM_TeleportTo(nearestTownID) then
+    local mapReach,reason = ROM_TeleportTo(nearestTownID);
+	if mapReach or (reason ~= nil) then
 		local tempArgs = {};
 		tempArgs.targetMapID = nearestTownID;
 		tempArgs.showClickGround = true;

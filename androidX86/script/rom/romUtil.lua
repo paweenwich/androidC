@@ -1640,9 +1640,13 @@ function ROM_GetPathToMap(fromMapID,toMapID)
 		if nearestTown == fromMapID then
 			ret[1] = {func="Walk"}
 		else
-			--ret[1] = {func="FindNearestNPC"}
-			ret[1] = {func="Teleport", mapID=nearestTown}
-			ret[2] = {func="Walk"}
+            if ROM_IsTeleportableMap(nearestTown) and ROM_IsActiveMap(nearestTown) then
+                ret[1] = {func="Teleport", mapID=nearestTown}
+                ret[2] = {func="Walk"}
+            else
+                ret[2] = {func="Walk"}
+            end;
+            --ret[1] = {func="Walk"}
 		end;
 	end;
 	return ret;
@@ -1669,9 +1673,9 @@ function ROM_TeleportTo(mapID)
 				--for followID,_ in pairs(followers) do
 				local followingTeammatesID = UIModelKaplaTransmit.Ins():GetFollowingTeammates()
 				if #followingTeammatesID == 0 then
-					ServiceNUserProxy.Instance:CallGoToGearUserCmd(mapID, SceneUser2_pb.EGoToGearType_Single, nil);
+					ServiceNUserProxy.Instance:CallGoToGearUserCmd(cmd.mapID, SceneUser2_pb.EGoToGearType_Single, nil);
 				else
-					ServiceNUserProxy.Instance:CallGoToGearUserCmd(mapID, SceneUser2_pb.EGoToGearType_Team, followingTeammatesID)
+					ServiceNUserProxy.Instance:CallGoToGearUserCmd(cmd.mapID, SceneUser2_pb.EGoToGearType_Team, followingTeammatesID)
 				end;
 				--
 				--
@@ -1686,6 +1690,8 @@ function ROM_TeleportTo(mapID)
 					--LogDebug(QuestToString(q));
 					--ROM_ClickNearestNPC(true);
 				--end
+        else        
+            return false,"NPCNotFound";
 		end;
 		return false;
 	end;
@@ -1708,8 +1714,8 @@ function ROM_FindNearestNPC()
 		--end;
 		--LogDebug(PropToString(v));
 		local npcData = Table_Npc[v.ID];
-		if npcData and npcData.Position and npcData.Icon and npcData.MapIcon then
-			if npcData.Icon ~= "" or npcData.MapIcon ~= "" then
+		if npcData and npcData.Position and npcData.Icon and npcData.MapIcon  and npcData.Desc and npcData.Desc ~="" then
+			if npcData.Icon ~= "" or (npcData.MapIcon ~= "" and npcData.MapIcon ~= "map_collection") then
 				local poses = ROM_GetOriginalPoses(v.ID,mapID)
 				if poses then
 					--LogDebug("ROM_FindNearestNPC:found" .. " " .. PropToString(npcData));
@@ -1851,6 +1857,16 @@ ROM_tabMonsterOrigin = {
 				[3]=-10.082882
 			},
 			mapID=22
+		},
+    },
+    [10081]={
+		[1]={
+            pos={
+				[1]=31.940000534058,
+				[2]=10.880000114441,
+				[3]=69.349998474121
+			},
+			mapID=37
 		},
     },
     
