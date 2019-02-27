@@ -1774,6 +1774,38 @@ if FunctionMonster ~= nil then
     end
 end;
 
+if MissionCommand then
+    if MissionCommandHunt == nil then
+        MissionCommandHunt = class("MissionCommandHunt", MissionCommand)
+    end;
+    function MissionCommandHunt:ctor()
+        LogDebug("MissionCommandHunt:ctor()");
+        MissionCommandHunt.super.ctor(self)
+        self.ai = AutoAI_Rom.new();
+
+    end
+    function MissionCommandHunt:DoLaunch()
+        LogDebug("MissionCommandHunt:DoLaunch()");
+        self.ai:Enable(true);
+        --self.oldConfig = ROM_SetConfig(self.args.config);        
+        --LogDebug(MyTostring(self.args.config));
+        --LogDebug(MyTostring(self.oldConfig));
+        --ROM_Alert("MissionCommandHunt Start");
+    end
+    function MissionCommandHunt:DoShutdown()
+        LogDebug("MissionCommandHunt:DoShutdown()");
+        self.ai:Enable(false);
+        --ROM_SetConfig(self.oldConfig);
+        --ROM_Alert("MissionCommandHunt End");
+    end
+    function MissionCommandHunt:DoUpdate(time, deltaTime)
+        LogDebug("MissionCommandHunt:DoUpdate() " .. time);
+        --function AutoAI_Rom:Prepare(idleElapsed, time, deltaTime, creature)
+        self.ai:Prepare(0, time, deltaTime, nil)
+        return true;
+    end;
+end;
+
 ROM_tabTeleport = {
     [22]=20,
 }

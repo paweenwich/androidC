@@ -62,7 +62,7 @@ myAIRules = {
 ignoreMonList = {
     60132, -- name=Sumina
     10084, -- name=Abysmal Knight
-    10081, -- name=Gargoyle
+--    10081, -- name=Gargoyle
 	17301, -- name=Weak Puppet
 	20022, -- name=Dark Illusion
 	18055, -- name=Dark Illusion 
@@ -91,7 +91,7 @@ ROM_Config[4313990901] = {
         10061, --  name=Bongun
         10060, --  name=Munak
         10120, --  name=Evil Druid
-        10121,--  name=Dark Priest
+        10121, --  name=Dark Priest
         10080, --  name=Wraith Type=Monster
     },
     myMonsterRules ={
@@ -186,14 +186,25 @@ ROM_Config[4315742181] = {  -- paladin
 	walkBack = false,
 }
 
+function ROM_SetConfig(conf)
+    local oldConfig = {
+        myMonsterList = myMonsterList,
+        myMonsterRules = myMonsterRules,
+        myAIRules = myAIRules,
+        walkBack = walkBack,
+    };
+    myMonsterList = conf.myMonsterList;
+    myMonsterRules = conf.myMonsterRules;
+    myAIRules = conf.myAIRules;
+    walkBack = conf.walkBack;
+    return oldConfig;
+end;
+
 
 if Game and Game.Myself and Game.Myself.data then
     if ROM_Config[Game.Myself.data.id] ~= nil then
         LogDebug("Use ROM_Config for " .. Game.Myself.data.id);
         local conf = ROM_Config[Game.Myself.data.id];
-        myMonsterList = conf.myMonsterList;
-        myMonsterRules = conf.myMonsterRules;
-        myAIRules = conf.myAIRules;
-		walkBack = conf.walkBack;
+        ROM_SetConfig(conf);
     end;
 end;

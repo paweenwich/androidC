@@ -1287,10 +1287,36 @@ oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairCo
 		
 		{
 			event = function (npcinfo)
-                --FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[5000], nil, 1 );
-				--LOgDebug();
-				--ROM_FindNearestNPC();
-				--ROM_TeleportTo(2);
+                local status,err = pcall(function()
+                    LogDebug("Test Start")
+                    local config = {
+                        myMonsterList = {10081},
+                        myMonsterRules = myMonsterRules,
+                        myAIRules = myAIRules,
+                        walkBack = false,
+                    };
+                    --local oldConfig = ROM_SetConfig(config)
+                    
+                    local cmdArgs = {
+                        --monID = 10081,
+                        config = config,
+                        --targetMapID = 0,
+                        --targetPos = 0,
+                    }
+                    Game.Myself:Client_SetMissionCommand(nil );
+                    local cmd = ReusableObject.Create( MissionCommandHunt, true, cmdArgs );
+                    --local cmd = MissionCommandFactory.CreateCommand(cmdArgs, MissionCommandHunt);
+                    if(cmd)then
+                        Game.Myself:Client_SetMissionCommand(cmd );
+                    else
+                        LogDebug("cmd error");
+                    end
+                    LogDebug("Test End")
+                end);
+                if status == false then
+                    LogDebug("ERROR: " .. singleLine(tostring(err)));
+                    return false
+                end;
 			end,
 			closeDialog = true,
 			NameZh="Test",
