@@ -395,10 +395,10 @@ function ROM_WalkToRange(tab)
         --LogDebug("ROM_WalkToRange: dist=" .. distance);
         if distance > range then
             LogDebug("ROM_WalkToRange walk to target");
-			Game.AreaTrigger_ExitPoint:SetDisable(true)
+			--Game.AreaTrigger_ExitPoint:SetDisable(true)
             Game.Myself:Client_MoveTo(targetPosition, nil, 
 				function(self,param)
-					Game.AreaTrigger_ExitPoint:SetDisable(false)
+					--Game.AreaTrigger_ExitPoint:SetDisable(false)
 					LogDebug("ROM_WalkToRange done");
 				end, 
 			nil, nil, range);
@@ -902,6 +902,25 @@ function ROM_Test(g)
 	--for _, npc in pairs(Table_Npc) do
 	--	LogDebug("" .. npc.id .. " " .. npc.NameZh .. " " .. PropToString(npc.NpcFunction[1],"NpcFunction."));
 	--end;
+    if ROM_warnPopup then
+        ROM_warnPopup = nil;
+    else
+        local data = {
+            content="content",
+            title="title",
+            confirmtext="confirm",
+            canceltext="cancel",
+        };
+        local uiCamera = NGUIUtil:GetCameraByLayername("UI");
+        ROM_warnPopup = WarnPopup.new(data,nil);
+        ROM_warnPopup.gameObject.transform.position = uiCamera:ViewportToWorldPoint(Vector3(0.2,0.2,0));
+        ROM_warnPopup:AddEventListener(UIEvent.CloseUI,function()
+            LogDebug("CloseUI");
+            ROM_warnPopup:Destroy();
+            ROM_warnPopup = nil;
+        end
+        ,ROM_warnPopup)
+    end;
 
 	
     UIUtil.FloatMsgByText("Test Done 1");	
@@ -1072,10 +1091,12 @@ function ROM_Auto()
 	end;
     if Game.Myself.ai.autoAI_Rom:IsEnable() then
         Game.Myself.ai.autoAI_Rom:Enable(false);
+        Game.AreaTrigger_ExitPoint:SetDisable(false);        
         uiLabel.effectStyle = UILabel.Effect.None;
         --uiLabel.effectColor = ColorUtil.NGUILabelBlueBlack;
     else
         Game.Myself.ai.autoAI_Rom:Enable(true);
+        Game.AreaTrigger_ExitPoint:SetDisable(true);        
         uiLabel.effectColor = ColorUtil.NGUILabelRed;
         uiLabel.effectStyle = UILabel.Effect.Outline;
         -- remember this position
