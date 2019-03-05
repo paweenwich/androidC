@@ -1827,6 +1827,7 @@ if SkillLogic_Base ~= nil then
                 local phaseData = self.phaseData
                 for i=1, targetCount do
                     local targetCreature = tempCreatureArray[i]
+                    local stat = ROM_GetMonStatus(targetCreature);
                     local damageType, damage, shareDamageInfos = SkillLogic_Base.CalcDamage(
                         skillID, 
                         creature, 
@@ -1840,20 +1841,28 @@ if SkillLogic_Base ~= nil then
                         shareDamageInfos)
                     -- KKK
 					if skillInfo.staticData.id  == 403001 then
-						LogDebug("SNATCH FOUND INDEX " .. Game.Myself.data.randomFunc.index);
-						for h = 1,20 do
-						phaseData:AddTarget(
-							targetCreature.data.id, 
-							damageType, 
-							damage,
-							shareDamageInfos)
-						end;	
-
+						LogDebug("SNATCH FOUND INDEX " .. Game.Myself.data.randomFunc.index .. ' ' ..targetCreature.data.id);
+                        LogDebug(MonsterToString(targetCreature));
+                        --if stat.frachp > 0.9 then
+						for h = 1,10 do
+                            phaseData:AddTarget(
+                                targetCreature.data.id, 
+                                damageType, 
+                                damage,
+                                shareDamageInfos)
+                        end;	
+                        --end;
 					end;
                     if i == 1 and Game.Myself.myCheat == true and isClean == false and damage > 0 then
                         local players =  ROM_GetNearPlayers(10,true);
                         local numHit = 3
-						local numNeed = math.floor(targetCreature.data:GetProperty("Hp") / damage) + 1						
+                        local rate = 1.5;
+                        if 4306006504 == Game.Myself.data.id then
+                            if stat.frachp > 0.9 then
+                                rate = 0.8;
+                            end;
+                        end;
+						local numNeed = math.floor((targetCreature.data:GetProperty("Hp") * rate) / damage) + 1						
                         if #players == 0 then      
 							if numNeed > 999 then
 								numHit = 999 - targetCount;

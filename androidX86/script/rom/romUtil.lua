@@ -775,7 +775,7 @@ if class ~= nil then
 			if in2 then
 				LogDebug("AutoAI_Rom:Prepare() InCD");
 			else
-				LogDebug("AutoAI_Rom:Prepare() nothing to do! " .. tostring(walkBack));
+				LogDebug("AutoAI_Rom:Prepare() nothing to do!! " .. tostring(walkBack));
 				self.nextUpdateTime = self.nextUpdateTime + 1.0;
 			end;
             -- nothing to do
@@ -865,6 +865,11 @@ function ROM_FindNearestMonsterEx2(tab)
             if tab.filter ~= nil then
                 return tab.filter(mon);
                 --LogDebug(MonsterToString(mon));
+            end;
+            
+            local monStatus = ROM_GetMonStatus(mon);
+            if monStatus.hp <= 0 then
+                return false;
             end;
             return true;
         end;
@@ -1374,7 +1379,7 @@ function ROM_GetNearPlayers(range,checkTeam,pos)
 					ret[#ret+1] = players[i];
 				else	
 
-					LogDebug("ROM_GetNearPlayers MY TEAM " .. CreatureToString(players[i]) .. ' dist=' .. dist);											
+					--LogDebug("ROM_GetNearPlayers MY TEAM " .. CreatureToString(players[i]) .. ' dist=' .. dist);											
 				end;
 			end;
 			return ret;
@@ -1782,26 +1787,55 @@ if MissionCommand then
         LogDebug("MissionCommandHunt:ctor()");
         MissionCommandHunt.super.ctor(self)
         self.ai = AutoAI_Rom.new();
-
+        self.count = 0;
     end
     function MissionCommandHunt:DoLaunch()
         LogDebug("MissionCommandHunt:DoLaunch()");
         self.ai:Enable(true);
-        --self.oldConfig = ROM_SetConfig(self.args.config);        
-        --LogDebug(MyTostring(self.args.config));
-        --LogDebug(MyTostring(self.oldConfig));
-        --ROM_Alert("MissionCommandHunt Start");
+        if self.args.quest and self.args.quest.params.monster ~= nil then
+            ListField(self.args.quest.params,"",{},"    ");          
+            self.args.config.myMonsterList = {self.args.quest.params.monster};
+            self.args.config.myMonsterRules ={
+                {func= ROM_FindNearestMonsterEx2, monlist=self.args.config.myMonsterList, ignore=ignoreMonList, selectFunc=ROM_GetBestScoreMonFromList}, 
+                {func= ROM_FindNearestMonsterEx2, monlist=self.args.config.myMonsterList, ignore=ignoreMonList}, 
+            };
+            LogDebug("MissionCommandHunt Hunt " .. self.args.quest.params.monster);
+        else
+            self.args.config.myMonsterRules ={
+                {func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, selectFunc=ROM_GetBestScoreMonFromList}, 
+                {func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList}, 
+            };
+            LogDebug("MissionCommandHunt Hunt ALL");
+        end
+        self.oldConfig = ROM_SetConfig(self.args.config);    
     end
     function MissionCommandHunt:DoShutdown()
         LogDebug("MissionCommandHunt:DoShutdown()");
         self.ai:Enable(false);
-        --ROM_SetConfig(self.oldConfig);
-        --ROM_Alert("MissionCommandHunt End");
+        ROM_SetConfig(self.oldConfig);
     end
     function MissionCommandHunt:DoUpdate(time, deltaTime)
         LogDebug("MissionCommandHunt:DoUpdate() " .. time);
+        local q = self.args.quest;
+        if q then
+            if q.params.num == nil then
+                if q.params.team_can_finish and q.params.team_can_finish ~= 1 then 
+                    LogDebug("MissionCommandHunt: wait for team");                                                        
+                else
+                    LogDebug("MissionCommandHunt: Quest done");                            
+                    --ROM_WalkToBoard();
+                    return false;
+                end;     
+            end;
+        end;
         --function AutoAI_Rom:Prepare(idleElapsed, time, deltaTime, creature)
-        self.ai:Prepare(0, time, deltaTime, nil)
+        local ret = self.ai:Prepare(0, time, deltaTime, nil);
+        if ret == false then
+            self.count = self.count + 1;
+            LogDebug("MissionCommandHunt: " .. self.count);
+        else
+            self.count = 0;
+        end;
         return true;
     end;
 end;

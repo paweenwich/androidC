@@ -375,7 +375,8 @@ function ROM_DoAutoQuest()
 						if ROM_WalkToNPCPos(q.params.monster,q.wantedData.MapId) then
 							-- wait for friend
 							if ROM_IsTeamReady() then
-								ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
+                                ROM_CommandHuntMonsterFromQuest(q);
+								--ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
 							else
 								LogDebug("ROM_DoAutoQuest: kill (ROM_WalkToNPCPos) wait for team");
 							end;
@@ -461,7 +462,8 @@ function ROM_DoAutoQuest()
 							if ROM_WalkToNPCPos(q.params.monster,q.wantedData.MapId) then
 								-- wait for friend
 								if ROM_IsTeamReady() then
-									ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
+                                    ROM_CommandHuntMonsterFromQuest(q);
+									--ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
 								else
 									LogDebug("ROM_DoAutoQuest: gather (ROM_WalkToNPCPos) wait for team");
 								end;
@@ -476,7 +478,8 @@ function ROM_DoAutoQuest()
 							if ROM_WalkToNPCPos(mons[1].id,q.wantedData.MapId) then
 								-- wait for friend
 								if ROM_IsTeamReady() then
-									ROM_CommandVisitMonster(q.wantedData.MapId,mons[1].id);
+                                    ROM_CommandHuntMonsterFromQuest(q);
+									--ROM_CommandVisitMonster(q.wantedData.MapId,mons[1].id);
 								else
 									LogDebug("ROM_DoAutoQuest: gather (ROM_WalkToNPCPos) wait for team");
 								end;

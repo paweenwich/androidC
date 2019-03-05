@@ -84,7 +84,7 @@ cleanSkill = {
 walkBack = false;
 
 ROM_Config = {};
-ROM_Config[4313990901] = {
+ROM_Config[4313990901] = {                  -- priest turn
     myMonsterList = {
     	10052, -- name=Mummy
         10063, -- name=Archer Skeleton
@@ -109,7 +109,7 @@ ROM_Config[4313990901] = {
 		{name="Holy Light Strike", func=ROM_SkillTarget, filter = ROM_NoPlayerAround},    
         {name="Turn", func=ROM_TurnUndead, frachp=0.6},  
         {name="Holy Light Strike", func=ROM_SkillTarget,
-            filter = function(mon) 
+            filter1 = function(mon) 
                 return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
             end
         },  	

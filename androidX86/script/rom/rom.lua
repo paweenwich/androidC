@@ -171,12 +171,17 @@ function ROM_SkillTarget(tab)
     local skillNeeded = ROM_GetSkillNeeded(skillID);
     if skillNeeded.sp < myStatus.sp then
 		local npc = ROM_GetMonsterLockTarget();
+        if npc then
+            local monStatus = ROM_GetMonStatus(npc);
+            if monStatus.hp <= 0 then
+                npc = nil;
+            end;
+        end;
 		if npc == nil then
 			LogDebug("ROM_SkillTarget: ROM_FindBestMonster");
 			npc = ROM_FindBestMonster();
-		else
-			--LogDebug("ROM_SkillTarget: use locktarget");
 		end;
+        
         if npc ~= nil then
 			if tab.filter ~= nil and tab.filter(npc,tab) == false then
 				return false;
@@ -902,6 +907,8 @@ function ROM_Test(g)
 	--for _, npc in pairs(Table_Npc) do
 	--	LogDebug("" .. npc.id .. " " .. npc.NameZh .. " " .. PropToString(npc.NpcFunction[1],"NpcFunction."));
 	--end;
+    
+    --[[
     if ROM_warnPopup then
         ROM_warnPopup = nil;
     else
@@ -921,8 +928,34 @@ function ROM_Test(g)
         end
         ,ROM_warnPopup)
     end;
-
-	
+]]
+    local skillID = 403001;
+	local phaseData = SkillPhaseData.Create(skillID)
+    phaseData:SetSkillPhase(SkillPhase.Attack)
+    local mons = ROM_GetAllMonster();   
+    local mon = ROM_GetNearestMonFromList(mons);
+    if mon then    
+        local damageType, damage, shareDamageInfos = SkillLogic_Base.CalcDamage(
+            skillID, 
+            Game.Myself, 
+            mon, 
+            1, 
+            1)
+        local numHit = 1;
+        for h = 1,numHit do
+            phaseData:AddTarget(
+                mon.data.id, 
+                damageType, 
+                damage,
+                shareDamageInfos)
+        end;
+        ServicePlayerProxy.Instance:CallMapObjectData(mon.data.id);
+    end;
+    Game.Myself:Client_UseSkillHandler(Game.Myself.data.randomFunc.index,phaseData)
+    Game.Myself.data.randomFunc.index = Game.Myself.data.randomFunc.index + 1;
+    phaseData:Destroy()
+    phaseData = nil
+    
     UIUtil.FloatMsgByText("Test Done 1");	
 	--local followingTeammatesID = UIModelKaplaTransmit.Ins():GetFollowingTeammates()
 	--ServiceNUserProxy.Instance:CallGoToGearUserCmd(self.mapInfo.id, SceneUser2_pb.EGoToGearType_Team, followingTeammatesID)
@@ -1094,6 +1127,11 @@ function ROM_Auto()
         Game.AreaTrigger_ExitPoint:SetDisable(false);        
         uiLabel.effectStyle = UILabel.Effect.None;
         --uiLabel.effectColor = ColorUtil.NGUILabelBlueBlack;
+        Game.Myself.silverGain = Game.Myself.data.userdata:Get(UDEnum.SILVER) - Game.Myself.startSilver;
+        Game.Myself.autoTime  = ServerTime.CurServerTime() - Game.Myself.startAuto;
+        local silverPerMin = math.floor((Game.Myself.silverGain*1000*60)/Game.Myself.autoTime);
+        LogDebug("silverGain=" .. Game.Myself.silverGain .. " time=" .. math.floor(Game.Myself.autoTime) .. " ZPM=" .. silverPerMin);
+        UIUtil.FloatMsgByText("Auto " .. tostring(Game.Myself.ai.autoAI_Rom:IsEnable()) .. " " .. silverPerMin);
     else
         Game.Myself.ai.autoAI_Rom:Enable(true);
         Game.AreaTrigger_ExitPoint:SetDisable(true);        
@@ -1102,9 +1140,12 @@ function ROM_Auto()
         -- remember this position
         Game.Myself.autoPos = Game.Myself:GetPosition():Clone();
 		Game.Myself.autoMapID = Game.MapManager:GetMapID();
+        Game.Myself.startAuto = ServerTime.CurServerTime();        
+        Game.Myself.startSilver = Game.Myself.data.userdata:Get(UDEnum.SILVER);
         LogDebug("autoPos=" .. tostring(Game.Myself.autoPos) .. " autoMapID=" .. Game.Myself.autoMapID);
+        UIUtil.FloatMsgByText("Auto " .. tostring(Game.Myself.ai.autoAI_Rom:IsEnable()));
     end;
-    UIUtil.FloatMsgByText("Auto " .. tostring(Game.Myself.ai.autoAI_Rom:IsEnable()));
+    
 end;
 
 function ROM_Quest()
@@ -1310,6 +1351,47 @@ oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairCo
 			event = function (npcinfo)
                 local status,err = pcall(function()
                     LogDebug("Test Start")
+                    --[[
+                    local q = ROM_GetAcceptedQuest();
+                    if q ~= nil then
+                        LogDebug(QuestToString(q));
+                        if q.params.num == nil then
+							if q.params.item ~= nil then
+								local num = BagProxy.Instance:GetAllItemNumByStaticID(q.params.item[1].id);
+								if num < q.params.item[1].num then 
+									LogDebug("" .. tostring(num) .. "/" .. tostring(q.params.item[1].num));
+									return 
+								end;
+							end;
+                            if  q.params.npc ~= nil then
+                                
+                                LogDebug("ROM_CommandVisitMonster walk to npc");
+                                if q.params.team_can_finish and q.params.team_can_finish ~= 1 then 
+                                    LogDebug("ROM_CommandVisitMonster: wait for team 2");                                    
+                                else
+                                    -- might need to wait here
+                                    ROM_WalkToNPC(q.map,q.params.npc,
+                                        function()
+                                            ROM_VisitNearestNPC();
+                                            ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
+                                            GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
+                                            LogDebug(QuestToString(q));
+                                            ROM_ClickNearestNPC(true);
+                                        end
+                                    );
+                                end;
+                            end;
+                            if q.params.team_can_finish and q.params.team_can_finish ~= 1 then 
+                                LogDebug("ROM_CommandVisitMonster: wait for team");                                                        
+                            else
+                                LogDebug("ROM_CommandVisitMonster: Quest done");                            
+                                ROM_WalkToBoard();
+                            end;
+                            
+                        else 
+                            LogDebug("" .. tostring(q.process) .. "/" .. tostring(q.params.num));
+                        end;
+                    end;      ]]
                     local config = {
                         myMonsterList = {10081},
                         myMonsterRules = myMonsterRules,
@@ -1319,6 +1401,7 @@ oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairCo
                     --local oldConfig = ROM_SetConfig(config)
                     
                     local cmdArgs = {
+                        quest = ROM_GetAcceptedQuest(),
                         --monID = 10081,
                         config = config,
                         --targetMapID = 0,
@@ -1425,6 +1508,26 @@ function ROM_GetMonsterByGroupID(groupID)
 		end;
 	end;
 	return ret;
+end;
+
+function ROM_CommandHuntMonsterFromQuest(q)
+    local config = {
+        myAIRules = myAIRules,
+        walkBack = false,
+    };
+    local cmdArgs = {
+        quest = q,
+        config = config,
+    }
+    Game.Myself:Client_SetMissionCommand(nil );
+    --local cmd = ReusableObject.Create( MissionCommandHunt, true, cmdArgs );
+    local cmd = MissionCommandHunt.new();
+    cmd:Construct(true, cmdArgs)
+    if(cmd)then
+        Game.Myself:Client_SetMissionCommand(cmd );
+    else
+        LogDebug("ROM_CommandHuntMonsterFromQuest: cmd error");
+    end
 end;
 
 function ROM_CommandVisitMonster(mapID,monID)
