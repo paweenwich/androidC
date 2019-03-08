@@ -170,19 +170,27 @@ function ROM_SkillTarget(tab)
     local myStatus= ROM_GetMyStatus();
     local skillNeeded = ROM_GetSkillNeeded(skillID);
     if skillNeeded.sp < myStatus.sp then
-		local npc = ROM_GetMonsterLockTarget();
-        if npc then
-            local monStatus = ROM_GetMonStatus(npc);
-            if monStatus.hp <= 0 then
-                npc = nil;
+        local npc = ROM_FindBestMonster();
+		local locknpc = ROM_GetMonsterLockTarget();
+        if locknpc then
+            local monStatus = ROM_GetMonStatus(locknpc);
+            if monStatus.hp > 0 then
+                if npc == nil then
+                    npc = locknpc;
+                else
+                    -- check distance    
+                    if ROM_DistanceToCreature(locknpc) < ROM_DistanceToCreature(npc) then
+                        npc = locknpc;
+                    end;
+                end;
             end;
         end;
-		if npc == nil then
-			LogDebug("ROM_SkillTarget: ROM_FindBestMonster");
-			npc = ROM_FindBestMonster();
-		end;
+        
+        
+		--end;
         
         if npc ~= nil then
+            npc:SetClickable(true);
 			if tab.filter ~= nil and tab.filter(npc,tab) == false then
 				return false;
 			end;
@@ -202,8 +210,8 @@ function ROM_FakeDead(tab)
     if skillInfo == nil then return false end;
     local skillID = skillInfo.staticData.id;
 
-	local frachp = tab.frachp or 0.2;
-	local fracsp = tab.fracsp or 0.2;
+	local frachp = tab.frachp or 0.3;
+	local fracsp = tab.fracsp or 0.3;
     --local skillID = tab.id;
     local myStatus= ROM_GetMyStatus();
 	if ROM_GetMonsterLockTarget() == nil then
@@ -347,21 +355,21 @@ function ROM_TurnUndead(tab)
 					if monStatus.frachp > (tab.frachp or 0.9) then
 						local players =  ROM_GetNearPlayers();
 						--Game.Myself.data.randomFunc.index = 20;			
-						if #players > 0 then
+						--[[if #players > 0 then
 							LogDebug("ROM_TurnUndead: " .. MonsterToString(npc) .. ' players=' .. #players);
 							local willHit = ROM_WillTurnSuccess(skillID,npc.data);
 							if willHit == false then
 								LogDebug("Game.Myself:Client_UseSkill rand index=" .. Game.Myself.data.randomFunc.index .. ' willHit=' .. tostring(willHit));
 								Game.Myself.data:GetRandom();   -- roll next dice
 							end;
-						else
+						else]]
 							local willHit = ROM_WillTurnSuccess(skillID,npc.data);
 							while willHit == false do
 								LogDebug("Game.Myself:Client_UseSkill rand index=" .. Game.Myself.data.randomFunc.index .. ' willHit=' .. tostring(willHit));
 								Game.Myself.data:GetRandom();   -- roll next dice
 								willHit = ROM_WillTurnSuccess(skillID,npc.data);
 							end;
-						end;
+						--end;
 						LogDebug("ROM_TurnUndead: " .. MonsterToString(npc));
 						LogDebug("Game.Myself:Client_UseSkill rand index=" .. Game.Myself.data.randomFunc.index);
 						Game.Myself:Client_UseSkill(skillID, npc,nil,nil,true);
@@ -929,87 +937,44 @@ function ROM_Test(g)
         ,ROM_warnPopup)
     end;
 ]]
+    --local skillID = 145010; --403001;
+    --TypeID=17106 name=Ghost Type=Monster HP=31703
+    local ghostFilterFunc = function(mon)
+        if TableUtil.HasValue({17106},mon.data.staticData.id) then
+            return true;
+        end;    
+        return false;
+    end;        
     local skillID = 403001;
-	local phaseData = SkillPhaseData.Create(skillID)
-    phaseData:SetSkillPhase(SkillPhase.Attack)
-    local mons = ROM_GetAllMonster();   
+    --local skillID = 469001;
+    local mons = ROM_GetAllMonster(ghostFilterFunc);   
     local mon = ROM_GetNearestMonFromList(mons);
     if mon then    
-        local damageType, damage, shareDamageInfos = SkillLogic_Base.CalcDamage(
-            skillID, 
-            Game.Myself, 
-            mon, 
-            1, 
-            1)
-        local numHit = 1;
-        for h = 1,numHit do
-            phaseData:AddTarget(
-                mon.data.id, 
-                damageType, 
-                damage,
-                shareDamageInfos)
-        end;
-        ServicePlayerProxy.Instance:CallMapObjectData(mon.data.id);
+        UIUtil.FloatMsgByText("Ghost Found");	
+        --ROM_UseSkill(469001,mon,50);
+        --ROM_UseSkill(skillID,mon);
+        LogDebug(MonsterToString(mon));
     end;
-    Game.Myself:Client_UseSkillHandler(Game.Myself.data.randomFunc.index,phaseData)
-    Game.Myself.data.randomFunc.index = Game.Myself.data.randomFunc.index + 1;
-    phaseData:Destroy()
-    phaseData = nil
-    
+    --[[
+    if Game.Myself.data.randomFunc.index > 100 then
+        Game.Myself.data.randomFunc.index = 0;
+    end;
+    LogDebug("Game.AreaTrigger_ExitPoint.disable=" .. tostring(Game.AreaTrigger_ExitPoint.disable));
+    LogDebug("Game.AreaTrigger_ExitPoint.onlyEPID=" .. tostring(Game.AreaTrigger_ExitPoint.onlyEPID));
+    LogDebug("index=" .. tostring(Game.Myself.data.randomFunc.index));
+    LogDebug(tostring(Game.Myself.data:GetRandom()));
+    LogDebug("index=" .. tostring(Game.Myself.data.randomFunc.index));
+    LogDebug(tostring(Game.Myself.data.randomFunc:GetRandom()));
+    LogDebug("index=" .. tostring(Game.Myself.data.randomFunc.index));
+    LogDebug(MyTostring(Game.Myself.data.randomFunc.array));
+    local r,newIndex = CommonFun.GetRandom(Game.Myself.data.randomFunc.array,Game.Myself.data.randomFunc.index);
+    LogDebug("r=" .. r .. " newIndex=" .. newIndex);
+    local r,newIndex = ROM_GetRandom(Game.Myself.data.randomFunc.array,Game.Myself.data.randomFunc.index);
+    LogDebug("r=" .. r .. " newIndex=" .. newIndex);]]
     UIUtil.FloatMsgByText("Test Done 1");	
-	--local followingTeammatesID = UIModelKaplaTransmit.Ins():GetFollowingTeammates()
-	--ServiceNUserProxy.Instance:CallGoToGearUserCmd(self.mapInfo.id, SceneUser2_pb.EGoToGearType_Team, followingTeammatesID)
-	
-	--ServiceNUserProxy.Instance:CallGoToGearUserCmd(18, SceneUser2_pb.EGoToGearType_Single, nil);
-		
-    if true then
-        return;
-    end;
-
-
-    
-
-    local npc = ROM_FindBestMonster();
-    --LogDebug(MyTostring(npc));
-    --ListField(npc);
-    if npc ~= nil then
-        Game.Myself:Client_LockTarget(npc);
-        --Game.Myself:Client_MoveTo(npc:GetPosition(),true);	-- ignore mesg seem to work   
-        --01/08/19 16:20:05 ID=146005 name=[Blessing] type=Buff
-        --01/08/19 16:20:05 ID=144003 name=[Heal] type=Heal        
---[[        
-        local skillID = 146005;
-        if ROM_HasBuffFromSkillID(skillID) == true then
-            UIUtil.FloatMsgByText("Has buff");   
-        else
-            Game.Myself:Client_UseSkill(skillID, nil,nil,nil,true);
-        end
-        LogDebug(MyTostring(ROM_GetSkillNeeded(skillID)));]]
-        
-    else
-        LogDebug("Target not found");
-    end;
-    
-    --ListField(MyTostring(SkillProxy.Instance.equipedSkillsArrays[SkillProxy.AutoSkillsIndex]));
-    --ListField(SkillProxy.Instance.equipedSkillsArrays[SkillProxy.AutoSkillsIndex],"",{}," ");
-    --ListField(SkillProxy.Instance.learnedSkills,"",{},"  ");
-    --local lstAttkSkill = SkillProxy.Instance.learnedSkills[10];
-    --tableForEach(lstAttkSkill, function(i, v)
-            --local skill = v;
-            --LogDebug(MyTostring(skill.id) .. " " );
-            --local skillInfo = Game.LogicManager_Skill:GetSkillInfo(skill:GetID());
-            --LogDebug("id=" .. skillInfo.staticData.id .. " name=[" .. skillInfo.staticData.NameZh .. "] type=" .. skillInfo.staticData.SkillType);
-            --ListField(skillInfo);
-    --end);
-    --Game.Myself:Client_UseSkill(10001, npc,nil,nil,true);
-    --DumpLearnSkill();
-    --DumpMonsters();
-    --local skills = ROM_GetActiveSkill();
-    
-    --ListField(Game.Myself.ai.idleAIManager.ais,"",{},"  ");
-    --ListField(Game.Myself.data.props,"",{}," ");
-    LogDebug(MyTostring(ROM_GetMyStatus()));
-    UIUtil.FloatMsgByText("Test");    
+    --FloatingPanel.Instance.pushCtrl.datas = {};
+    --FloatingPanel.Instance.pushCtrl:Reset();
+    --FloatingPanel.Instance:FloatingMidEffect(2518);
 end;
 
 function ROM_GetBestQuest()

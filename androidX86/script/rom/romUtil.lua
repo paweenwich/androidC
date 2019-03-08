@@ -414,7 +414,7 @@ function MonsterToString(m)
 			else
                 --return NPCToString(m);
 				local ret =  "ID=" .. m.data.id .. " TypeID=" .. m.data.staticData.id .. " name=" ..  m.data.staticData.NameZh .. " Type=" .. m.data.staticData.Type .. ' HP=' .. stat.hp .. " Race=" .. m.data.staticData.Race .. " Nature=" .. m.data.staticData.Nature .. " Shape=" .. m.data.staticData.Shape;	
-				ret = ret .. " lvl=" .. m.data.staticData.Level .. " BExp=" .. m.data.staticData.BaseExp .. " JExp=" .. m.data.staticData.JobExp .. " IsStar=" .. (m.data.staticData.IsStar or 0) .. " IsHatred=" .. tostring(m:IsHatred());
+				ret = ret .. " lvl=" .. m.data.staticData.Level .. " BExp=" .. m.data.staticData.BaseExp .. " JExp=" .. m.data.staticData.JobExp .. " IsStar=" .. (m.data.staticData.IsStar or 0) .. " IsHatred=" .. tostring(m:IsHatred()) .. " click=" .. tostring(m:GetClickable());
 				return ret;
 			end;			
 		else
@@ -822,6 +822,66 @@ function ROM_GetMonStatus(mon)
         fracsp=fracsp,
     };
 end;
+
+function ROM_UseSkill(skillID,mon,numHit)
+    numHit = numHit or 1;
+    --local phaseData0 = SkillPhaseData.Create(skillID)
+    --phaseData0:SetSkillPhase(0);
+	local phaseData = SkillPhaseData.Create(skillID)
+    phaseData:SetSkillPhase(1)
+    --local mons = ROM_GetAllMonster();   
+    --local mon = ROM_GetNearestMonFromList(mons);
+    local rand = Game.Myself.data.randomFunc.index;
+    if mon then    
+        local damageType, damage, shareDamageInfos = SkillLogic_Base.CalcDamage(
+            skillID, 
+            Game.Myself, 
+            mon, 
+            1, 
+        1)
+    
+        for h = 1,numHit do
+        
+            phaseData:AddTarget(
+                mon.data.id, 
+                damageType, 
+                damage,
+                shareDamageInfos)
+        end;
+        --[[phaseData0:AddTarget(
+                mon.data.id, 
+                0, 
+                0,
+                shareDamageInfos)]]
+        ServicePlayerProxy.Instance:CallMapObjectData(mon.data.id);
+        --LogDebug(MonsterToString(mon));
+        Game.Myself:Client_UseSkillHandler(rand,phaseData)
+    end;
+    phaseData:Destroy()
+    phaseData = nil
+end;
+
+function ROM_GetRandom(array, index)
+
+    -- 随机数最大个数为20, 每个数包含5个随机数, 共可表示100个随机数
+    local MAX_RANDOM_INDEX = 100
+    --return 20,50
+    local group = math.ceil(index / 5)              -- ex: 8 -> 2
+    local key = index - math.floor(index / 5) * 5        -- ex: 8 -> 3, 取第二个数据的第3随机数,(1234567890->56)
+    key = key ~= 0 and key or 5
+
+    LogDebug("group="..group);
+    if array[group]==nil or index > MAX_RANDOM_INDEX then
+      return 0, index
+    end
+
+    local groupValue = array[group]
+    local value = math.floor(groupValue/math.pow(100, 5-key)) % 100
+
+    local newIndex = index == MAX_RANDOM_INDEX and 1 or index + 1
+
+    return value, newIndex
+end
 
 function ROM_GetMyStatus()
 	return ROM_GetMonStatus(Game.Myself);

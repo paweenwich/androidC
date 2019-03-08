@@ -30,7 +30,7 @@ myMonsterRules = {
 --    {func= ROM_FindMiniBoss}, -- priority to miniboss
     {func= ROM_FindStaticMonster},  -- priority to static monster
 --    {func= ROM_FindNearestMonsterEx, param=myMonsterList},  -- selected monster
-    {func= ROM_FindNearestMonsterEx2, monlist={},selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+    {func= ROM_FindNearestMonsterEx2, monlist={},ignore=ignoreMonList, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
 };
 
 myAIRules = {
@@ -67,12 +67,14 @@ ignoreMonList = {
 	20022, -- name=Dark Illusion
 	18055, -- name=Dark Illusion 
     40015, -- mimic
+    17106, -- name=Ghost Type=Monster
 }
 
 avoidMonList = {
 	10084, -- name=Abysmal Knight
 	20022, -- name=Dark Illusion
 	18055, -- name=Dark Illusion 
+    20024, -- name=Clock
     --10081, -- name=Gargoyle
 }
 
@@ -98,11 +100,12 @@ ROM_Config[4313990901] = {                  -- priest turn
         --{func= ROM_FindStaticMonster},  -- priority to static monster
         --{func= ROM_FindNearestMonsterEx2, monlist={}, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
 		{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+        {func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList},  -- selected monster
     },
     myAIRules = {
         {name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
         {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
-        {name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
+        --{name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
         {name="Magnif", func=ROM_BuffNoTarget, fracsp=0.5},  -- Gloria    
         {name="WalkToRange", func=ROM_WalkToRange, filter = ROM_NoPlayerAround, range=6},  		
         {name="Heal", func=ROM_Heal,frachp=0.7},  -- bless    

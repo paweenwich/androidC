@@ -564,6 +564,9 @@ function HOOK_NetProtocol_DispatchListener(id1, id2, data)
 		ROM_HandleRecv(id1,id2,data);
 		--LogDebug("RECV: [" .. id1 .. '] [' .. id2 .. '] ' .. tostring(data));
 	end;
+    --if id1 == 9 and id2 == 2 then
+    --    LogDebug("RECV: [" .. id1 .. '] [' .. id2 .. '] ' .. tostring(data));
+    --end;
 	NetProtocol._DispatchListener(id1, id2, data);
 end;
 
@@ -1751,6 +1754,7 @@ if SkillLogic_Base ~= nil then
 
     function SkillLogic_Base.Client_DeterminTargets(self, creature)
         LogDebug("SkillLogic_Base.Client_DeterminTargets");
+        local myStatus= ROM_GetMyStatus();
         self.phaseData:ClearTargets()
         if self.info:NoSelect(creature) then
             LogDebug("SkillLogic_Base NoSelect " .. CreatureToString(creature));
@@ -1844,7 +1848,7 @@ if SkillLogic_Base ~= nil then
 						LogDebug("SNATCH FOUND INDEX " .. Game.Myself.data.randomFunc.index .. ' ' ..targetCreature.data.id);
                         LogDebug(MonsterToString(targetCreature));
                         --if stat.frachp > 0.9 then
-						for h = 1,10 do
+						for h = 1,20 do
                             phaseData:AddTarget(
                                 targetCreature.data.id, 
                                 damageType, 
@@ -1863,7 +1867,7 @@ if SkillLogic_Base ~= nil then
                             end;
                         end;
 						local numNeed = math.floor((targetCreature.data:GetProperty("Hp") * rate) / damage) + 1						
-                        if #players == 0 then      
+                        if #players == 0 or myStatus.frachp < 0.5 then      
 							if numNeed > 999 then
 								numHit = 999 - targetCount;
 							else	
@@ -1945,6 +1949,26 @@ if FunctionNpcFunc then
 		return event(lnpc, param, npcFunctionData);
 	end
 
+end;
+
+-- SKIP steal message
+if FloatingPanel and FloatingPanel.Instance then
+    function FloatingPanel:TryFloatMessageByData(data)
+        --LogDebug("TryFloatMessageByData " .. MyTostring(data));
+        if data.text == "No more Zeny to steal from this monster" then
+            --LogDebug("Skip");
+            return;
+        end;
+        -- local cell = self:GetFloatCell()
+        -- cell:SetData(data)
+        self.pushCtrl:AddData(data)
+        -- self:AddToWaiting(self:GetFloatCell(text))
+    end    
+end;
+if NCreature then
+    function NCreature:GetClickable()
+        return true;
+    end
 end;
 --[[
 if HappyShop then
