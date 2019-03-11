@@ -1961,3 +1961,40 @@ end;
 
 ]]
 
+if ChatRoomProxy then
+	function ChatRoomProxy:RecvChatMessage(data)
+		LogDebug("ChatRoomProxy:RecvChatMessage");
+		LogDebug(singleLine(data));
+		local chat = ChatMessageData.CreateAsArray(data)
+		--LogDebug(MyTostring(chat));
+		local channel = chat:GetChannel()
+
+		self:HandleItemCode(chat)
+		self:HandleSpeech(chat,channel)
+
+		self:UpdateChatContents(chat,channel)
+		self:UpdatePrivateChatContents(chat,channel)
+		self:UpdateScrollScreenContents(chat,channel)
+		self:UpdateKeywordContents(chat,channel)
+		self:UpdateBarrageContents(chat,channel)
+
+		return chat
+	end
+end;
+--[[
+if NCreature then
+	function NCreature:Server_SetDirCmd(mode,dir,noSmooth)
+		--helplog(string.format("Server SetDirCmd Player:%s Dir:%s", self.data.name, dir));
+		self.ai:PushCommand(FactoryAICMD.GetSetAngleYCmd(mode,dir,noSmooth), self)
+	end
+end;
+]]
+if LogUtility then
+	LogUtility.SetTraceEnable(false);
+end;
+if helplog then
+	function helplog(str)
+		--LogDebug("helplog " .. str);
+		--LogDebug(debug.traceback());
+	end;
+end;

@@ -186,6 +186,30 @@ ROM_Config[4315742181] = {  -- paladin
 	walkBack = false,
 }
 
+ROM_Config[4304519536] = {  -- Merchant
+    myMonsterList = {},
+    myMonsterRules ={
+        --{func= ROM_FindStaticMonster},  -- priority to static monster
+        --{func= ROM_FindNearestMonsterEx2, monlist={}, filter=ROM_MonFullHP, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+		{func= ROM_FindNearestMonsterEx2, monlist={10106}, ignore=ignoreMonList, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
+    },
+    myAIRules = {
+		{name="Play Dead", func=ROM_FakeDead, fracsp=0.2},    --fake dead
+	--	{name="Endure", func=ROM_BuffNoTarget, ignoreLockTarget=true},
+	--	{name="Shield Boomerang", func=ROM_NeverMiss,filter1=function(mon) return ROM_IsEliteMonster(mon) end},    			
+	--	{name="Shield Charge", func=ROM_NeverMiss,filter=function(mon) return ROM_IsEliteMonster(mon) end},    	
+		{name="Auto", func=ROM_SkillTarget, filter1 = ROM_NoPlayerAround},    
+	--    {name="Crasher", func=ROM_SkillTarget},
+	--	{name="Shield Boomerang", func=ROM_SkillTarget, 
+	--		filter = function(mon) 
+	--			return (mon == ROM_GetMonsterLockTarget()) or (ROM_IsStaticMonster(mon))
+	--		end
+	--	},    
+	},
+	walkBack = false,
+}
+
+
 function ROM_SetConfig(conf)
     local oldConfig = {
         myMonsterList = myMonsterList,

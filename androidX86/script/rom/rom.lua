@@ -951,11 +951,47 @@ function ROM_Test(g)
         end;
         ServicePlayerProxy.Instance:CallMapObjectData(mon.data.id);
     end;
-    Game.Myself:Client_UseSkillHandler(Game.Myself.data.randomFunc.index,phaseData)
-    Game.Myself.data.randomFunc.index = Game.Myself.data.randomFunc.index + 1;
+    --Game.Myself:Client_UseSkillHandler(Game.Myself.data.randomFunc.index,phaseData)
+    --Game.Myself.data.randomFunc.index = Game.Myself.data.randomFunc.index + 1;
     phaseData:Destroy()
     phaseData = nil
-    
+	--GetActiveItem()
+	--ListField(BagProxy.Instance.bagData:GetActiveItem(),"",{},"    ");    
+	
+	--ListField(PetAdventureProxy.Instance.questData,"",{},"  ");  
+	LogDebug("---- MATCH ---")
+	for i=1,#PetAdventureProxy.Instance.questData do
+		if PetAdventureProxy.Instance.questData[i].status==PetAdventureProxy.QuestPhase.MATCH then
+			--ListField(PetAdventureProxy.Instance.questData[i],"",{},"  ");  
+			LogDebug(PropToString(PetAdventureProxy.Instance.questData[i]," ") .. " " .. PropToString(PetAdventureProxy.Instance.questData[i].staticData,"staticData."));
+			--if PetAdventureProxy.Instance.questData[i].id == 100 then
+			--	ListField(PetAdventureProxy.Instance.questData[i],"",{},"  ");  
+			--end;
+			--ServiceScenePetProxy.Instance:CallGetAdventureRewardPetCmd(PetAdventureProxy.Instance.questData[i].id);
+		end
+	end	
+	LogDebug("--UNDERWAY--")
+	for i=1,#PetAdventureProxy.Instance.questData do
+		if PetAdventureProxy.Instance.questData[i].status==PetAdventureProxy.QuestPhase.UNDERWAY then
+			--ListField(PetAdventureProxy.Instance.questData[i],"",{},"  ");  
+			LogDebug(PropToString(PetAdventureProxy.Instance.questData[i]," ") .. " " .. PropToString(PetAdventureProxy.Instance.questData[i].staticData,"staticData."));
+			--ServiceScenePetProxy.Instance:CallGetAdventureRewardPetCmd(PetAdventureProxy.Instance.questData[i].id);
+		end
+	end	
+	LogDebug("--FINISHED--")
+	for i=1,#PetAdventureProxy.Instance.questData do
+		if PetAdventureProxy.Instance.questData[i].status==PetAdventureProxy.QuestPhase.FINISHED then
+			--ListField(PetAdventureProxy.Instance.questData[i],"",{},"  ");  
+			LogDebug(PropToString(PetAdventureProxy.Instance.questData[i]," ") .. " " .. PropToString(PetAdventureProxy.Instance.questData[i].staticData,"staticData."));
+			ServiceScenePetProxy.Instance:CallGetAdventureRewardPetCmd(PetAdventureProxy.Instance.questData[i].id);
+		end
+	end	
+	local petQuest = ROM_PetAdventureQuestByID(118)
+	if petQuest and petQuest.status == PetAdventureProxy.QuestPhase.MATCH then
+		ROM_PetAdventure(118,10056);
+	end;
+
+	--ROM_LogChat("BOT: Hello");
     UIUtil.FloatMsgByText("Test Done 1");	
 	--local followingTeammatesID = UIModelKaplaTransmit.Ins():GetFollowingTeammates()
 	--ServiceNUserProxy.Instance:CallGoToGearUserCmd(self.mapInfo.id, SceneUser2_pb.EGoToGearType_Team, followingTeammatesID)
@@ -1009,6 +1045,9 @@ function ROM_Test(g)
     --ListField(Game.Myself.ai.idleAIManager.ais,"",{},"  ");
     --ListField(Game.Myself.data.props,"",{}," ");
     LogDebug(MyTostring(ROM_GetMyStatus()));
+	
+
+	
     UIUtil.FloatMsgByText("Test");    
 end;
 
@@ -1351,71 +1390,10 @@ oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairCo
 			event = function (npcinfo)
                 local status,err = pcall(function()
                     LogDebug("Test Start")
-                    --[[
-                    local q = ROM_GetAcceptedQuest();
-                    if q ~= nil then
-                        LogDebug(QuestToString(q));
-                        if q.params.num == nil then
-							if q.params.item ~= nil then
-								local num = BagProxy.Instance:GetAllItemNumByStaticID(q.params.item[1].id);
-								if num < q.params.item[1].num then 
-									LogDebug("" .. tostring(num) .. "/" .. tostring(q.params.item[1].num));
-									return 
-								end;
-							end;
-                            if  q.params.npc ~= nil then
-                                
-                                LogDebug("ROM_CommandVisitMonster walk to npc");
-                                if q.params.team_can_finish and q.params.team_can_finish ~= 1 then 
-                                    LogDebug("ROM_CommandVisitMonster: wait for team 2");                                    
-                                else
-                                    -- might need to wait here
-                                    ROM_WalkToNPC(q.map,q.params.npc,
-                                        function()
-                                            ROM_VisitNearestNPC();
-                                            ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 
-                                            GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);
-                                            LogDebug(QuestToString(q));
-                                            ROM_ClickNearestNPC(true);
-                                        end
-                                    );
-                                end;
-                            end;
-                            if q.params.team_can_finish and q.params.team_can_finish ~= 1 then 
-                                LogDebug("ROM_CommandVisitMonster: wait for team");                                                        
-                            else
-                                LogDebug("ROM_CommandVisitMonster: Quest done");                            
-                                ROM_WalkToBoard();
-                            end;
-                            
-                        else 
-                            LogDebug("" .. tostring(q.process) .. "/" .. tostring(q.params.num));
-                        end;
-                    end;      ]]
-                    local config = {
-                        myMonsterList = {10081},
-                        myMonsterRules = myMonsterRules,
-                        myAIRules = myAIRules,
-                        walkBack = false,
-                    };
-                    --local oldConfig = ROM_SetConfig(config)
-                    
-                    local cmdArgs = {
-                        quest = ROM_GetAcceptedQuest(),
-                        --monID = 10081,
-                        config = config,
-                        --targetMapID = 0,
-                        --targetPos = 0,
-                    }
-                    Game.Myself:Client_SetMissionCommand(nil );
-                    local cmd = ReusableObject.Create( MissionCommandHunt, true, cmdArgs );
-                    --local cmd = MissionCommandFactory.CreateCommand(cmdArgs, MissionCommandHunt);
-                    if(cmd)then
-                        Game.Myself:Client_SetMissionCommand(cmd );
-                    else
-                        LogDebug("cmd error");
-                    end
-                    LogDebug("Test End")
+					ServiceItemProxy.Instance:CallPackageSort(SceneItem_pb.EPACKTYPE_MAIN); 
+					ServiceNUserProxy.Instance:CallBattleTimelenUserCmd()
+					ServiceScenePetProxy.Instance:CallQueryPetAdventureListPetCmd()
+					ServiceScenePetProxy.Instance:CallQueryBattlePetCmd()
                 end);
                 if status == false then
                     LogDebug("ERROR: " .. singleLine(tostring(err)));
