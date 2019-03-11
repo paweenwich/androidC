@@ -44,6 +44,14 @@ function ROM_Alert(mesg)
     UIUtil.FloatMsgByText(mesg);	
 end;
 
+function ROM_LogChat(mesg)
+	local chat = ChatMessageData:new();
+	chat:SetStr(mesg);
+	chat[4] = ChatChannelEnum.System;
+	ChatRoomProxy.Instance:UpdateScrollScreenContents(chat,ChatChannelEnum.System);
+	ChatRoomProxy.Instance:UpdateChatContents(chat,ChatChannelEnum.System)
+	GameFacade.Instance:sendNotification(ChatRoomEvent.SystemMessage , chat)
+end;
 
 
 
@@ -99,14 +107,14 @@ function PropToString(obj,prefix,order,ignore)
 	local ret = "";
 	tableForEach(order, function(i, v)	
 		if obj[v] ~= nil then
-			if ((type(obj[v]) == 'string') or (type(obj[v]) == 'number'))  then
+			if ((type(obj[v]) == 'string') or (type(obj[v]) == 'number') or (type(obj[v]) == 'boolean' ))  then
 				ret = ret .. prefix .. tostring(v) .. "=" .. tostring(obj[v]) .. ",";
 			end;
 		end;
 	end);
 
 	tableForEach(obj, function(i, v)	
-		if ((type(i) == 'string') or (type(i) == 'number')) and ((type(v) == 'string') or (type(v) == 'number')) then
+		if ((type(i) == 'string') or (type(i) == 'number')) and ((type(v) == 'string') or (type(v) == 'number') or (type(v) == 'boolean' )) then
 			if TableUtil.HasValue(order,tostring(i)) == false and TableUtil.HasValue(ignore,tostring(i)) == false then	
 				ret = ret .. prefix .. tostring(i) .. "=" .. tostring(v) .. ",";
 			end;
@@ -739,8 +747,10 @@ if class ~= nil then
 
 	function AutoAI_Rom:Prepare(idleElapsed, time, deltaTime, creature)
 		--LogDebug("AutoAI_Rom:Prepare()");
+		self.waitForTime = false;
         if self.enable then
 			if time < self.nextUpdateTime then
+				self.waitForTime = true;
 				return true
 			end
 			--LogDebug("AutoAI_Rom:Prepare() " .. (time - self.nextUpdateTime) .. " " .. self.UpdateInterval);
@@ -1637,6 +1647,29 @@ function ROM_IsTeamReady()
     end]]
 end;
 
+function ROM_PetAdventure(questID,monID)
+	monID = monID or 0;
+	local petEggs = BagProxy.Instance:GetMyPetEggs();
+	if #petEggs == 3 then
+		local petids = {};
+		for i=1,#petEggs do
+			--LogDebug(PropToString(petEggs[i]," ") .. " " .. PropToString(petEggs[i].staticData,"staticData."));		
+			petids[#petids+1] = petEggs[i].id;
+		end;
+		--LogDebug(MyTostring(petids));		
+		ServiceScenePetProxy.Instance:CallStartAdventurePetCmd(questID, petids, monID);
+	end;
+end;
+
+function ROM_PetAdventureQuestByID(questID)
+	for i=1,#PetAdventureProxy.Instance.questData do
+		if PetAdventureProxy.Instance.questData[i].id==questID then
+			return PetAdventureProxy.Instance.questData[i];
+		end
+	end	
+	return nil;
+end;
+
 function ROM_HasFollowers()
 	local followers = Game.Myself:Client_GetAllFollowers();
     local count = 0;
@@ -1875,7 +1908,7 @@ if MissionCommand then
         ROM_SetConfig(self.oldConfig);
     end
     function MissionCommandHunt:DoUpdate(time, deltaTime)
-        LogDebug("MissionCommandHunt:DoUpdate() " .. time);
+        LogDebug("MissionCommandHunt:DoUpdate() " .. time .. " " .. self.count);
         local q = self.args.quest;
         if q then
             if q.params.num == nil then
@@ -1894,7 +1927,10 @@ if MissionCommand then
             self.count = self.count + 1;
             LogDebug("MissionCommandHunt: " .. self.count);
         else
-            self.count = 0;
+			if self.ai.waitForTime == false then
+				self.count = 0;
+				LogDebug("MissionCommandHunt: " .. self.count);
+			end;
         end;
         return true;
     end;
@@ -1993,6 +2029,16 @@ ROM_tabMonsterOrigin = {
 				[3]=69.349998474121
 			},
 			mapID=37
+		},
+    },
+    [10130]={
+		[1]={
+            pos={
+				[1]=6.73,
+				[2]=4.36,
+				[3]=66.62
+			},
+			mapID=45
 		},
     },
     
