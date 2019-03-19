@@ -682,28 +682,31 @@ function ROM_Test(g)
     end);
 	
     local npcList = Game.MapManager:GetNPCPointArray();
-	LogDebug("npcList=" .. #npcList);
-    tableForEach(npcList, function(i, v)
-        if(v and v.ID and v.position)then
-            local npcData = Table_Npc[v.ID];
-            if npcData then
-				LogDebug(MyTostring(npcData));
+    if npcList then
+        LogDebug("npcList=" .. #npcList);
+        tableForEach(npcList, function(i, v)
+            if(v and v.ID and v.position)then
+                local npcData = Table_Npc[v.ID];
+                if npcData then
+                    LogDebug(MyTostring(npcData));
+                end;
             end;
-        end;
-    end);
+        end);
+    end;
 	
 	--local exitPoints =  Game.MapManager:GetExitPointMap();
 	local exitPoints =  Game.MapManager:GetExitPointArray();	
-	
-	LogDebug("exitPoints=" .. #npcList);
-    tableForEach(exitPoints, function(i, v)
-        --if(v and v.ID and v.position)then
-        --    local npcData = Table_Npc[v.ID];
-        --    if npcData  then
-                LogDebug("" .. i .. " to " .. ROM_GetMapName(v.nextSceneID) .. " " .. MyTostring(v));
-        --    end;
-        --end;
-    end);
+    if npcList then
+        LogDebug("exitPoints=" .. #npcList);
+        tableForEach(exitPoints, function(i, v)
+            --if(v and v.ID and v.position)then
+            --    local npcData = Table_Npc[v.ID];
+            --    if npcData  then
+                    LogDebug("" .. i .. " to " .. ROM_GetMapName(v.nextSceneID) .. " " .. MyTostring(v));
+            --    end;
+            --end;
+        end);
+    end;
     
     local exitPoints2 = ROM_GetExitPoints(Game.MapManager:GetMapID());
     if exitPoints2 then
@@ -715,6 +718,42 @@ function ROM_Test(g)
 	
 	
     local mainViewMiniMap = g_mainView.viewMap["MainViewMiniMap"];
+    local minimapWindow = mainViewMiniMap.minimapWindow;
+    
+    --ROM_DoDailyQuest();
+    tableForEach(QuestProxy.Instance.questList, function(index, __)
+		--if QuestProxy.Instance.questList[index] then
+			LogDebug("--- questList " .. index .. "-----" .. #QuestProxy.Instance.questList[index]);
+			for i, v in pairs(QuestProxy.Instance.questList[index]) do 
+				--LogDebug(i);
+				--LogDebug(tostring(v) .. " " .. v.id);
+				--ListField(v,"",{}," ");
+				if v ~= nil and (v.type == "daily_maprand" or v.type == "daily_box") then
+					-- only trace quest
+					--if v.whetherTrace == 1 and v.traceInfo and v.traceInfo ~= "" then
+                    LogDebug(PropToString(v,"",{"id","type","map","step"}) .. " " .. PropToString(v.params,"params."));
+                        --ListField(v,"",{},"  ");
+					--end;
+				end;
+			end 
+		--end;
+	end);    
+    if exitPoints then
+        local targetExit = exitPoints[1];
+        LogDebug("ROM_CommandWalkAndFight " .. ROM_GetMapName(targetExit.nextSceneID) .. " " .. MyTostring(targetExit));
+        ROM_CommandWalkAndFight(LuaVector3(targetExit.position[1],targetExit.position[2],targetExit.position[3]));
+    end;
+    --ROM_DoDailyQuest();
+    UIUtil.FloatMsgByText("Test Done 1");	
+	--local followingTeammatesID = UIModelKaplaTransmit.Ins():GetFollowingTeammates()
+	--ServiceNUserProxy.Instance:CallGoToGearUserCmd(self.mapInfo.id, SceneUser2_pb.EGoToGearType_Team, followingTeammatesID)
+	
+	--ServiceNUserProxy.Instance:CallGoToGearUserCmd(18, SceneUser2_pb.EGoToGearType_Single, nil);
+		
+    if true then
+        return;
+    end;
+    --ListField(minimapWindow.questMap,"",{},"    ");
     --ListField(mainViewMiniMap,"",{},"  ");
     --ListField(FunctionCDCommand.me,"-",{},"      ");
     --ListField(FunctionCDCommand.me.cmdMap,"-",{},"      ");
@@ -778,6 +817,7 @@ function ROM_Test(g)
         end;
     end);
 ]]    
+
     
     --local players = ROM_GetNearPlayers();
     --UIUtil.FloatMsgByText("Players=" .. #players);	
@@ -816,6 +856,7 @@ function ROM_Test(g)
 		--ROM_WalkToNPCPos(quest.params.npc);
 	end;
     --ROM_WalkToNPCPos(1067);
+    
 	LogDebug("-- submitable quest --");
 	local wq = ROM_GetSubmitableQuest();
 	if wq then
@@ -988,7 +1029,7 @@ function ROM_Test(g)
 	if petQuest and petQuest.status == PetAdventureProxy.QuestPhase.MATCH then
 		ROM_PetAdventure(118,10056);
 	end;
-
+    
 	--ROM_LogChat("BOT: Hello");
     UIUtil.FloatMsgByText("Test Done 1");	
 	--local followingTeammatesID = UIModelKaplaTransmit.Ins():GetFollowingTeammates()
@@ -1170,7 +1211,7 @@ if farmData == nil then
 farmData = {};
 end;
 function ROM_MyDlg()
-		local viewdata = {
+    local viewdata = {
 		viewname = "DialogView",
 		tasks = nil,
 		dialoglist = {"เล่นกันดีๆไท้ได้เหรอ]"},
@@ -1318,9 +1359,10 @@ oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairCo
 		{
 			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[3004], nil, 1 ); end, closeDialog = true, NameZh="Greedy Shop",
 		},
---[[		{
-			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[850], nil, 1 ); end, closeDialog = true, NameZh="FriendShip Shop",
-		},]]
+		{
+			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[600], nil, 1 ); end, closeDialog = true, NameZh="Common",
+            --event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[2100], nil, 1 ); end, closeDialog = true, NameZh="Common",
+		},
 		{
 			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[3003], nil, 1 ); end, closeDialog = true, NameZh="Lucky Shop",
 		},
@@ -1333,9 +1375,9 @@ oveDate=4294967295,LevelDes=,lockArg=,ItemID=12109,BaseLv=0,discountMax=0,hairCo
 		{
 			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[100], nil, 1 ); end, closeDialog = true, NameZh="Storage",
 		},
-		{
-			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[302], nil, 1 ); end, closeDialog = true, NameZh="DeCompose",
-		},
+--		{
+--			event = function (npcinfo) FunctionNpcFunc.Me():DoNpcFunc(Table_NpcFunction[302], nil, 1 ); end, closeDialog = true, NameZh="DeCompose",
+--		},
 		
 		{
 			event = function (npcinfo)
@@ -1437,6 +1479,25 @@ function ROM_GetMonsterByGroupID(groupID)
 		end;
 	end;
 	return ret;
+end;
+
+function ROM_CommandWalkAndFight(pos)
+    local config = {
+        myAIRules = myAIRules,
+        walkBack = false,
+    };
+    local cmdArgs = {
+        pos = pos,
+        config = config,
+    }
+    Game.Myself:Client_SetMissionCommand(nil );
+    local cmd = MissionCommandWalknFight.new();
+    cmd:Construct(true, cmdArgs)
+    if(cmd)then
+        Game.Myself:Client_SetMissionCommand(cmd );
+    else
+        LogDebug("ROM_CommandWalkAndFight: cmd error");
+    end
 end;
 
 function ROM_CommandHuntMonsterFromQuest(q)

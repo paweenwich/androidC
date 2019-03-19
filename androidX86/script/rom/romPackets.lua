@@ -1265,7 +1265,7 @@ ROM_Packets = {
 
 {8,1,"RecvQuestList"},
 {8,2,"RecvQuestUpdate"},
-{8,5,"RecvQuestStepUpdate"},
+{8,5,"RecvQuestStepUpdate",ROM_RecvQuestStepUpdate},
 {8,3,"RecvQuestAction"},
 {8,4,"RecvRunQuestStep"},
 {8,6,"RecvQuestTrace"},

@@ -953,6 +953,47 @@ function ROM_FindNearestMonsterEx2(tab)
 	end;
 end;
 
+function ROM_GetBestScoreMonFromListWalknFight(mons)
+    local minScore = 100000;
+    local retNpc = nil;
+    local myPos = Game.Myself:GetPosition();
+    local maxDist = 0;
+    local targetPos = MissionCommandWalknFight.pos;
+    LogDebug("ROM_GetBestScoreMonFromListWalknFight " .. tostring(targetPos));
+    LogDebug("ROM_GetBestScoreMonFromListWalknFight " .. tostring(myPos));
+    local canArrive3,path3 = NavMeshUtils.CanArrived(targetPos, myPos, WorldTeleport.DESTINATION_VALID_RANGE, true, nil);            
+    local myCost = NavMeshUtils.GetPathDistance(path3);
+    LogDebug("myCost= " .. myCost);
+    tableForEach(mons,function(i,v)
+        local npc = v;
+		local pos = npc:GetPosition();
+        --local distance = LuaVector3.Distance(myPos,pos);
+        local canArrive,path = NavMeshUtils.CanArrived(myPos, pos, WorldTeleport.DESTINATION_VALID_RANGE, true, nil);        
+        local canArrive2,path2 = NavMeshUtils.CanArrived(targetPos, pos, WorldTeleport.DESTINATION_VALID_RANGE, true, nil);        
+
+        if canArrive then
+            local cost = NavMeshUtils.GetPathDistance(path);
+            local cost2 = NavMeshUtils.GetPathDistance(path2);
+            if cost < 30 and cost2 < myCost then
+                --local players = NSceneUserProxy.Instance:FindNearUsers(pos,15,nil);
+				local players = ROM_GetNearPlayers(range,true,pos);
+                local score = cost + (#players * 10);
+                if score < minScore then
+                    retNpc = npc;
+                    minScore = score;
+                    maxDist = cost;
+                    LogDebug("cost2= " .. cost2);
+                end;
+            end;
+        end;
+    end);
+	if retNpc ~= nil then
+		LogDebug("ROM_GetBestScoreMonFromListToMissionPos: maxDist=" .. maxDist);
+	end;
+    return retNpc;
+end;
+
+
 function ROM_GetBestScoreMonFromList(mons)
     local minScore = 100000;
     local retNpc = nil;
@@ -1742,11 +1783,12 @@ function ROM_GetPathToMap(fromMapID,toMapID)
                 ret[1] = {func="Teleport", mapID=nearestTown}
                 ret[2] = {func="Walk"}
             else
-                ret[2] = {func="Walk"}
+                ret[1] = {func="Walk"}
             end;
             --ret[1] = {func="Walk"}
 		end;
 	end;
+    --LogDebug("ROM_GetPathToMap return " .. MyTostring(ret));
 	return ret;
 end;
 
@@ -1756,6 +1798,8 @@ function ROM_TeleportTo(mapID)
 		return true;	-- already there
 	end;
 	local path = ROM_GetPathToMap(currentMapID,mapID);
+    LogDebug(MyTostring(path));
+    --LogDebug(MyTostring(path[1]));
 	local cmd = path[1];
 	if cmd.func == "Walk" then
 		ROM_CommandGOTO(mapID);
@@ -1797,8 +1841,11 @@ function ROM_TeleportTo(mapID)
 end;
 
 function ROM_FindNearestNPC()
-	LogDebug("ROM_FindNearestNPC: start");
+	LogDebug("ROM_FindNearestNPC: start1");
 	local npcs = ROM_GetMapNPCsEx();
+    if npcs == nil or #npcs == 0 then
+        return nil;
+    end;
 	local mindist = 1000;
 	local minNPC = nil;
 	local myPos = Game.Myself:GetPosition();
@@ -1934,6 +1981,71 @@ if MissionCommand then
         end;
         return true;
     end;
+    
+    if MissionCommandWalknFight == nil then
+        MissionCommandWalknFight = class("MissionCommandWalknFight", MissionCommand)
+    end;
+    function MissionCommandWalknFight:ctor()
+        LogDebug("MissionCommandWalknFight:ctor()");
+        MissionCommandWalknFight.super.ctor(self)
+        self.ai = AutoAI_Rom.new();
+        self.count = 0;
+    end
+    function MissionCommandWalknFight:DoLaunch()
+        LogDebug("MissionCommandWalknFight:DoLaunch()");
+        self.ai:Enable(true);
+        MissionCommandWalknFight.pos = self.args.pos;
+        if self.args.quest and self.args.quest.params.monster ~= nil then
+            ListField(self.args.quest.params,"",{},"    ");          
+            self.args.config.myMonsterList = {self.args.quest.params.monster};
+            self.args.config.myMonsterRules ={
+                {func= ROM_FindNearestMonsterEx2, monlist=self.args.config.myMonsterList, ignore=ignoreMonList, selectFunc=ROM_GetBestScoreMonFromListWalknFight}, 
+                {func= ROM_FindNearestMonsterEx2, monlist=self.args.config.myMonsterList, ignore=ignoreMonList}, 
+            };
+            LogDebug("MissionCommandWalknFight Hunt " .. self.args.quest.params.monster);
+        else
+            self.args.config.myMonsterRules ={
+                {func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, selectFunc=ROM_GetBestScoreMonFromListWalknFight}, 
+                {func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList}, 
+            };
+            LogDebug("MissionCommandWalknFight Hunt ALL");
+        end
+        self.oldConfig = ROM_SetConfig(self.args.config);    
+    end
+    function MissionCommandWalknFight:DoShutdown()
+        LogDebug("MissionCommandWalknFight:DoShutdown()");
+        self.ai:Enable(false);
+        ROM_SetConfig(self.oldConfig);
+    end
+    function MissionCommandWalknFight:DoUpdate(time, deltaTime)
+        LogDebug("MissionCommandWalknFight:DoUpdate() " .. time .. " " .. self.count);
+        local q = self.args.quest;
+        if q then
+            if q.params.num == nil then
+                if q.params.team_can_finish and q.params.team_can_finish ~= 1 then 
+                    LogDebug("MissionCommandWalknFight: wait for team");                                                        
+                else
+                    LogDebug("MissionCommandWalknFight: Quest done");                            
+                    --ROM_WalkToBoard();
+                    return false;
+                end;     
+            end;
+        end;
+        --function AutoAI_Rom:Prepare(idleElapsed, time, deltaTime, creature)
+        local ret = self.ai:Prepare(0, time, deltaTime, nil);
+        if ret == false then
+            self.count = self.count + 1;
+            LogDebug("MissionCommandWalknFight: " .. self.count);
+        else
+			if self.ai.waitForTime == false then
+				self.count = 0;
+				LogDebug("MissionCommandWalknFight: " .. self.count);
+			end;
+        end;
+        return true;
+    end;
+    
+    
 end;
 
 ROM_tabTeleport = {
@@ -2041,5 +2153,27 @@ ROM_tabMonsterOrigin = {
 			mapID=45
 		},
     },
+    [10141]={
+		[1]={
+            pos={
+				[1]=96.579296,
+				[2]=18.529636,
+				[3]=-57.093349
+			},
+			mapID=49
+		},
+    },    
+    [10090]={
+		[1]={
+            pos={
+				[1]=-56.703093,
+				[2]=7.654091,
+				[3]=18.114621
+			},
+			mapID=29
+		},
+    },    
     
+    --ME ID=4300736919 HP=10834/10834 SP=496/617 lvl=94 Zeny=52505494 pos=LuaVector3(-56.703093, 7.654091, 18.114621) mapID=29 leader=true
+    --ME ID=4300736919 HP=10834/10834 SP=327/617 lvl=94 Zeny=52467547 pos=LuaVector3(96.579296, 18.529636, -57.093349) mapID=49 leader=true
 };

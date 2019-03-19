@@ -76,6 +76,7 @@ avoidMonList = {
 	18055, -- name=Dark Illusion 
     20024, -- name=Clock
     --10081, -- name=Gargoyle
+    72029, --name=Spashire
 }
 
 
@@ -147,7 +148,7 @@ ROM_Config[4299674004] = {  -- priest
 		{func= ROM_FindNearestMonsterEx2, monlist={}, ignore=ignoreMonList, selectFunc=ROM_GetBestScoreMonFromList},  -- selected monster
     },
     myAIRules = {
-		{func=ROM_Follow},
+		--{func=ROM_Follow},
 		{name="Heal", func=ROM_Heal,frachp=0.7},  -- bless    
         {name="Blessing", func=ROM_BuffNoTarget},  -- bless    
         {name="Gloria", func=ROM_BuffNoTarget},  -- Gloria    
@@ -210,6 +211,16 @@ ROM_Config[4304519536] = {  -- Merchant
 	--	},    
 	},
 	walkBack = false,
+}
+
+tabAnswer = {
+    ["1000080001_0"] = 2,
+    ["1000080001_1"] = 3,
+    ["1000080001_2"] = -1,
+    ["1000080001_4"] = 6,
+    ["1000080001_5"] = -1,
+    ["1000080001_7"] = 9,
+    ["1000080001_8"] = -1,
 }
 
 

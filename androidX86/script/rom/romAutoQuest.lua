@@ -255,6 +255,7 @@ function ROM_GetAcceptedQuest()
     return nil;
 end;
 
+
 function ROM_ClickNearestNPC(autoClose)
     autoClose = autoClose or false;
     LogDebug("ROM_ClickNearestNPC: " .. tostring(autoClose));
@@ -296,6 +297,179 @@ function ROM_GetSubmitableQuest()
 		end;
     end;
 	return nil;
+end;
+
+function ROM_GetDailyBox()
+	for i, v in pairs(QuestProxy.Instance.questList[1]) do 
+        if v ~= nil then
+            if v.type == "daily_box" and v.complete == false and v.id == 601500001 then
+                return v;
+            end;
+        end;
+    end 
+end;
+function ROM_GetDailyQuest()
+    local igNoreID = {1000070001}
+    local qBox = ROM_GetDailyBox();
+    if qBox then
+        for i, v in pairs(QuestProxy.Instance.questList[1]) do 
+            if v ~= nil  then
+                if v.type == "daily_maprand" and v.complete == false and v.step ~= 0 and not TableUtil.HasValue(igNoreID,v.id) then
+                    return v;
+                end;
+            end;
+        end 
+        if qBox.step == 2 then
+            for i, v in pairs(QuestProxy.Instance.questList[1]) do 
+                if v ~= nil  then
+                    if v.type == "daily_maprand" and v.complete == false and v.step == 0 and v.map == 48 and not TableUtil.HasValue(igNoreID,v.id) then
+                        return v;
+                    end;
+                end;
+            end 
+        end;
+        return qBox;
+    end;
+--[[	for i, v in pairs(QuestProxy.Instance.questList[3]) do 
+        if v ~= nil and v.map == Game.MapManager:GetMapID() then
+            if v.type == "daily_maprand" then
+                return v;
+            end;
+        end;
+    end     
+
+	for i, v in pairs(QuestProxy.Instance.questList[2]) do 
+        if v ~= nil and v.map == Game.MapManager:GetMapID() then
+            if v.type == "daily_maprand" then
+                return v;
+            end;
+        end;
+    end     ]]
+    -- acceptable 
+    -- main daily_box
+    --daily_box
+    return nil;
+end;
+
+function ROM_DoDailyQuest()
+    local q = ROM_GetDailyQuest();
+    if q then
+        local questString = QuestToString(q);
+        ListField(q,"",{},"    ");          
+        LogDebug("ROM_DoDailyQuest: Acceptable Quest " .. questString );
+        if ROM_TeleportTo(q.map) == false then
+            return;
+        end;
+        if q.questDataStepType == "kill" then
+            LogDebug("KILL");
+            if ROM_WalkToNPCPos(q.params.monster,q.map) then
+                -- wait for friend
+                if ROM_IsTeamReady() then
+                    ROM_CommandHuntMonsterFromQuest(q);
+                    --ROM_CommandVisitMonster(q.wantedData.MapId,q.params.monster);
+                else
+                    LogDebug("ROM_DoDailyQuest: kill (ROM_WalkToNPCPos) wait for team");
+                end;
+            end;
+           --params.monster=54030,params.num=1
+        end;
+        if q.questDataStepType == "dialog" then
+           LogDebug("DIALOG"); 
+           ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil,2, q.step); 
+        end;
+        
+        if q.questDataStepType == "visit" then
+            if q.pos then
+                if ROM_IsMeNear(q.map,q.pos) then
+                    local nearestNPC, nearestDist = ROM_GetNearestNPC();	
+                    ServicePlayerProxy.Instance:CallMapObjectData(nearestNPC.data.id);
+                    ROM_VisitNearestNPC();                
+                    ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, q.step+1, q.step);  
+                else
+                    ROM_CommandGOTO(q.map,q.pos);
+                end;
+                return;
+            end;
+            if ROM_WalkToNPCPos(q.params.npc,q.map) then
+                LogDebug("ROM_DoDailyQuest: reach");
+                local nearestNPC, nearestDist = ROM_GetNearestNPC();	
+                ServicePlayerProxy.Instance:CallMapObjectData(nearestNPC.data.id);
+                ROM_VisitNearestNPC();
+                if q.type == "daily_box" then
+                    if q.step == 1 then
+                        ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 3, q.step);
+                    end;
+                end
+                --ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 		
+                if  q.step == 0 then
+                    ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 2, q.step); 				
+                else
+                    local key = "" .. q.id  .. "_" .. q.step;
+                    if tabAnswer[key] then
+                    --if q.id == 1000080001 and q.step==1 then
+                        ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, tabAnswer[key], q.step);
+                        ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, nil, q.step); 	
+                    else
+                        --ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, q.steps[q.step].staticData.SubGroup, q.step);   
+                        ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 				
+                    end;
+                end;
+            else
+                LogDebug("ROM_DoDailyQuest: not reach ");
+            end;
+        end;
+        if q.questDataStepType == "selfie" then
+            LogDebug("target pos = " .. MyTostring(q.pos));
+            --if ROM_TeleportTo(q.wantedData.MapId) then
+                if ROM_IsMeNear(q.map,q.pos) then
+                    if ROM_IsTeamReady() then
+                        LogDebug("ROM_DoDailyQuest: selfie take photo");
+                        ServiceNUserProxy.Instance:CallStateChange(ProtoCommon_pb.ECREATURESTATUS_SELF_PHOTO);
+                        ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 
+                        ServiceNUserProxy.Instance:CallStateChange(0);                            
+                    else
+                        LogDebug("ROM_DoDailyQuest: selfie wait for team");
+                    end;
+                else
+                    ROM_CommandGOTO(q.map,q.pos);
+                end;
+            --end;
+        end;
+        if q.questDataStepType == "use" then
+            LogDebug("target pos = " .. MyTostring(q.pos));
+            --if ROM_TeleportTo(q.wantedData.MapId) then
+                if ROM_IsMeNear(q.map,q.pos) then
+                    if ROM_IsTeamReady() then
+                        LogDebug("ROM_DoDailyQuest: use");
+                        --[[
+                        03/18/19 15:24:15 MyTick:Tick() table: 0x70588c80 1.01 nil
+03/18/19 15:24:18 SEND: SceneQuest_pb.RunQuestStep step: 4 subgroup: 0 questid: 1000050001
+03/18/19 15:24:18 RECV: RecvQuestStepUpdate data { config { FinishJump: 0 Content: dialog Map: 48 params { params { items { items { value: 52916 key: 1 } } key: dialog } } Auto: 1 Class: 0 QuestName:
+Ill-tempered Worker SubGroup: 2 Type: daily_maprand FailJump: 0 TraceInfo: WhetherTrace: 1 allrewardid: 880005 FirstClass: 0 Level: 0 RewardGroup: 0 Name: Ill-tempered Worker } } step: 5 id: 100005000
+1
+03/18/19 15:24:19 RECV< ROM_RecvMemberDataUpdate id=4300736919 [NoDaMe] sp=100
+03/18/19 15:24:20 SEND: SceneQuest_pb.RunQuestStep questid: 1000050001 step: 5
+03/18/19 15:24:20 RECV: RecvQuestStepUpdate data { config { FinishJump: 0 Content: use Map: 48 params { params { value: Check key: button } params { key: distance value: 3 } params { value: 72 key: it
+emIcon } params { value: Rope key: name } params { items { items { value: -6.1 key: 1 } items { value: 3.25 key: 2 } items { value: 53.33 key: 3 } } key: pos } } Auto: 0 Class: 0 QuestName: Ill-temper
+ed Worker SubGroup: 2 Type: daily_maprand FailJump: 0 TraceInfo: Continue to find Long-term worker Carville's rope WhetherTrace: 1 allrewardid: 880005 FirstClass: 0 Level: 0 RewardGroup: 0 Name: Ill-t
+empered Worker } } step: 6 id: 1000050001
+
+                        ]]
+                        --ServiceNUserProxy.Instance:CallStateChange(ProtoCommon_pb.ECREATURESTATUS_SELF_PHOTO);
+                        --ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, 0, q.step); 
+                        --ServiceNUserProxy.Instance:CallStateChange(0);   
+                        ServiceQuestProxy.Instance:CallRunQuestStep(q.id, nil, q.steps[q.step].staticData.SubGroup, q.step);                         
+                    else
+                        LogDebug("ROM_DoDailyQuest: use wait for team");
+                    end;
+                else
+                    ROM_CommandGOTO(q.map,q.pos);
+                end;
+            --end;
+        end;        
+        --questDataStepType=use
+        --questDataStepType=selfie
+    end;
 end;
 
 function ROM_DoAutoQuest()
@@ -570,32 +744,36 @@ end;
 function ROM_GetMapNPCs()
     local npcList = Game.MapManager:GetNPCPointArray();
 	local ret = {};
-    tableForEach(npcList, function(i, v)
-        if(v and v.ID and v.position and v.Icon)then
-            local npcData = Table_Npc[v.ID];
-            if npcData  then
-				--LogDebug(MyTostring(npcData) .. " " .. v.ID .. " " .. tostring(v.position));
-				--LogDebug(MyTostring(v));
-				ret[#ret + 1] = v;
+    if npcList then
+        tableForEach(npcList, function(i, v)
+            if(v and v.ID and v.position and v.Icon)then
+                local npcData = Table_Npc[v.ID];
+                if npcData  then
+                    --LogDebug(MyTostring(npcData) .. " " .. v.ID .. " " .. tostring(v.position));
+                    --LogDebug(MyTostring(v));
+                    ret[#ret + 1] = v;
+                end;
             end;
-        end;
-    end);
+        end);
+    end;
 	return ret;
 end;
 
 function ROM_GetMapNPCsEx()
     local npcList = Game.MapManager:GetNPCPointArray();
 	local ret = {};
-    tableForEach(npcList, function(i, v)
-        --if(v and v.id and v.Position and v.Icon)then
-            --local npcData = Table_Npc[v.ID];
-            --if npcData  then
-				--LogDebug(MyTostring(npcData) .. " " .. v.ID .. " " .. tostring(v.position));
-				--LogDebug(MyTostring(v));
-				ret[#ret + 1] = v;
+    if npcList then
+        tableForEach(npcList, function(i, v)
+            --if(v and v.id and v.Position and v.Icon)then
+                --local npcData = Table_Npc[v.ID];
+                --if npcData  then
+                    --LogDebug(MyTostring(npcData) .. " " .. v.ID .. " " .. tostring(v.position));
+                    --LogDebug(MyTostring(v));
+                    ret[#ret + 1] = v;
+                --end;
             --end;
-        --end;
-    end);
+        end);
+    end;
 	return ret;
 end;
 

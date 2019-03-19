@@ -359,50 +359,41 @@ function ROM_RecvDonateListGuildCmd(data)
     end;
     return true;
 end;
+function ROM_RecvQuestStepUpdate(data)
+--[[
+03/19/19 11:53:09 RECV: RecvQuestStepUpdate step: 2 data { config { RewardGroup: 0 Name: Super Observation FinishJump: 5 Content: dialog Map: 48 params { params { items { items { value: 52935 key: 1 }
+ } key: dialog } } Auto: 1 Class: 0 QuestName: Super Observation SubGroup: 3 Type: daily_maprand FailJump: 0 TraceInfo: WhetherTrace: 1 allrewardid: 880008 FirstClass: 0 Level: 0 } } id: 1000080001 
+ ]]
+    local status,err = pcall(function()
+        local ret = "";
+        local key = data.id .. "_" .. data.step;
+        if tabAnswer[key] then
+            LogDebug("AutoAnswer " .. key);
+            if tabAnswer[key] < 0 then
+                ServiceQuestProxy.Instance:CallRunQuestStep(data.id, nil, nil, data.step); 
+            else
+                ServiceQuestProxy.Instance:CallRunQuestStep(data.id, nil, tabAnswer[key], data.step); 
+            end;
+            ROM_DelayCall(3000,
+                function(param) 
+                    LogDebug("ROM_RecvQuestStepUpdate auto close UI");
+                    GameFacade.Instance:sendNotification(UIEvent.CloseUI,UIViewType.DialogLayer);                                    
+                end,
+            nil);
+        end;
+        LogDebug("RECV< ROM_RecvQuestStepUpdate " .. ret);
+		LogDebug(singleLine(tostring(data)));        
+    end);
+    if status == false then
+        LogDebug("ERROR: " .. singleLine(tostring(err)));
+        return false
+    end;
+    return true;
+end;
 function ROM_RecvUpdateWantedQuestTeamCmd(data)
     local status,err = pcall(function()
         local ret = "";
---[[		02/05/19 01:19:25 RECV: RecvUpdateWantedQuestTeamCmd quest { questid: 54670001 charid: 4300736919 questdata { config { Auto: 0 Class: 0 QuestName: Book of Evil Druid SubGroup: 0 Type: wanted FailJump:
- 0 TraceInfo: WhetherTrace: 1 FirstClass: 0 Level: 0 RewardGroup: 0 Name: Book of Evil Druid FinishJump: 0 Content: GM Map: 0 params { params { value: 2 key: etype } params { value: effect key: type }
- } } } action: 1 }
- 
- 02/05/19 01:44:38 quest { questid: 54660001 charid: 4300736919 questdata { config { Auto: 0 Class: 0 QuestName: An Experiment SubGroup: 0 Type: wanted FailJump: 0 TraceInfo: Go to the Mission Board of
- a nearby city to submit quests WhetherTrace: 0 FirstClass: 0 Level: 0 RewardGroup: 0 Name: An Experiment FinishJump: 0 Content: visit Map: 0 params { params { value: 1 key: ifAccessFc } params { valu
-e: 1 key: mark_team_wanted } params { value: 1016 key: npc } } } } step: 5 action: 1 }
-
- 02/05/19 01:33:56 RECV: RecvUpdateWantedQuestTeamCmd quest { questid: 54670001 charid: 4300736919 questdata { config { Auto: 0 Class: 0 QuestName: Book of Evil Druid SubGroup: 0 Type: wanted FailJump:
- 0 TraceInfo: WhetherTrace: 1 FirstClass: 0 Level: 0 RewardGroup: 0 Name: Book of Evil Druid FinishJump: 0 Content: GM Map: 0 params { params { value: 2 key: etype } params { value: effect key: type }
- } } } action: 2 }
- 
- 02/05/19 02:21:00 quest { questid: 54550001 charid: 4299674004 questdata { config { Auto: 0 Class: 0 QuestName: Mutated Cramp SubGroup: 0 Type: wanted FailJump: 0 TraceInfo: WhetherTrace: 1 FirstClass
-: 0 Level: 0 RewardGroup: 0 Name: Mutated Cramp FinishJump: 0 Content: GM Map: 0 params { params { value: 2 key: etype } params { value: effect key: type } } } } action: 2 }
-
-02/06/19 09:27:38 RECV< ROM_RecvUpdateWantedQuestTeamCmd ACCEPTED step=7 questid=55070001 MY TEAM[4300736919] τÑ₧τºÿτÜäµëïµÄî
-02/06/19 09:27:38 quest { step: 7 action: 1 questid: 55070001 charid: 4300736919 questdata { config { Level: 0 RewardGroup: 0 Name: Mystical Palms FinishJump: 0 Content: visit Map: 0 params { params {
- value: 1 key: ifAccessFc } params { value: 1 key: mark_team_wanted } params { value: 1016 key: npc } } Auto: 0 Class: 0 QuestName: Mystical Palms SubGroup: 4 Type: wanted FailJump: 0 TraceInfo: Go to
- the Mission Board of a nearby city to submit quests WhetherTrace: 0 FirstClass: 0 } } }
-02/06/19 09:27:39 RECV: RecvMemberPosUpdate id: 4313990901 pos { y: 119 z: 7770 x: -7129 }
-02/06/19 09:27:40 RECV< ROM_RecvMemberDataUpdate id=4313990901 [α╕₧α╕▓α╕ùα╣ëα╕¡α╣üα╕ùα╣ë] mapid=47  raid=0  guildraidindex=0
-
-2/06/19 10:25:23 Found quest id=54620001,type=wanted,map=37,step=1,acceptlv=88,traceTitle=ΦíÇµƒôτÜäµòÖσáé,traceInfo=Go to Glast Heim Churchyard to take a picture of the Ruins┬╖Sage's End,process=0,fi
-ishcount=4,questDataStepType=selfie,scope=cityScope,orderId=54620001,instanceID=162630,questListType=1,whetherTrace=1,time=1549404000,params.distance=5,params.cameraId=9,params.button=µïìτàº,params.i
-emIcon=74,
-2/06/19 10:25:23 RECV< ROM_RecvUpdateWantedQuestTeamCmd ACCEPTED step=3 questid=54620001 MY TEAM[4300736919] ΦíÇµƒôτÜäµòÖσáé
-
-02/08/19 09:11:24 quest { questdata { config { RewardGroup: 0 Name: Blue Gem FinishJump: 0 Content: visit Map: 0 params { params { value: 1 key: ifAccessFc } params { value: 1 key: mark_team_wanted }
-params { value: 1016 key: npc } } Auto: 0 Class: 0 QuestName: Blue Gem SubGroup: 4 Type: wanted FailJump: 0 TraceInfo: Go to the Mission Board of a nearby city to submit quests WhetherTrace: 0 FirstCl
-ass: 0 Level: 0 } } step: 7 action: 1 questid: 55030001 charid: 4300736919 }
-02/08/19 09:11:25 RECV: RecvQuestStepUpdate data { config { RewardGroup: 0 Name: Blue Gem FinishJump: 0 Content: visit Map: 43 params { params { items { items { key: 1 value: 88894 } } key: dialog } p
-arams { key: npc value: 6507 } params { key: uniqueid value: 6507 } } Auto: 1 Class: 0 QuestName: Blue Gem SubGroup: 4 Type: wanted FailJump: 0 TraceInfo: Give 8 Cyfars to Thelma WhetherTrace: 1 First
-Class: 0 Level: 0 } } step: 6 id: 55030001
-
-2/08/19 09:25:31 RECV< ROM_RecvMemberDataUpdate id=4313990901 [α╕₧α╕▓α╕ùα╣ëα╕¡α╣üα╕ùα╣ë] mapid=26  raid=0  guildraidindex=0
-2/08/19 09:25:31 Found quest id=55030001,type=wanted,map=43,step=6,finishcount=2,questListType=1,acceptlv=89,traceInfo=Give 8 Cyfars to Thelma,traceTitle=Φô¥Φë▓σ«¥τƒ│,questDataStepType=visit,time=154
-576800,whetherTrace=1,process=0,scope=cityScope,instanceID=35250,orderId=55030001,params.npc=6507,params.uniqueid=6507,
-2/08/19 09:25:31 SEND: SceneQuest_pb.VisitNpcUserCmd npctempid: 2147485661
-2/08/19 09:25:31 SEND: SceneQuest_pb.RunQuestStep questid: 55030001 step: 6
- 
- ]]
+        
 		if data.quest.action == 1 then 
 			local shouldAccept = false
 			if data.quest.step then
